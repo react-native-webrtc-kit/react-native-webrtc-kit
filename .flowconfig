@@ -1,0 +1,26 @@
+[ignore]
+# example以下は一切解析する必要が無いので無視するようにする
+.*/example/.*
+
+[include]
+
+[untyped]
+# node_modules以下に対して全ての型チェックを消去する
+# この [untyped] は最近追加されたオプションのようで、公式ドキュメントにすら記載がない
+# 参考: https://github.com/facebook/flow/issues/869#issuecomment-385961451
+# 参考: https://flow.org/en/docs/config/libs/
+#
+# ほかにも node_modules 内に対する余計なタイプチェックを防ぐ方法は色々あるが
+# 現状この方法が最も安定して使える
+# 他の方法については以下のリンクを参照すると良い
+# 参考: https://qiita.com/gyarasu/items/0f0be114490981bd8cab (libs扱いにする方法、試してみたが旨く動作せず)
+# 参考: https://qiita.com/zaki-yama/items/3567b316f0fb62986809 (flow-typedを使う方法、あまりにも負担が大きくなりすぎるので却下)
+.*/node_modules/.*
+
+[libs]
+
+[lints]
+
+[options]
+
+[strict]

@@ -1,0 +1,33 @@
+source 'https://github.com/shiguredo/sora-ios-sdk-specs.git'
+source 'https://github.com/CocoaPods/Specs.git'
+
+platform :ios, '10.0'
+
+inhibit_all_warnings!
+
+node_modules_path = '../node_modules'
+
+react_native_webrtc_kit_path = '../../..'
+
+target 'Touchstone' do
+
+  pod 'yoga', path: "#{node_modules_path}/react-native/ReactCommon/yoga/yoga.podspec"
+  pod 'React', path: "#{node_modules_path}/react-native"
+
+  pod 'ReactNativeWebRTCKit', :path => "#{react_native_webrtc_kit_path}/ios"
+
+  # Add new pods below this line
+  
+  target 'TouchstoneTests' do
+    inherit! :search_paths
+  end
+
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    if target.name == "React"
+      target.remove_from_project
+    end
+  end
+end

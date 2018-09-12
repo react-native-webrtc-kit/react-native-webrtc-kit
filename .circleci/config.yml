@@ -1,0 +1,32 @@
+version: 2
+jobs:
+  ios:
+    macos:
+      xcode: "9.4.0"
+    working_directory: ~/react-native-webrtc-kit/
+    environment:
+      FL_OUTPUT_DIR: output
+      FASTLANE_LANE: test
+    shell: /bin/bash --login -o pipefail
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - pods-{{ checksum "test/Touchstone/ios/Podfile.lock" }}
+            - pods-
+      - run:
+          command: yarn install
+          working_directory: test/Touchstone
+      - run:
+          command: pod install
+          working_directory: test/Touchstone/ios
+      - save_cache:
+          key: pods-{{ checksum "test/Touchstone/ios/Podfile.lock" }}
+          paths:
+            - test/Touchstone/ios/Pods
+
+workflows:
+  version: 2
+  react-native:
+    jobs:
+      - ios
