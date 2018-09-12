@@ -1,0 +1,42 @@
+{
+  "name": "react-native-webrtc-kit",
+  "version": "1.0.0",
+  "description": "WebRTC for React Native",
+  "main": "index.js",
+  "keywords": [
+    "react-native",
+    "webrtc"
+  ],
+  "author": "Shiguredo Inc <info@shiguredo.jp>",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=16.4.1",
+    "react-native": ">=0.56.1"
+  },
+  "devDependencies": {
+    "babel-jest": "^23.6.0",
+    "babel-preset-react-native": "^5",
+    "jest": "^23.6.0",
+    "react-test-renderer": "^16.5.0",
+    "esdoc": "^1.1.0",
+    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
+    "esdoc-flow-type-plugin": "^1.1.0",
+    "esdoc-react-plugin": "^1.0.1",
+    "esdoc-standard-plugin": "^1.0.0"
+  },
+  "dependencies": {
+    "event-target-shim": "^3.0.2",
+    "prop-types": "^15.6.2"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shiguredo/react-native-webrtc-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shiguredo/react-native-webrtc-kit/issues"
+  },
+  "homepage": "https://github.com/shiguredo/react-native-webrtc-kit#readme"
+}

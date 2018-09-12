@@ -1,0 +1,30 @@
+{
+  "source": "./src",
+  "destination": "./docs/apiref",
+  "plugins": [
+    {
+      "name": "esdoc-standard-plugin",
+      "option": {
+        "accessor": {
+          "access": [
+            "public",
+            "protected"
+          ],
+          "autoPrivate": true
+        }
+      }
+    },
+    {
+      "name": "esdoc-ecmascript-proposal-plugin",
+      "option": {
+        "all": true
+      }
+    },
+    {
+      "name": "esdoc-flow-type-plugin",
+      "option": {
+        "enable": true
+      }
+    }
+  ]
+}
