@@ -14,7 +14,7 @@ target 'Touchstone' do
   pod 'yoga', path: "#{node_modules_path}/react-native/ReactCommon/yoga/yoga.podspec"
   pod 'React', path: "#{node_modules_path}/react-native"
 
-  pod 'ReactNativeWebRTCKit', :path => "#{react_native_webrtc_kit_path}/ios"
+  pod 'ReactNativeWebRTCKit', :path => "#{react_native_webrtc_kit_path}"
 
   # Add new pods below this line
   
