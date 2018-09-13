@@ -18,6 +18,9 @@ jobs:
           command: yarn install
           working_directory: test/Touchstone
       - run:
+          command: react-native link
+          working_directory: test/Touchstone
+      - run:
           command: pod install
           working_directory: test/Touchstone/ios
       - save_cache:
