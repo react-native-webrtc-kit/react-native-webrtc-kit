@@ -38,3 +38,4 @@ workflows:
               only:
                 - master
                 - develop
+                - /feature\/.*/
