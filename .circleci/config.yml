@@ -29,4 +29,9 @@ workflows:
   version: 2
   react-native:
     jobs:
-      - ios
+      - ios:
+          filters:
+            branches:
+              only:
+                - master
+                - develop
