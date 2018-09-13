@@ -15,6 +15,9 @@ jobs:
             - pods-{{ checksum "test/Touchstone/ios/Podfile.lock" }}
             - pods-
       - run:
+          command: yarn global add react-native-cli
+          working_directory: test/Touchstone
+      - run:
           command: yarn install
           working_directory: test/Touchstone
       - run:
