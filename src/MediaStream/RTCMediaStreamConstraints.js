@@ -75,7 +75,7 @@ export default class RTCMediaStreamConstraints {
      * デフォルトの制約は以下の通りです。
      * 
      * - `video.facingMode = 'user'`
-     * - `video.widtch = 1280`
+     * - `video.width = 1280`
      * - `video.height = 720`
      * - `video.frameRate = 30`
      * - `audio = true`
