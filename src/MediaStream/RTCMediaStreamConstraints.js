@@ -104,6 +104,12 @@ export default class RTCMediaStreamConstraints {
                 frameRate: video.frameRate
             };
         }
+        var audio = this.audio;
+        if(audio === true || audio === null){
+          json.audio = DEFAULT_AUDIO_CONSTRAINTS;
+        } else {
+          json.audio = audio;
+        }
 
         return json;
     }
