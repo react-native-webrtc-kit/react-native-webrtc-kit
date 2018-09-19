@@ -9,6 +9,11 @@
 - FIX
     - バグ修正
 
+## develop
+
+- [FIX] audio トラックが常に NO になってしまう問題を修正 @kdxu
+- [FIX] ドキュメントの typo 修正 @kdxu
+
 ## 1.0.0
 
 リリース
