@@ -20,7 +20,9 @@ RCT_EXPORT_MODULE()
 RCT_CUSTOM_VIEW_PROPERTY(objectFit, NSString *, WebRTCVideoView) {
     NSString *s = [RCTConvert NSString:json];
     UIViewContentMode contentMode;
-    if ([s isEqualToString:@"cover"]) {
+    if ([s isEqualToString:@"fill"]) {
+        contentMode = UIViewContentModeScaleToFill;
+    } else if ([s isEqualToString:@"cover"]) {
         contentMode = UIViewContentModeScaleAspectFit;
     } else if ([s isEqualToString:@"contain"]) {
         contentMode = UIViewContentModeScaleAspectFill;

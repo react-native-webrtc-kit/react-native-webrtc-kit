@@ -14,6 +14,9 @@ import type { ValueTag } from '../PeerConnection/RTCPeerConnection';
  * 映像のサイズ調整方法です。
  * CSS の `object-fit` に近い動作の設定です。
  * 
+ * - `'fill'` -
+ *   アスペクト比を無視してビュー全体を埋めます。
+ *   
  * - `'contain'` -
  *   アスペクト比を維持しつつ、ビュー全体の中にビデオが収まるようにします
  *   (空白になる領域が存在する可能性があります) 。
@@ -28,6 +31,7 @@ import type { ValueTag } from '../PeerConnection/RTCPeerConnection';
  * @see https://www.w3.org/TR/html5/rendering.html#video-object-fit
   */
 export type RTCObjectFit =
+  | 'fill'
   | 'contain'
   | 'cover'
 
@@ -41,7 +45,7 @@ type Props = {
 const NativeProps = {
   name: 'WebRTCVideoView',
   propTypes: {
-    objectFit: PropTypes.oneOf(['contain', 'cover']),
+    objectFit: PropTypes.oneOf(['fill', 'contain', 'cover']),
     streamValueTag: PropTypes.string,
     ...ViewPropTypes
   }
