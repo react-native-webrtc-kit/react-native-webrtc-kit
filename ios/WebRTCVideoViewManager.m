@@ -28,6 +28,7 @@ RCT_CUSTOM_VIEW_PROPERTY(objectFit, NSString *, WebRTCVideoView) {
         contentMode = UIViewContentModeScaleAspectFill;
     }
     view.contentMode = contentMode;
+    [view setNeedsLayout];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(streamValueTag, NSString, WebRTCVideoView) {
