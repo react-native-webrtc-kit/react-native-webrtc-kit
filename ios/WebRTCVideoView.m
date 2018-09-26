@@ -73,8 +73,11 @@ NS_ASSUME_NONNULL_BEGIN
     CGRect newFrame;
     if (width <= 0 || height <= 0) {
         newFrame = CGRectZero;
+    } else if (self.contentMode == UIViewContentModeScaleToFill) {
+        // objectFit: fill
+        newFrame = self.bounds;
     } else if (self.contentMode == UIViewContentModeScaleAspectFill) {
-        // cover
+        // objectFit: cover
         newFrame = self.bounds;
         if (newFrame.size.width != width || newFrame.size.height != height) {
             CGFloat scaleFactor = MAX(newFrame.size.width / width, newFrame.size.height / height);
@@ -86,6 +89,7 @@ NS_ASSUME_NONNULL_BEGIN
             newFrame.size.height = height;
         }
     } else {
+        // objectFit: contain
         newFrame = AVMakeRectWithAspectRatioInsideRect(CGSizeMake(width, height), self.bounds);
     }
     

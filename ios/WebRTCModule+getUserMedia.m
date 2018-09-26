@@ -178,16 +178,6 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
 
 @implementation WebRTCModule (getUserMedia)
 
-/**
- * {@link https://www.w3.org/TR/mediacapture-streams/#navigatorusermediaerrorcallback}
- */
-typedef void (^NavigatorUserMediaErrorCallback)(NSString *errorType, NSString *errorMessage);
-
-/**
- * {@link https://www.w3.org/TR/mediacapture-streams/#navigatorusermediasuccesscallback}
- */
-typedef void (^NavigatorUserMediaSuccessCallback)(RTCMediaStream *mediaStream);
-
 #pragma mark - React Native Exports
 
 RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
@@ -199,7 +189,7 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
     // そのため、音声のみ必要な場合でもカメラを起動する必要がある
     if (constraints.video) {
         AVCaptureDevicePosition *position;
-        if (constraints.video.facingMode == WebRTCFacingModeUser)
+        if ([constraints.video.facingMode isEqualToString: WebRTCFacingModeUser])
             position = AVCaptureDevicePositionFront;
         else
             position = AVCaptureDevicePositionBack;

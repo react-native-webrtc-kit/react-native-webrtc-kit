@@ -105,10 +105,10 @@ export default class RTCMediaStreamConstraints {
             };
         }
         var audio = this.audio;
-        if(audio === true || audio === null){
-          json.audio = DEFAULT_AUDIO_CONSTRAINTS;
+        if (audio === true || audio === null) {
+            json.audio = DEFAULT_AUDIO_CONSTRAINTS;
         } else {
-          json.audio = audio;
+            json.audio = audio;
         }
 
         return json;
