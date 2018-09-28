@@ -244,6 +244,9 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
     // constraints の指定に従ってトラックの可否を決める
     videoTrack.isEnabled = constraints.video ? YES : NO;
     audioTrack.isEnabled = constraints.audio ? YES : NO;
+
+    // アスペクト比の設定
+    videoTrack.aspectRatio = constraints.video.aspectRatio;
     
     // トラックの情報を集める
     NSMutableArray *tracks = [NSMutableArray array];

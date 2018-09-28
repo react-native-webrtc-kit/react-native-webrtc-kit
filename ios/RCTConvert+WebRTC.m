@@ -151,6 +151,8 @@ NS_ASSUME_NONNULL_BEGIN
                        NSNumber, videoConsts[@"height"]);
         AssertNullable(@"RTCMediaStreamConstraints.video.frameRate",
                        NSNumber, videoConsts[@"frameRate"]);
+        AssertNullable(@"RTCMediaStreamConstraints.video.aspectRatio",
+                       NSNumber, videoConsts[@"aspectRatio"]);
         AssertNullable(@"RTCMediaStreamConstraints.video.sourceId",
                        NSString, videoConsts[@"sourceId"]);
         
@@ -176,6 +178,10 @@ NS_ASSUME_NONNULL_BEGIN
         NSNumber *frameRate = videoConsts[@"frameRate"];
         if (frameRate)
             consts.video.frameRate = [frameRate intValue];
+        
+        NSNumber *aspectRatio = videoConsts[@"aspectRatio"];
+        if (aspectRatio)
+            consts.video.aspectRatio = (CGFloat)[aspectRatio doubleValue];
         
         NSString *sourceId = videoConsts[@"sourceId"];
         if (sourceId)
