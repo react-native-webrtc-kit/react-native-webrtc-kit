@@ -37,7 +37,14 @@ static WebRTCModule *sharedModule;
         RTCEnableMetrics();
         sharedModule = self;
         
-        self.peerConnectionFactory = [[RTCPeerConnectionFactory alloc] init];
+        RTCDefaultVideoEncoderFactory *encoderFactory =
+        [[RTCDefaultVideoEncoderFactory alloc] init];
+        RTCDefaultVideoDecoderFactory *decoderFactory =
+        [[RTCDefaultVideoDecoderFactory alloc] init];
+        self.peerConnectionFactory =
+        [[RTCPeerConnectionFactory alloc]
+         initWithEncoderFactory: encoderFactory
+         decoderFactory: decoderFactory];
         self.peerConnections = [NSMutableDictionary dictionary];
         self.localStreams = [NSMutableDictionary dictionary];
         self.localTracks = [NSMutableDictionary dictionary];
