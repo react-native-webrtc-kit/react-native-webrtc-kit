@@ -119,9 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     NSString *semantics = Nullable(json[@"sdpSemantics"]);
     if (semantics) {
-        if ([semantics isEqualToString: @"default"])
-            config.sdpSemantics = RTCSdpSemanticsDefault;
-        else if ([semantics isEqualToString: @"planb"])
+        if ([semantics isEqualToString: @"planb"])
             config.sdpSemantics = RTCSdpSemanticsPlanB;
         else if ([semantics isEqualToString: @"unified"])
             config.sdpSemantics = RTCSdpSemanticsUnifiedPlan;
