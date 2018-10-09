@@ -141,6 +141,23 @@ RCT_EXPORT_METHOD(trackSetAspectRatio:(nonnull NSNumber *)aspectRatio
     }
 }
 
+
+RCT_EXPORT_METHOD(addTrack:(nonnull NSString *)trackId
+                  valueTag:(nonnull NSString *)valueTag
+                  kind:(nonnull NSString*) kind)
+{
+    RTCMediaStream *stream = [self streamForValueTag: valueTag];
+    if (stream) {
+        if ([kind isEqualToString:@"audio"]) {
+            RTCAudioTrack *track = [self createAudioTrack: trackId]
+            [stream addAudioTrack:(RTCAudioTrack *)track];
+        } else if([kind isEqualToString:@"video"]) {
+            RTCAudioTrack *track = [self createVideoTrack: trackId]
+            [stream addVideoTrack:(RTCVideoTrack *)track];
+        }
+    }
+}
+
 @end
 
 NS_ASSUME_NONNULL_END
