@@ -28,6 +28,22 @@ static void *valueTagKey = "valueTag";
     return nil;
 }
 
+- (nullable RTCAudioTrack *)createAudioTrack:(NSString *)trackId
+{
+    RTCAudioSource *audioSource = [self.peerConnectionFactory audioSourceWithConstraints: nil];
+    RTCAudioTrack *audioTrack = [self.peerConnectionFactory audioTrackWithSource: audioSource trackId: trackId];
+    return audioTrack;
+}
+
+- (nullable RTCVideoTrack *)createVideoTrack:(NSString *)trackId
+{
+    RTCVideoSource *videoSource = [self.peerConnectionFactory videoSource];
+    RTCVideoTrack *videoTrack = [self.peerConnectionFactory  videoTrackWithSource: videoSource
+                                                                          trackId: trackId];
+    return videoTrack;
+}
+
+
 @end
 
 @implementation RTCVideoTrack (ReactNativeWebRTCKit)
@@ -65,6 +81,23 @@ RCT_EXPORT_METHOD(trackSetEnabled:(nonnull NSNumber *)isEnabled
         RTCMediaStreamTrack *track = [stream trackForTrackId: trackId];
         if (track)
             track.isEnabled = [isEnabled boolValue];
+    }
+}
+
+
+RCT_EXPORT_METHOD(addTrack:(nonnull NSString *)trackId
+                  valueTag:(nonnull NSString *)valueTag
+                  kind:(nonnull NSString*) kind)
+{
+    RTCMediaStream *stream = [self streamForValueTag: valueTag];
+    if (stream) {
+        if ([kind isEqualToString:@"audio"]) {
+            RTCAudioTrack *track = [self createAudioTrack: trackId]
+            [stream addAudioTrack:(RTCAudioTrack *)track];
+        } else if([kind isEqualToString:@"video"]) {
+            RTCAudioTrack *track = [self createVideoTrack: trackId]
+            [stream addVideoTrack:(RTCVideoTrack *)track];
+        }
     }
 }
 
