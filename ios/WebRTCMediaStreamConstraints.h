@@ -1,4 +1,5 @@
-#import <Foundation/Foundation.h>
+@import Foundation;
+@import AVFoundation;
 
 extern const NSString *WebRTCFacingModeUser;
 extern const NSString *WebRTCFacingModeEnvironment;
@@ -9,6 +10,7 @@ extern const NSString *WebRTCFacingModeEnvironment;
 @property (assign) int width;
 @property (assign) int height;
 @property (assign) int frameRate;
+@property (assign) CGFloat aspectRatio;
 
 // 映像ソースにするデバイス (AVCaptureDevice) の ID
 @property (copy, nullable) NSString *sourceId;

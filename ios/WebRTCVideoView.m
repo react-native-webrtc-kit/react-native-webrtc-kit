@@ -1,5 +1,6 @@
 @import AVFoundation;
 
+#import "WebRTCModule+RTCMediaStream.h"
 #import "WebRTCVideoView.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -73,8 +74,16 @@ NS_ASSUME_NONNULL_BEGIN
     CGRect newFrame;
     if (width <= 0 || height <= 0) {
         newFrame = CGRectZero;
+    } else if (self.videoTrack.aspectRatio > 0) {
+        CGFloat ratio = self.videoTrack.aspectRatio;
+        newFrame = self.bounds;
+        newFrame.size.width = newFrame.size.height * ratio;
+        newFrame.origin.x += (self.bounds.size.width - newFrame.size.width) / 2.0;
+    } else if (self.contentMode == UIViewContentModeScaleToFill) {
+        // objectFit: fill
+        newFrame = self.bounds;
     } else if (self.contentMode == UIViewContentModeScaleAspectFill) {
-        // cover
+        // objectFit: cover
         newFrame = self.bounds;
         if (newFrame.size.width != width || newFrame.size.height != height) {
             CGFloat scaleFactor = MAX(newFrame.size.width / width, newFrame.size.height / height);
@@ -86,6 +95,7 @@ NS_ASSUME_NONNULL_BEGIN
             newFrame.size.height = height;
         }
     } else {
+        // objectFit: contain
         newFrame = AVMakeRectWithAspectRatioInsideRect(CGSizeMake(width, height), self.bounds);
     }
     

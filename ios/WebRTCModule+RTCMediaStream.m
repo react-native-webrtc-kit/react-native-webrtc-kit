@@ -30,6 +30,28 @@ static void *valueTagKey = "valueTag";
 
 @end
 
+@implementation RTCVideoTrack (ReactNativeWebRTCKit)
+
+static void *aspectRatioKey = "aspectRatio";
+
+- (CGFloat)aspectRatio
+{
+    NSNumber *ratio = objc_getAssociatedObject(self, aspectRatioKey);
+    if (ratio)
+        return (CGFloat)[ratio doubleValue];
+    else
+        return -1;
+}
+
+- (void)setAspectRatio:(CGFloat)aspectRatio
+{
+    objc_setAssociatedObject(self, aspectRatioKey,
+                             [[NSNumber alloc] initWithDouble: aspectRatio],
+                             OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+@end
+
 @implementation WebRTCModule (RTCMediaStream)
 
 // MARK: -trackSetEnabled:trackId:valueTag:

@@ -13,6 +13,7 @@ const NSString *WebRTCFacingModeEnvironment =  @"environment";
         _width = -1;
         _height = -1;
         _frameRate = -1;
+        _aspectRatio = -1;
     }
     return self;
 }
@@ -26,6 +27,7 @@ const NSString *WebRTCFacingModeEnvironment =  @"environment";
     consts.width = _width;
     consts.height = _height;
     consts.frameRate = _frameRate;
+    consts.aspectRatio = _aspectRatio;
     return consts;
 }
 

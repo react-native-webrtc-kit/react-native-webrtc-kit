@@ -1,4 +1,5 @@
 @import Foundation;
+@import AVFoundation;
 
 #import "WebRTCModule.h"
 
@@ -9,6 +10,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) NSString *valueTag;
 
 - (nullable RTCMediaStreamTrack *)trackForTrackId:(NSString *)trackId;
+
+@end
+
+@interface RTCVideoTrack (ReactNativeWebRTCKit)
+
+@property (nonatomic) CGFloat aspectRatio;
 
 @end
 
