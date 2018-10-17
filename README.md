@@ -42,9 +42,9 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ### iOS アプリケーションの開発
 
-- iOS 10.0 以降
+- iOS 12.0 以降
 
-- Xcode 9.4
+- Xcode 10
 
 - CocoaPods 1.5.0
 
@@ -54,7 +54,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ## WebRTC ライブラリについて
 
-本ライブラリは WebRTC M66 に対応しています。
+本ライブラリは WebRTC M70 に対応しています。
 
 本ライブラリが利用する WebRTC ライブラリは、デフォルトの設定では弊社がビルドしたバイナリを指定しています (https://github.com/shiguredo/sora-webrtc-ios) 。このバイナリは弊社製品用の設定でビルドしてあるので、他のバイナリを使いたい場合は次の方法で入れ替えてください。
 
