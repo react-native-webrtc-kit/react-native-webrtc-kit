@@ -3,6 +3,7 @@
 import { NativeModules } from 'react-native';
 import RTCMediaStreamTrackEventTarget from './RTCMediaStreamTrackEventTarget';
 import WebRTC from '../WebRTC';
+import { RTCAspectRatio, aspectRatioValue } from './RTCMediaStreamConstraints';
 
 /**
  * トラックの状態を表します。
@@ -49,6 +50,7 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
     remote: boolean;
 
     _enabled: boolean;
+    _aspectRatio: number | null;
 
     /**
      * トラックの出力の可否
@@ -70,6 +72,19 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
         }
         this._enabled = enabled;
         WebRTC.trackSetEnabled(this.id, this.streamValueTag, enabled);
+    }
+
+    get aspectRatio(): number | null {
+        return this._aspectRatio;
+    }
+
+    set aspectRatio(ratio: RTCAspectRatio | number | null): void {
+        let value = aspectRatioValue(ratio);
+        if (this._aspectRatio == value) {
+            return;
+        }
+        this._aspectRatio = value;
+        WebRTC.trackSetAspectRatio(this.id, this.streamValueTag, value);
     }
 
     /**
