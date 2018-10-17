@@ -17,6 +17,19 @@ export type RTCAspectRatio =
     | '16:9'
 
 /**
+ * @package
+ */
+export function aspectRatioValue(ratio: RTCAspectRatio | number | null): number | null {
+    if (ratio === '4:3') {
+        return 1.3333333333;
+    } else if (ratio === '16:9') {
+        return 1.7777777778;
+    } else {
+        return ratio;
+    }
+}
+
+/**
  * 映像に関する制約です。
  */
 export class RTCMediaStreamVideoConstraints {
@@ -106,20 +119,12 @@ export default class RTCMediaStreamConstraints {
             video = DEFAULT_VIDEO_CONSTRAINTS;
         }
         if (video) {
-            var aspectRatio;
-            if (video.aspectRatio == '4:3') {
-                aspectRatio = 1.3333333333;
-            } else if (video.aspectRatio == '16:9') {
-                aspectRatio = 1.7777777778;
-            } else {
-                aspectRatio = video.aspectRatio;
-            }
             json.video = {
                 facingMode: video.facingMode,
                 width: video.width,
                 height: video.height,
                 frameRate: video.frameRate,
-                aspectRatio: aspectRatio
+                aspectRatio: aspectRatioValue(video.aspectRatio)
             };
         }
         var audio = this.audio;
