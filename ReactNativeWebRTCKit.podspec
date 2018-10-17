@@ -16,5 +16,5 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   
   s.dependency "React"
-  s.dependency "WebRTC", "~> 66.8.0" # source 'https://github.com/shiguredo/sora-ios-sdk-specs.git'
+  s.dependency "WebRTC", "~> 70.17.0" # source 'https://github.com/shiguredo/sora-ios-sdk-specs.git'
 end
