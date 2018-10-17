@@ -101,6 +101,21 @@ RCT_EXPORT_METHOD(addTrack:(nonnull NSString *)trackId
     }
 }
 
+// MARK: -trackSetAspectRatio:trackId:valueTag:
+
+RCT_EXPORT_METHOD(trackSetAspectRatio:(nonnull NSNumber *)aspectRatio
+                  trackId:(nonnull NSString *)trackId
+                  valueTag:(nonnull NSString *)valueTag)
+{
+    RTCMediaStream *stream = [self streamForValueTag: valueTag];
+    if (stream) {
+        RTCMediaStreamTrack *track = [stream trackForTrackId: trackId];
+        if ([track isKindOfClass: [RTCVideoTrack class]]) {
+            ((RTCVideoTrack *)track).aspectRatio = [aspectRatio doubleValue];
+        }
+    }
+}
+
 @end
 
 NS_ASSUME_NONNULL_END

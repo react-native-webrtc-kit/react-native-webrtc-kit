@@ -84,4 +84,10 @@ export default class WebRTC {
     WebRTCModule.trackSetEnabled(enabled, valueTag, streamValueTag);
   }
 
+  static trackSetAspectRatio(valueTag: ValueTag,
+    streamValueTag: ValueTag,
+    aspectRatio: number) {
+    WebRTCModule.trackSetAspectRatio(aspectRatio, valueTag, streamValueTag);
+  }
+
 }
