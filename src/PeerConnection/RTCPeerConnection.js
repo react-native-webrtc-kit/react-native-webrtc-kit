@@ -144,6 +144,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   _localStreams: Array<RTCMediaStream> = [];
   _remoteStreams: Array<RTCMediaStream> = [];
   _nativeEventListeners: Array<any> = [];
+  _constraints: RTCMediaConstraints;
 
   /**
    * オブジェクトを生成し、リモートのピアまたはサーバーに接続します。
@@ -170,6 +171,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
       constraints = new RTCMediaConstraints();
     }
     this._valueTag = (nextPeerConnectionValueTag++).toString();
+    this._constraints = constraints;
     WebRTC.peerConnectionInit(this._valueTag,
       configuration,
       constraints);
@@ -405,7 +407,13 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
         const stream: RTCMediaStream = new RTCMediaStream(ev.streamId, ev.streamValueTag);
         const tracks: Array<any> = ev.tracks;
         for (let i = 0; i < tracks.length; i++) {
-          stream.addTrack(new RTCMediaStreamTrack(tracks[i]));
+          let track = new RTCMediaStreamTrack(tracks[i]);
+          if (track.kind == 'video') {
+            if (this._constraints.video) {
+              track.aspectRatio = this._constraints.video.aspectRatio;
+            }
+          }
+          stream.addTrack(track);
         }
         this._remoteStreams.push(stream);
         this.dispatchEvent(new RTCMediaStreamEvent('addstream', { stream }));
