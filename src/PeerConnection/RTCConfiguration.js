@@ -1,5 +1,7 @@
+// @flow
+
 import RTCIceServer from './RTCIceServer';
-import RTCIceTransportPolicy from './RTCIceTransportPolicy';
+import type { RTCIceTransportPolicy } from './RTCIceTransportPolicy';
 
 /**
  * SDP でのマルチストリームの記述方式です。
