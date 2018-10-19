@@ -6,7 +6,7 @@ import WebRTC from '../WebRTC';
 import aspectRatioValue from './RTCMediaStreamConstraints';
 import type { RTCAspectRatio } from './RTCMediaStreamConstraints';
 
-export type RTCMediaStreamTracKind =
+export type RTCMediaStreamTrackKind =
     | 'video'
     | 'audio';
 
