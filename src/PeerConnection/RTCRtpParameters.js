@@ -1,6 +1,6 @@
 // @flow
 
-import type { RTCMediaStreamTracKind } from '../MediaStream/RTCMediaStreamTrack';
+import type { RTCMediaStreamTrackKind } from '../MediaStream/RTCMediaStreamTrack';
 
 export type RTCRtpCodec =
   | 'rtx'
@@ -96,7 +96,7 @@ export class RTCRtpCodecParameters {
 
   payloadType: number;
   codec: RTCRtpCodec;
-  kind: RTCMediaStreamTracKind;
+  kind: RTCMediaStreamTrackKind;
   clockRate: String | null;
   numChannels: number | null;
   parameters: Map<String, String> = new Map();
