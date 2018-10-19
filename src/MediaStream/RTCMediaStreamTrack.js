@@ -42,7 +42,7 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
      * - `'video'` - 映像トラック
      * - `'audio'` - 音声トラック
      */
-    kind: string;
+    kind: RTCMediaStreamTrackKind;
 
     /**
      * トラックの状態
