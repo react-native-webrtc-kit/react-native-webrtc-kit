@@ -3,7 +3,8 @@
 import { NativeModules } from 'react-native';
 import RTCMediaStreamTrackEventTarget from './RTCMediaStreamTrackEventTarget';
 import WebRTC from '../WebRTC';
-import { RTCAspectRatio, aspectRatioValue } from './RTCMediaStreamConstraints';
+import aspectRatioValue from './RTCMediaStreamConstraints';
+import type { RTCAspectRatio } from './RTCMediaStreamConstraints';
 
 /**
  * トラックの状態を表します。
