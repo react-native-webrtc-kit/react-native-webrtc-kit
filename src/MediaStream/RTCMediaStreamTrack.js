@@ -6,6 +6,10 @@ import WebRTC from '../WebRTC';
 import aspectRatioValue from './RTCMediaStreamConstraints';
 import type { RTCAspectRatio } from './RTCMediaStreamConstraints';
 
+export type RTCMediaStreamTracKind =
+    | 'video'
+    | 'audio';
+
 /**
  * トラックの状態を表します。
  * 

@@ -24,6 +24,12 @@ export type { RTCPeerConnectionState } from './src/PeerConnection/RTCPeerConnect
 export type { RTCSignalingState } from './src/PeerConnection/RTCPeerConnection';
 export type { RTCIceGatheringState } from './src/PeerConnection/RTCPeerConnection';
 export type { RTCIceConnectionState } from './src/PeerConnection/RTCPeerConnection';
+export type { RTCRtcpParameters } from './src/PeerConnection/RTCRtpParameters';
+export type { RTCRtpCodec } from './src/PeerConnection/RTCRtpParameters';
+export type { RTCRtpParameters } from './src/PeerConnection/RTCRtpParameters';
+export type { RTCRtpHeaderExtension } from './src/PeerConnection/RTCRtpParameters';
+export type { RTCRtpEncodingParameters } from './src/PeerConnection/RTCRtpParameters';
+export type { RTCRtpCodecParameters } from './src/PeerConnection/RTCRtpParameters';
 export type { ValueTag } from './src/PeerConnection/RTCPeerConnection';
 export type { RTCFacingMode } from './src/MediaStream/RTCMediaStreamConstraints';
 export type { RTCSdpType } from './src/PeerConnection/RTCSessionDescription';
