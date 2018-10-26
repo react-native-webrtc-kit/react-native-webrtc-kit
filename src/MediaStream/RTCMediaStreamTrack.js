@@ -5,6 +5,7 @@ import RTCMediaStreamTrackEventTarget from './RTCMediaStreamTrackEventTarget';
 import WebRTC from '../WebRTC';
 import aspectRatioValue from './RTCMediaStreamConstraints';
 import type { RTCAspectRatio } from './RTCMediaStreamConstraints';
+import type { ValueTag } from '../PeerConnection/RTCPeerConnection';
 
 export type RTCMediaStreamTrackKind =
     | 'video'
@@ -49,6 +50,7 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
      */
     remote: boolean;
 
+    _valueTag: ValueTag;
     _enabled: boolean;
     _aspectRatio: number | null;
 
@@ -96,6 +98,7 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
         this.kind = info.kind;
         this.readyState = info.readyState;
         this.remote = info.remote;
+        this._valueTag = info.valueTag;
         this._enabled = info.enabled;
     }
 
