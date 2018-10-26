@@ -27,11 +27,6 @@ export type RTCMediaStreamTrackState =
 export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget {
 
     /**
-     * 所属するストリームのタグ
-     */
-    streamValueTag: string;
-
-    /**
      * トラック ID
      */
     id: string;
@@ -97,7 +92,6 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
      */
     constructor(info: Object) {
         super();
-        this.streamValueTag = info.valueTag;
         this.id = info.id;
         this.kind = info.kind;
         this.readyState = info.readyState;
