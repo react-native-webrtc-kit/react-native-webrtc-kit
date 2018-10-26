@@ -222,14 +222,14 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
     }
     
     // ストリームを生成して、カメラの映像の出力先に指定する
-    NSString *valueTag = [self createNewValueTag];
-    RTCMediaStream *mediaStream = [self.peerConnectionFactory mediaStreamWithStreamId: valueTag];
-    mediaStream.valueTag = valueTag;
-    [WebRTCCamera.streamValueTags addObject: valueTag];
+    NSString *streamValueTag = [self createNewValueTag];
+    RTCMediaStream *mediaStream = [self.peerConnectionFactory mediaStreamWithStreamId: streamValueTag];
+    mediaStream.valueTag = streamValueTag;
+    [WebRTCCamera.streamValueTags addObject: streamValueTag];
     
     // JS からアクセスできるようにするため、
     // ストリームに対するモジュール ID をグローバルに保持する
-    self.localStreams[valueTag] = mediaStream;
+    self.localStreams[streamValueTag] = mediaStream;
 
     // 映像と音声のトラックをストリームに追加する
     RTCVideoSource *videoSource = [self.peerConnectionFactory videoSource];
@@ -238,6 +238,8 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
                                              trackId: [self createNewValueTag]];
     RTCAudioSource *audioSource = [self.peerConnectionFactory audioSourceWithConstraints: nil];
     RTCAudioTrack *audioTrack = [self.peerConnectionFactory audioTrackWithSource: audioSource trackId: [self createNewValueTag]];
+    videoTrack.valueTag = [self createNewValueTag];
+    audioTrack.valueTag = [self createNewValueTag];
     [mediaStream addVideoTrack: videoTrack];
     [mediaStream addAudioTrack: audioTrack];
     
@@ -253,22 +255,14 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
     for (NSString *propertyName in @[ @"audioTracks", @"videoTracks" ]) {
         SEL sel = NSSelectorFromString(propertyName);
         for (RTCMediaStreamTrack *track in [mediaStream performSelector:sel]) {
-            NSString *trackId = track.trackId;
-            
-            self.localTracks[trackId] = track;
-            [tracks addObject:@{@"valueTag": valueTag,
-                                @"enabled": @(track.isEnabled),
-                                @"id": trackId,
-                                @"kind": track.kind,
-                                @"readyState": @"live",
-                                @"remote": @(NO)
-                                }];
+            self.localTracks[track.valueTag] = track;
+            [tracks addObject: [track json]];
         }
     }
     
     // JS に処理を戻す
     resolve(@{@"streamId": mediaStream.streamId,
-              @"valueTag": valueTag,
+              @"valueTag": streamValueTag,
               @"tracks": tracks});
 }
 

@@ -7,16 +7,67 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation RTCPeerConnection (ReactNativeWebRTCKit)
+@implementation RTCRtpSender (ReactNativeWebRTCKit)
 
-static void *valueTagKey = "valueTag";
+static void *senderValueTagKey = "senderValueTag";
 
 - (nullable NSString *)valueTag {
-    return objc_getAssociatedObject(self, valueTagKey);
+    return objc_getAssociatedObject(self, senderValueTagKey);
 }
 
 - (void)setValueTag:(nullable NSString *)valueTag {
-    objc_setAssociatedObject(self, valueTagKey, valueTag, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, senderValueTagKey, valueTag, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+@end
+
+@implementation RTCRtpReceiver (ReactNativeWebRTCKit)
+
+static void *receiverValueTagKey = "receiverValueTag";
+
+- (nullable NSString *)valueTag {
+    return objc_getAssociatedObject(self, receiverValueTagKey);
+}
+
+- (void)setValueTag:(nullable NSString *)valueTag {
+    objc_setAssociatedObject(self,
+                             receiverValueTagKey,
+                             valueTag,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+@end
+
+@implementation RTCRtpTransceiver (ReactNativeWebRTCKit)
+
+static void *transceiverValueTagKey = "transceiverValueTagKey";
+
+- (nullable NSString *)valueTag {
+    return objc_getAssociatedObject(self, transceiverValueTagKey);
+}
+
+- (void)setValueTag:(nullable NSString *)valueTag {
+    objc_setAssociatedObject(self,
+                             transceiverValueTagKey,
+                             valueTag,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+@end
+
+@implementation RTCPeerConnection (ReactNativeWebRTCKit)
+
+static void *peerConnectionValueTagKey = "peerConnectionValueTag";
+
+- (nullable NSString *)valueTag {
+    return objc_getAssociatedObject(self, peerConnectionValueTagKey);
+}
+
+- (void)setValueTag:(nullable NSString *)valueTag {
+    objc_setAssociatedObject(self,
+                             peerConnectionValueTagKey,
+                             valueTag,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 static void* remoteStreamsKey = "remoteStreams";
@@ -164,35 +215,69 @@ RCT_EXPORT_METHOD(peerConnectionSetConfiguration:(nonnull RTCConfiguration *)con
     [peerConnection setConfiguration:configuration];
 }
 
-// MARK: -peerConnectionAddStream:streamValueTag:valueTag:
+// TODO: deprecated
 
-RCT_EXPORT_METHOD(peerConnectionAddStream:(nonnull NSString *)streamValueTag
-                  valueTag:(nonnull NSString *)valueTag) {
+// MARK: -peerConnectionAddTrack:streamValueTag:valueTag:
+
+RCT_EXPORT_METHOD(peerConnectionAddTrack:(nonnull NSString *)trackValueTag
+                  streamValueTags:(nonnull NSArray *)streamValueTags
+                  valueTag:(nonnull NSString *)valueTag
+                  resolver:(nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject) {
     RTCPeerConnection *peerConnection = self.peerConnections[valueTag];
     if (!peerConnection) {
+        reject(@"NotFoundError", @"peer connection is not found", nil);
         return;
     }
-    RTCMediaStream *stream = self.localStreams[streamValueTag];
-    if (!stream) {
+    RTCMediaStreamTrack *track = self.localTracks[trackValueTag];
+    if (!track) {
+        reject(@"NotFoundError", @"track is not found", nil);
         return;
     }
-    [peerConnection addStream:stream];
+    NSMutableArray *streamIds = [[NSMutableArray alloc]
+                               initWithCapacity: [streamValueTags count]];
+    for (NSString *tag in streamValueTags) {
+        RTCMediaStream *stream = self.localStreams[tag];
+        if (!stream) {
+            reject(@"NotFoundError", @"stream is not found", nil);
+            return;
+        }
+        [streamIds addObject: stream.streamId];
+    }
+
+    RTCRtpSender *sender = [peerConnection addTrack: track
+                                          streamIds: streamIds];
+    sender.valueTag = [self createNewValueTag];
+    self.senders[sender.valueTag] = sender;
+    
+    resolve(@{@"id": sender.senderId,
+              @"valueTag": sender.valueTag,
+              @"track": [track json]});
 }
 
-// MARK: -peerConnectionRemoveStream:valueTag:
+// MARK: -peerConnectionRemoveTrack:valueTag:
 
-RCT_EXPORT_METHOD(peerConnectionRemoveStream:(nonnull NSString *)streamValueTag
-                  valueTag:(nonnull NSString *)valueTag) {
+RCT_EXPORT_METHOD(peerConnectionRemoveTrack:(nonnull NSString *)senderValueTag
+                  valueTag:(nonnull NSString *)valueTag
+                  resolver:(nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject) {
     RTCPeerConnection *peerConnection = self.peerConnections[valueTag];
     if (!peerConnection) {
+        reject(@"NotFoundError", @"peer connection is not found", nil);
         return;
     }
-    RTCMediaStream *stream = self.localStreams[streamValueTag];
-    if (!stream) {
+    RTCRtpSender *sender = self.senders[senderValueTag];
+    if (!sender) {
+        reject(@"NotFoundError", @"sender is not found", nil);
         return;
     }
     
-    [peerConnection removeStream:stream];
+    self.senders[sender.valueTag] = nil;
+    if ([peerConnection removeTrack: sender]) {
+        resolve(nil);
+    } else {
+        reject(@"RemoveTrackFailed", @"cannot remove track", nil);
+    }
 }
 
 // MARK: -peerConnectionCreateOffer:constraints:resolver:rejecter:
