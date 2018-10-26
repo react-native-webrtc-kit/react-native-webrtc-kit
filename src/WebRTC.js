@@ -7,6 +7,7 @@ import RTCMediaStream from './MediaStream/RTCMediaStream';
 import RTCMediaStreamTrackEventTarget from './MediaStream/RTCMediaStreamTrackEventTarget';
 import RTCMediaConstraints from './PeerConnection/RTCMediaConstraints';
 import RTCMediaStreamConstraints from './MediaStream/RTCMediaStreamConstraints';
+import RTCRtpSender from './PeerConnection/RTCRtpSender';
 import RTCSessionDescription from './PeerConnection/RTCSessionDescription';
 import type { ValueTag } from './PeerConnection/RTCPeerConnection';
 
@@ -44,8 +45,15 @@ export default class WebRTC {
     return WebRTCModule.peerConnectionAddICECandidate(candidate.toJSON(), valueTag);
   }
 
-  static peerConnectionAddStream(valueTag: ValueTag, streamValueTag: ValueTag) {
-    WebRTCModule.peerConnectionAddStream(streamValueTag, valueTag);
+  static peerConnectionAddTrack(valueTag: ValueTag,
+    trackValueTag: ValueTag,
+    streamValueTags: Array<ValueTag>,
+  ): Promise<Object> {
+    return WebRTCModule.peerConnectionAddTrack(trackValueTag, streamValueTags, valueTag);
+  }
+
+  static peerConnectionRemoveTrack(valueTag: ValueTag, senderValueTag: ValueTag) {
+    WebRTCModule.peerConnectionRemoveTrack(senderValueTag, valueTag);
   }
 
   static peerConnectionClose(valueTag: ValueTag) {
