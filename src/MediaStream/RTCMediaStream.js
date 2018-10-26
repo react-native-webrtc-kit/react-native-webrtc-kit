@@ -39,18 +39,16 @@ export default class RTCMediaStream extends RTCMediaStreamEventTarget {
   }
 
   /**
-   * TODO: ネイティブにトラックを追加する
    * @ignore
    */
-  addTrack(track: RTCMediaStreamTrack): void {
+  _addTrack(track: RTCMediaStreamTrack): void {
     this._tracks.push(track);
   }
 
   /**
-   * TODO: ネイティブからトラックを削除する
    * @ignore
    */
-  removeTrack(track: RTCMediaStreamTrack): void {
+  _removeTrack(track: RTCMediaStreamTrack): void {
   }
 
   /**

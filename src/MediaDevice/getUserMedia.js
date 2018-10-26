@@ -37,7 +37,7 @@ export function getUserMedia(constraints: RTCMediaStreamConstraints | null): Pro
     .then(ev => {
       const stream = new RTCMediaStream(ev.streamId, ev.valueTag);
       for (const track of ev.tracks) {
-        stream.addTrack(new RTCMediaStreamTrack(track));
+        stream._addTrack(new RTCMediaStreamTrack(track));
       }
       return stream;
     })
