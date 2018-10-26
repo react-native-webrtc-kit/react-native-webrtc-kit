@@ -48,7 +48,10 @@ static WebRTCModule *sharedModule;
         self.peerConnections = [NSMutableDictionary dictionary];
         self.localStreams = [NSMutableDictionary dictionary];
         self.localTracks = [NSMutableDictionary dictionary];
-        
+        self.senders = [NSMutableDictionary dictionary];
+        self.receivers = [NSMutableDictionary dictionary];
+        self.transceivers = [NSMutableDictionary dictionary];
+
         dispatch_queue_attr_t attributes =
         dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL,
                                                 QOS_CLASS_USER_INITIATED, -1);
@@ -120,6 +123,9 @@ RCT_EXPORT_METHOD(finishLoading) {
     [_peerConnections removeAllObjects];
     [_localTracks removeAllObjects];
     [_localStreams removeAllObjects];
+    [_senders removeAllObjects];
+    [_receivers removeAllObjects];
+    [_transceivers removeAllObjects];
 }
 
 @end

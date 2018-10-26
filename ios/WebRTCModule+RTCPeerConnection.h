@@ -12,6 +12,24 @@ typedef NS_ENUM(NSUInteger, RTCPeerConnectionState) {
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface RTCRtpSender (ReactNativeWebRTCKit)
+
+@property (nonatomic, nullable) NSString *valueTag;
+
+@end
+
+@interface RTCRtpReceiver (ReactNativeWebRTCKit)
+
+@property (nonatomic, nullable) NSString *valueTag;
+
+@end
+
+@interface RTCRtpTransceiver (ReactNativeWebRTCKit)
+
+@property (nonatomic, nullable) NSString *valueTag;
+
+@end
+
 @interface RTCPeerConnection (ReactNativeWebRTCKit)
 
 @property (nonatomic, nullable) NSString *valueTag;

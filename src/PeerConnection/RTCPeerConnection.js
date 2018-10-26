@@ -10,10 +10,12 @@ import RTCIceCandidate from './RTCIceCandidate';
 import RTCPeerConnectionEventTarget from './RTCPeerConnectionEventTarget';
 import RTCSessionDescription from './RTCSessionDescription';
 import RTCConfiguration from './RTCConfiguration';
+import RTCRtpSender from './RTCRtpSender';
+import RTCRtpReceiver from './RTCRtpReceiver';
+import RTCRtpTransceiver from './RTCRtpTransceiver';
 import logger from '../Util/RTCLogger';
 import RTCMediaConstraints from './RTCMediaConstraints';
 import WebRTC from '../WebRTC';
-
 
 /**
  * ネイティブレイヤーのオブジェクトに関連付けられたユニークな文字列です。
@@ -140,9 +142,13 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    */
   remoteDescription: RTCSessionDescription | null;
 
+  senders: Array<RTCRtpSender> = [];
+
+  receivers: Array<RTCRtpReceiver> = [];
+
+  transceivers: Array<RTCRtpTransceiver> = [];
+
   _valueTag: ValueTag;
-  _localStreams: Array<RTCMediaStream> = [];
-  _remoteStreams: Array<RTCMediaStream> = [];
   _nativeEventListeners: Array<any> = [];
   _constraints: RTCMediaConstraints;
 
@@ -176,41 +182,6 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
       configuration,
       constraints);
     this._registerEventsFromNative();
-  }
-
-  /**
-   * ICE candidate を追加します。
-   * 
-   * @param {RTCIceCandidate} candidate ICE candidate
-   * @return {Promise<Void>} 結果を示す Promise
-   */
-  addIceCandidate(candidate: RTCIceCandidate): Promise<void> {
-    return WebRTC.peerConnectionAddICECandidate(this._valueTag, candidate);
-  }
-
-  /**
-   * {@link addLocalStream} と同等です。
-   * このメソッドはブラウザの API 名と合わせています。
-   */
-  addStream(stream: RTCMediaStream): void {
-    this.addLocalStream(stream);
-  }
-
-  /**
-   * 配信するストリームを追加します。
-   * このメソッドは {@link addStream} でも呼び出せます。
-   * 
-   * すでに無効になっているストリームは追加できません。
-   * 
-   * @param {RTCMediaStream} stream ストリーム
-   */
-  addLocalStream(stream: RTCMediaStream): void {
-    logger.log("# add local stream");
-    if (!stream.active) {
-      throw new Error("stream is not active");
-    }
-    WebRTC.peerConnectionAddStream(this._valueTag, stream.valueTag);
-    this._localStreams.push(stream);
   }
 
   // connectionState の状態を変更します。
@@ -257,15 +228,8 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   _finish(): void {
     logger.log("# connection finish");
+    this.senders.forEach(sender => this.removeTrack(sender));
     WebRTC.peerConnectionClose(this._valueTag);
-    this._finishStreams(this._localStreams);
-    this._finishStreams(this._remoteStreams);
-  }
-
-  _finishStreams(streams: Array<RTCMediaStream>) {
-    streams.forEach(stream => {
-      stream._close();
-    });
   }
 
   /**
@@ -293,34 +257,67 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   }
 
   /**
-   * ローカル (配信用) のストリームを返します。
+   * ICE candidate を追加します。
    * 
-   * @return {Array<RTCMediaStream>} ストリームのリスト
+   * @param {RTCIceCandidate} candidate ICE candidate
+   * @return {Promise<Void>} 結果を示す Promise
    */
-  getLocalStreams(): Array<RTCMediaStream> {
-    return this._localStreams.slice();
+  addIceCandidate(candidate: RTCIceCandidate): Promise<void> {
+    return WebRTC.peerConnectionAddICECandidate(this._valueTag, candidate);
   }
 
   /**
-   * リモート (受信) のストリームを返します。
-   * 
-   * @return {Array<RTCMediaStream>} ストリームのリスト
+   * @deprecated ストリームの操作は廃止されました。 senders を使用してください。
+   */
+  getLocalStreams(): Array<RTCMediaStream> {
+    throw new Error("getLocalStream() is deprecated")
+  }
+
+  /**
+   * @deprecated ストリームの操作は廃止されました。 receivers を使用してください。
    */
   getRemoteStreams(): Array<RTCMediaStream> {
     return this._remoteStreams.slice();
   }
 
   /**
-   * ローカルのストリームを削除します。
-   * 
-   * @param {RTCMediaStream} stream 削除するストリーム
+   * @deprecated ストリームの操作は廃止されました。 addTrack() を使用してください。
+   */
+  addStream(stream: RTCMediaStream): void {
+    throw new Error("addStream() is deprecated");
+  }
+
+  /**
+   * @deprecated ストリームの操作は廃止されました。 addTrack() を使用してください。
+   */
+  addLocalStream(stream: RTCMediaStream): void {
+    throw new Error("addLocalStream() is deprecated");
+  }
+
+  /**
+   * @deprecated ストリームの操作は廃止されました。 removeTrack() を使用してください。
    */
   removeLocalStream(stream: RTCMediaStream): void {
-    WebRTC.peerConnectionRemoveStream(stream.valueTag, this._valueTag);
-    let index = this._localStreams.indexOf(stream);
-    if (index !== -1) {
-      this._localStreams.splice(index, 1);
-    }
+    throw new Error("removeLocalStream() is deprecated")
+  }
+
+  addTrack(track: RTCMediaStreamTrack, streams: Array<RTCMediaStream>): RTCRtpSender {
+    var streamValueTags = [];
+    streams.forEach(stream => streamValueTags.push(stream.valueTag));
+    WebRTC.peerConnectionAddTrack(this._valueTag, track._valueTag,
+      streamValueTags)
+      .then((info) => {
+        console.log("addTrack: sender => ", info);
+        let sender = new RTCRtpSender(info);
+        this.senders.push(sender);
+        return sender;
+      });
+  }
+
+  removeTrack(sender: RTCRtpSender) {
+    this.senders = this.senders.filter(
+      e => e.id != sender.id);
+    WebRTC.peerConnectionRemoveTrack(this._valueTag, sender._valueTag);
   }
 
   /**
@@ -413,7 +410,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
               track.aspectRatio = this._constraints.video.aspectRatio;
             }
           }
-          stream.addTrack(track);
+          stream._addTrack(track);
         }
         this._remoteStreams.push(stream);
         this.dispatchEvent(new RTCMediaStreamEvent('addstream', { stream }));
