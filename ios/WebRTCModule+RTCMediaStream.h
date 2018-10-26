@@ -13,6 +13,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface RTCMediaStreamTrack (ReactNativeWebRTCKit)
+
+@property (nonatomic, nullable) NSString *valueTag;
+
+- (id)json;
+
+@end
+
 @interface RTCVideoTrack (ReactNativeWebRTCKit)
 
 @property (nonatomic) CGFloat aspectRatio;

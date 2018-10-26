@@ -46,6 +46,40 @@ static void *valueTagKey = "valueTag";
 
 @end
 
+@implementation RTCMediaStreamTrack (ReactNativeWebRTCKit)
+
+static void *trackValueTagKey = "valueTag";
+
+- (nullable NSString *)valueTag {
+    return objc_getAssociatedObject(self, trackValueTagKey);
+}
+
+- (void)setValueTag:(nullable NSString *)valueTag {
+    objc_setAssociatedObject(self, trackValueTagKey, valueTag, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (id)json
+{
+    NSString *state;
+    switch (self.readyState) {
+        case RTCMediaStreamTrackStateLive:
+            state = @"live";
+            break;
+        case RTCMediaStreamTrackStateEnded:
+            state = @"ended";
+            break;
+        default:
+            NSAssert(NO, @"invalid ready state");
+    }
+    return @{@"valueTag": self.valueTag,
+             @"enabled": @(self.isEnabled),
+             @"id": self.trackId,
+             @"kind": self.kind,
+             @"readyState": state};
+}
+
+@end
+
 @implementation RTCVideoTrack (ReactNativeWebRTCKit)
 
 static void *aspectRatioKey = "aspectRatio";
