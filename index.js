@@ -11,6 +11,9 @@ export { default as RTCPeerConnection } from './src/PeerConnection/RTCPeerConnec
 export { default as RTCIceCandidate } from './src/PeerConnection/RTCIceCandidate';
 export { default as RTCIceTransportPolicy } from './src/PeerConnection/RTCIceTransportPolicy';
 export { default as RTCIceServer } from './src/PeerConnection/RTCIceServer';
+export { default as RTCRtpSender } from './src/PeerConnection/RTCRtpSender';
+export { default as RTCRtpReceiver } from './src/PeerConnection/RTCRtpReceiver';
+export { default as RTCRtpTransceiver } from './src/PeerConnection/RTCRtpTransceiver';
 export { default as RTCSessionDescription } from './src/PeerConnection/RTCSessionDescription';
 export { default as RTCVideoView } from './src/VideoView/RTCVideoView';
 export { default as RTCMediaStream } from './src/MediaStream/RTCMediaStream';
