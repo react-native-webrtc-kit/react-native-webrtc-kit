@@ -33,16 +33,24 @@ RCT_CUSTOM_VIEW_PROPERTY(objectFit, NSString *, WebRTCVideoView) {
     [view setNeedsLayout];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(trackValueTag, NSString, WebRTCVideoView) {
+RCT_CUSTOM_VIEW_PROPERTY(track, id, WebRTCVideoView) {
     RTCVideoTrack *videoTrack = nil;
-    
     if (json) {
-        NSString *valueTag = (NSString *)json;
+        NSString *valueTag = (NSString *)[json objectForKey:@"_valueTag"];
+        if (!valueTag) {
+            NSLog(@"not found _valueTag property for %@", [json description]);
+            return;
+        }
         
         WebRTCModule *module = [self.bridge moduleForName:@"WebRTCModule"];
         videoTrack = module.localTracks[valueTag];
         if (!videoTrack) {
             NSLog(@"track for value tag %@ is not found", valueTag);
+            return;
+        }
+        if (![videoTrack.kind
+             isEqualToString: kRTCMediaStreamTrackKindVideo]) {
+            NSLog(@"not video track %@", videoTrack.kind);
             return;
         }
     }
