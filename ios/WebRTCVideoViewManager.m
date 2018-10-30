@@ -33,6 +33,10 @@ RCT_CUSTOM_VIEW_PROPERTY(objectFit, NSString *, WebRTCVideoView) {
     [view setNeedsLayout];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(streamValueTag, NSString *, WebRTCVideoView) {
+    NSAssert(NO, @"RTCVideoView: 'streamValueTag' property is deprecated. use 'track' property");
+}
+
 RCT_CUSTOM_VIEW_PROPERTY(track, id, WebRTCVideoView) {
     RTCVideoTrack *videoTrack = nil;
     if (json) {
