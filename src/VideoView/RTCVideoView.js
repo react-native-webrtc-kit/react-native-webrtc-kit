@@ -45,7 +45,6 @@ const NativeProps = {
   name: 'WebRTCVideoView',
   propTypes: {
     objectFit: PropTypes.oneOf(['fill', 'contain', 'cover']),
-    trackValueTag: PropTypes.string,
     track: PropTypes.instanceOf(RTCMediaStreamTrack),
     ...ViewPropTypes
   }

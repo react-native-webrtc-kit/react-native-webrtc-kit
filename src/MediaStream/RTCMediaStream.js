@@ -25,7 +25,7 @@ export default class RTCMediaStream extends RTCMediaStreamEventTarget {
   /**
    * ネイティブのオブジェクトと関連付けられたタグ
    */
-  valueTag: ValueTag;
+  _valueTag: ValueTag;
 
   _tracks: Array<RTCMediaStreamTrack> = [];
 
@@ -35,7 +35,7 @@ export default class RTCMediaStream extends RTCMediaStreamEventTarget {
   constructor(id: string, valueTag: string) {
     super();
     this.id = id;
-    this.valueTag = valueTag;
+    this._valueTag = valueTag;
   }
 
   /**
