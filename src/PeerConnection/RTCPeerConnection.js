@@ -303,7 +303,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   addTrack(track: RTCMediaStreamTrack, streams: Array<RTCMediaStream>): RTCRtpSender {
     var streamValueTags = [];
-    streams.forEach(stream => streamValueTags.push(stream.valueTag));
+    streams.forEach(stream => streamValueTags.push(stream._valueTag));
     WebRTC.peerConnectionAddTrack(this._valueTag, track._valueTag,
       streamValueTags)
       .then((info) => {
@@ -421,7 +421,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
         if (ev.valueTag !== this._valueTag) {
           return;
         }
-        const stream = this._remoteStreams.find(s => s.valueTag === ev.valueTag);
+        const stream = this._remoteStreams.find(s => s._valueTag === ev.valueTag);
         if (stream) {
           const index = this._remoteStreams.indexOf(stream);
           if (index > -1) {
