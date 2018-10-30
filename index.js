@@ -33,7 +33,6 @@ export type { RTCRtpParameters } from './src/PeerConnection/RTCRtpParameters';
 export type { RTCRtpHeaderExtension } from './src/PeerConnection/RTCRtpParameters';
 export type { RTCRtpEncodingParameters } from './src/PeerConnection/RTCRtpParameters';
 export type { RTCRtpCodecParameters } from './src/PeerConnection/RTCRtpParameters';
-export type { ValueTag } from './src/PeerConnection/RTCPeerConnection';
 export type { RTCFacingMode } from './src/MediaStream/RTCMediaStreamConstraints';
 export type { RTCSdpType } from './src/PeerConnection/RTCSessionDescription';
 

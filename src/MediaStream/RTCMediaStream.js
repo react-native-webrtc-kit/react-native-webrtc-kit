@@ -23,6 +23,8 @@ export default class RTCMediaStream extends RTCMediaStreamEventTarget {
   active: boolean = true;
 
   /**
+   * @package
+   * 
    * ネイティブのオブジェクトと関連付けられたタグ
    */
   _valueTag: ValueTag;

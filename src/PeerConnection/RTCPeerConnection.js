@@ -18,6 +18,8 @@ import RTCMediaConstraints from './RTCMediaConstraints';
 import WebRTC from '../WebRTC';
 
 /**
+ * @package
+ * 
  * ネイティブレイヤーのオブジェクトに関連付けられたユニークな文字列です。
  * JavaScript からネイティブのオブジェクトを操作するために使われます。
  * 例えばタグが `foo` であれば、
