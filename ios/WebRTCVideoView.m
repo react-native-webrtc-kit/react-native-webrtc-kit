@@ -125,6 +125,12 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Public
 
 - (void)setVideoTrack:(nullable RTCVideoTrack *)videoTrack {
+    if (videoTrack) {
+        NSAssert([videoTrack.kind isEqualToString: kRTCMediaStreamTrackKindVideo],
+                 @"track must be video track %@",
+                 [videoTrack description]);
+    }
+
     RTCVideoTrack *oldValue = self.videoTrack;
     if (oldValue == videoTrack) {
         return;
