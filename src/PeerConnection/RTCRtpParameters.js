@@ -1,33 +1,13 @@
 // @flow
 
-import type { RTCMediaStreamTrackKind } from '../MediaStream/RTCMediaStreamTrack';
-
-export type RTCRtpCodec =
-  | 'rtx'
-  | 'red'
-  | 'ulpfec'
-  | 'flexfec'
-  | 'opus'
-  | 'isac'
-  | 'l16'
-  | 'g722'
-  | 'ilbc'
-  | 'pcmu'
-  | 'pcma'
-  | 'dtmf'
-  | 'comfortnoise'
-  | 'vp8'
-  | 'vp9'
-  | 'h264';
-
 export class RTCRtcpParameters {
 
   cname: String;
-  isReducedSize: boolean;
+  reducedSize: boolean;
 
-  constructor(cname: String, isReducedSize: boolean) {
+  constructor(cname: String, reducedSize: boolean) {
     self.cname = cname;
-    self.isReducedSize = isReducedSize;
+    self.reducedSize = reducedSize;
   }
 
   /**
@@ -36,7 +16,7 @@ export class RTCRtcpParameters {
   toJSON(): Object {
     return {
       cname: this.cname,
-      isReducedSize: this.isReducedSize,
+      reducedSize: this.reducedSize,
     };
   }
 
@@ -70,9 +50,9 @@ export class RTCRtpHeaderExtension {
 export class RTCRtpEncodingParameters {
 
   active: boolean;
-  maxBitrateBps: number | null;
-  minBitrateBps: number | null;
-  ssrc: String | null;
+  maxBitrate: number | null;
+  minBitrate: number | null;
+  ssrc: number | null;
 
   constructor(active: boolean) {
     self.active = active;
@@ -84,8 +64,8 @@ export class RTCRtpEncodingParameters {
   toJSON(): Object {
     return {
       active: this.active,
-      maxBitrateBps: this.maxBitrateBps,
-      minBitrateBps: this.minBitrateBps,
+      maxBitrate: this.maxBitrate,
+      minBitrate: this.minBitrate,
       ssrc: this.ssrc
     };
   }
@@ -95,15 +75,16 @@ export class RTCRtpEncodingParameters {
 export class RTCRtpCodecParameters {
 
   payloadType: number;
-  codec: RTCRtpCodec;
-  kind: RTCMediaStreamTrackKind;
+  mimeType: String;
   clockRate: String | null;
-  numChannels: number | null;
+  channels: number | null;
+
+  // SDP fmtp parameters "a=fmtp"
   parameters: Map<String, String> = new Map();
 
-  constructor(payloadType: number, codec: RTCRtpCodec) {
+  constructor(payloadType: number, mimeType: String) {
     self.payloadType = payloadType;
-    self.codec = codec;
+    self.mimeType = mimeType;
   }
 
   /**
@@ -112,10 +93,9 @@ export class RTCRtpCodecParameters {
   toJSON(): Object {
     return {
       payloadType: this.payloadType,
-      codec: this.codec,
-      kind: this.kind,
+      mimeType: this.mimeType,
       clockRate: this.clockRate,
-      numChannels: this.numChannels,
+      channels: this.channels,
       parameters: this.parameters
     };
   }
@@ -126,20 +106,14 @@ export class RTCRtpParameters {
 
   transactionId: String;
   rtcp: RTCRtcpParameters;
-  headerExtensions: RTCRtpHeaderExtension;
-  encodings: RTCRtpEncodingParameters;
-  codecs: RTCRtpCodecParameters;
+  headerExtensions: Array<RTCRtpHeaderExtension> = [];
+  encodings: Array<RTCRtpEncodingParameters> = [];
+  codecs: Array<RTCRtpCodecParameters> = [];
 
   constructor(transactionId: String,
-    rtcp: RTCRtcpParameters,
-    headerExtensions: RTCRtpHeaderExtension,
-    encodings: RTCRtpEncodingParameters,
-    codecs: RTCRtpCodecParameters) {
+    rtcp: RTCRtcpParameters) {
     self.transactionId = transactionId;
     self.rtcp = rtcp;
-    self.headerExtensions = headerExtensions;
-    self.encodings = encodings;
-    self.codecs = codecs;
   }
 
   /**
@@ -149,9 +123,12 @@ export class RTCRtpParameters {
     return {
       transactionId: this.transactionId,
       rtcp: this.rtcp.toJSON(),
-      headerExtensions: this.headerExtensions.toJSON(),
-      encodings: this.encodings.toJSON(),
-      codecs: this.codecs.toJSON()
+      headerExtensions:
+        this.headerExtensions.forEach(ext => ext.toJSON()),
+      encodings:
+        this.encodings.forEach(enc => enc.toJSON()),
+      codecs:
+        this.codecs.forEach(codec => codec.toJSON()),
     };
   }
 
