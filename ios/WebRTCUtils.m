@@ -40,50 +40,6 @@
     return nil;
 }
 
-+ (id)jsonForRtpParameters:(RTCRtpParameters *)params
-{
-    NSDictionary *rtcp = @{@"cname": params.rtcp.cname,
-                           @"reducedSize":
-                               [[NSNumber alloc] initWithBool:
-                                params.rtcp.isReducedSize]};
-
-    NSMutableArray *headerExts = [[NSMutableArray alloc] init];
-    for (RTCRtpHeaderExtension *ext in params.headerExtensions) {
-        [headerExts addObject:
-         @{@"uri": ext.uri,
-           @"id": [[NSNumber alloc] initWithInt: ext.id],
-           @"encrypted":
-               [[NSNumber alloc] initWithBool: ext.encrypted]}];
-    }
-    
-    NSMutableArray *encodings = [[NSMutableArray alloc] init];
-    for (RTCRtpEncodingParameters *enc in params.encodings) {
-        [encodings addObject:
-         @{@"active": [[NSNumber alloc] initWithBool: enc.isActive],
-           @"maxBitrate": enc.maxBitrateBps,
-           @"minBitrate": enc.minBitrateBps,
-           @"ssrc": enc.ssrc}];
-    }
-    
-    NSMutableArray *codecs = [[NSMutableArray alloc] init];
-    for (RTCRtpCodecParameters *codec in params.codecs) {
-        [codecs addObject:
-         @{@"payloadType":
-               [[NSNumber alloc] initWithInt: codec.payloadType],
-           @"clockRate": codec.clockRate,
-           @"mimeType": [NSString stringWithFormat: @"%@/%@",
-                         codec.kind, codec.name],
-           @"channels": codec.numChannels,
-           @"parameters": codec.parameters}];
-    }
-    
-    return @{@"transactionId": params.transactionId,
-             @"rtcp": rtcp,
-             @"headerExtensions": headerExts,
-             @"encodings": encodings,
-             @"codecs": codecs};
-}
-
 + (NSDictionary<NSString *, NSString *> *)parseJavaScriptConstraints:(NSDictionary *)src
 {
     NSMutableDictionary<NSString *, NSString *> *result = [NSMutableDictionary dictionary];
