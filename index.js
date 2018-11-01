@@ -28,7 +28,6 @@ export type { RTCSignalingState } from './src/PeerConnection/RTCPeerConnection';
 export type { RTCIceGatheringState } from './src/PeerConnection/RTCPeerConnection';
 export type { RTCIceConnectionState } from './src/PeerConnection/RTCPeerConnection';
 export type { RTCRtcpParameters } from './src/PeerConnection/RTCRtpParameters';
-export type { RTCRtpCodec } from './src/PeerConnection/RTCRtpParameters';
 export type { RTCRtpParameters } from './src/PeerConnection/RTCRtpParameters';
 export type { RTCRtpHeaderExtension } from './src/PeerConnection/RTCRtpParameters';
 export type { RTCRtpEncodingParameters } from './src/PeerConnection/RTCRtpParameters';
