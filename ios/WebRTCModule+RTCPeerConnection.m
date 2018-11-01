@@ -7,6 +7,54 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@implementation RTCRtpParameters (ReactNativeWebRTCKit)
+
+- (id)json
+{
+    NSDictionary *rtcp = @{@"cname": self.rtcp.cname,
+                           @"reducedSize":
+                               [[NSNumber alloc] initWithBool:
+                                self.rtcp.isReducedSize]};
+    
+    NSMutableArray *headerExts = [[NSMutableArray alloc] init];
+    for (RTCRtpHeaderExtension *ext in self.headerExtensions) {
+        [headerExts addObject:
+         @{@"uri": ext.uri,
+           @"id": [[NSNumber alloc] initWithInt: ext.id],
+           @"encrypted":
+               [[NSNumber alloc] initWithBool: ext.encrypted]}];
+    }
+    
+    NSMutableArray *encodings = [[NSMutableArray alloc] init];
+    for (RTCRtpEncodingParameters *enc in self.encodings) {
+        [encodings addObject:
+         @{@"active": [[NSNumber alloc] initWithBool: enc.isActive],
+           @"maxBitrate": enc.maxBitrateBps,
+           @"minBitrate": enc.minBitrateBps,
+           @"ssrc": enc.ssrc}];
+    }
+    
+    NSMutableArray *codecs = [[NSMutableArray alloc] init];
+    for (RTCRtpCodecParameters *codec in self.codecs) {
+        [codecs addObject:
+         @{@"payloadType":
+               [[NSNumber alloc] initWithInt: codec.payloadType],
+           @"clockRate": codec.clockRate,
+           @"mimeType": [NSString stringWithFormat: @"%@/%@",
+                         codec.kind, codec.name],
+           @"channels": codec.numChannels,
+           @"parameters": codec.parameters}];
+    }
+    
+    return @{@"transactionId": self.transactionId,
+             @"rtcp": rtcp,
+             @"headerExtensions": headerExts,
+             @"encodings": encodings,
+             @"codecs": codecs};
+}
+
+@end
+
 @implementation RTCRtpSender (ReactNativeWebRTCKit)
 
 static void *senderValueTagKey = "senderValueTag";
@@ -252,8 +300,7 @@ RCT_EXPORT_METHOD(peerConnectionAddTrack:(nonnull NSString *)trackValueTag
     
     resolve(@{@"id": sender.senderId,
               @"valueTag": sender.valueTag,
-              @"parameters":
-                  [WebRTCUtils jsonForRtpParameters: sender.parameters],
+              @"parameters": [sender.parameters json],
               @"track": [track json]});
 }
 
