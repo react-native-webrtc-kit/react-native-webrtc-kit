@@ -252,6 +252,8 @@ RCT_EXPORT_METHOD(peerConnectionAddTrack:(nonnull NSString *)trackValueTag
     
     resolve(@{@"id": sender.senderId,
               @"valueTag": sender.valueTag,
+              @"parameters":
+                  [WebRTCUtils jsonForRtpParameters: sender.parameters],
               @"track": [track json]});
 }
 

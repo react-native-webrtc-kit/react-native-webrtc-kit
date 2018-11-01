@@ -6,6 +6,8 @@
 + (NSString *)stringForICEConnectionState:(RTCIceConnectionState)state;
 + (NSString *)stringForICEGatheringState:(RTCIceGatheringState)state;
 + (NSString *)stringForSignalingState:(RTCSignalingState)state;
++ (id)jsonForRtpParameters:(RTCRtpParameters *)params;
+
 + (NSDictionary<NSString *, NSString *> *)parseJavaScriptConstraints:(NSDictionary *)src;
 
 /**
