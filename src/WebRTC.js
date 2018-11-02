@@ -10,6 +10,7 @@ import RTCMediaStreamConstraints from './MediaStream/RTCMediaStreamConstraints';
 import RTCRtpSender from './PeerConnection/RTCRtpSender';
 import RTCSessionDescription from './PeerConnection/RTCSessionDescription';
 import type { ValueTag } from './PeerConnection/RTCPeerConnection';
+import type { RTCRtpTransceiverDirection } from './PeerConnection/RTCRtpTransceiver';
 
 const { WebRTCModule } = NativeModules;
 
@@ -96,6 +97,15 @@ export default class WebRTC {
     streamValueTag: ValueTag,
     aspectRatio: number) {
     WebRTCModule.trackSetAspectRatio(aspectRatio, valueTag, streamValueTag);
+  }
+
+  static transceiverCurrentDirection(valueTag: ValueTag):
+    Promise<RTCRtpTransceiverDirection | null> {
+    return WebRTCModule.transceiverCurrentDirection(valueTag);
+  }
+
+  static transceiverStop(valueTag: ValueTag) {
+    WebRTCModule.transceiverStop(valueTag);
   }
 
 }
