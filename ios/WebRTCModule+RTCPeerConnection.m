@@ -27,23 +27,29 @@ NS_ASSUME_NONNULL_BEGIN
     
     NSMutableArray *encodings = [[NSMutableArray alloc] init];
     for (RTCRtpEncodingParameters *enc in self.encodings) {
-        [encodings addObject:
-         @{@"active": [[NSNumber alloc] initWithBool: enc.isActive],
-           @"maxBitrate": enc.maxBitrateBps,
-           @"minBitrate": enc.minBitrateBps,
-           @"ssrc": enc.ssrc}];
+        NSMutableDictionary *json = [[NSMutableDictionary alloc] init];
+        json[@"active"] = [[NSNumber alloc] initWithBool: enc.isActive];
+        if (enc.maxBitrateBps)
+            json[@"maxBitrate"] = enc.maxBitrateBps;
+        if (enc.minBitrateBps)
+            json[@"minBitrate"] = enc.minBitrateBps;
+        if (enc.ssrc)
+            json[@"ssrc"] = enc.ssrc;
+        [encodings addObject: json];
     }
     
     NSMutableArray *codecs = [[NSMutableArray alloc] init];
     for (RTCRtpCodecParameters *codec in self.codecs) {
-        [codecs addObject:
-         @{@"payloadType":
-               [[NSNumber alloc] initWithInt: codec.payloadType],
-           @"clockRate": codec.clockRate,
-           @"mimeType": [NSString stringWithFormat: @"%@/%@",
-                         codec.kind, codec.name],
-           @"channels": codec.numChannels,
-           @"parameters": codec.parameters}];
+        NSMutableDictionary *json = [[NSMutableDictionary alloc] init];
+        json[@"payloadType"] = [[NSNumber alloc] initWithInt: codec.payloadType];
+        json[@"mimeType"] = [NSString stringWithFormat: @"%@/%@",
+                             codec.kind, codec.name];
+        json[@"parameters"] = codec.parameters;
+        if (codec.clockRate)
+            json[@"clockRate"] = codec.clockRate;
+        if (codec.numChannels)
+            json[@"channels"] = codec.numChannels;
+        [codecs addObject: json];
     }
     
     return @{@"transactionId": self.transactionId,
@@ -84,6 +90,13 @@ static void *receiverValueTagKey = "receiverValueTag";
                              OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+- (id)json
+{
+    return @{@"receiverId": self.receiverId,
+             @"parameters": [self.parameters json],
+             @"track": [self.track json]};
+}
+
 @end
 
 @implementation RTCRtpTransceiver (ReactNativeWebRTCKit)
@@ -99,6 +112,44 @@ static void *transceiverValueTagKey = "transceiverValueTagKey";
                              transceiverValueTagKey,
                              valueTag,
                              OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (id)json
+{
+    return @{@"valueTag": self.valueTag,
+             @"mid": self.mid,
+             @"sender": [self.sender json],
+             @"receiver": [self.receiver json],
+             @"stopped": [NSNumber numberWithBool: self.isStopped],
+             @"direction": [RTCRtpTransceiver directionDescription: self.direction]};
+}
+
++ (NSString *)directionDescription:(RTCRtpTransceiverDirection)direction
+{
+    switch (direction) {
+        case RTCRtpTransceiverDirectionSendRecv:
+            return @"sendrecv";
+        case RTCRtpTransceiverDirectionSendOnly:
+            return @"sendonly";
+        case RTCRtpTransceiverDirectionRecvOnly:
+            return @"recvonly";
+        case RTCRtpTransceiverDirectionInactive:
+            return @"inactive";
+    }
+}
+
++ (RTCRtpTransceiverDirection)directionFromString:(NSString *)string
+{
+    if ([string isEqualToString: @"sendrecv"])
+        return RTCRtpTransceiverDirectionSendRecv;
+    else if ([string isEqualToString: @"sendonly"])
+        return RTCRtpTransceiverDirectionSendOnly;
+    else if ([string isEqualToString: @"recvonly"])
+        return RTCRtpTransceiverDirectionRecvOnly;
+    else if ([string isEqualToString: @"inactive"])
+        return RTCRtpTransceiverDirectionInactive;
+    else
+        NSAssert(NO, @"invalid direction %@", string);
 }
 
 @end
