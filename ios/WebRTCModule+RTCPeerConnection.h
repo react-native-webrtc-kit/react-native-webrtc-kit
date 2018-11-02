@@ -22,17 +22,26 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, nullable) NSString *valueTag;
 
+- (id)json;
+
 @end
 
 @interface RTCRtpReceiver (ReactNativeWebRTCKit)
 
 @property (nonatomic, nullable) NSString *valueTag;
 
+- (id)json;
+
++ (NSString *)directionDescription:(RTCRtpTransceiverDirection)direction;
++ (RTCRtpTransceiverDirection)directionFromString:(NSString *)string;
+
 @end
 
 @interface RTCRtpTransceiver (ReactNativeWebRTCKit)
 
 @property (nonatomic, nullable) NSString *valueTag;
+
+- (id)json;
 
 @end
 
