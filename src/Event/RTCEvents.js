@@ -3,6 +3,8 @@
 import RTCMediaStream from '../MediaStream/RTCMediaStream';
 import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
 import RTCIceCandidate from '../PeerConnection/RTCIceCandidate';
+import RTCRtpReceiver from '../PeerConnection/RTCRtpReceiver';
+import RTCRtpTransceiver from '../PeerConnection/RTCRtpTransceiver';
 
 /**
  * 特にプロパティを持たない一般的なイベントを表します。
@@ -63,6 +65,10 @@ export class RTCMediaStreamTrackEvent {
      * トラック
      */
     track: RTCMediaStreamTrack;
+
+    receiver: RTCRtpReceiver;
+
+    transceiver: RTCRtpTransceiver;
 
     /**
      * @package
