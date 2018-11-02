@@ -2,6 +2,18 @@
 
 /**
  * @package
+ */
+export function nativeBoolean(value: boolean | number): boolean {
+    if (typeof value === 'boolean') {
+        return value;
+    } else {
+        return value > 0 ? true : false;
+    }
+}
+
+
+/**
+ * @package
  * 
  * Merge custom constraints with the default one. The custom one take precedence.
  *
