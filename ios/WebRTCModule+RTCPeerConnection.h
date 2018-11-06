@@ -1,6 +1,7 @@
 @import Foundation;
 
 #import "WebRTCModule.h"
+#import "WebRTCValueManager.h"
 
 typedef NS_ENUM(NSUInteger, RTCPeerConnectionState) {
     RTCPeerConnectionStateNew,
@@ -45,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface RTCPeerConnection (ReactNativeWebRTCKit)
+@interface RTCPeerConnection (ReactNativeWebRTCKit) <WebRTCExportable>
 
 @property (nonatomic, nullable) NSString *valueTag;
 
