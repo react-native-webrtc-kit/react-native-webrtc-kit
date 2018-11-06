@@ -1,18 +1,18 @@
 #import <objc/runtime.h>
 #import "WebRTCModule+RTCMediaStream.h"
+#import "WebRTCValueManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation RTCMediaStream (ReactNativeWebRTCKit)
 
-static void *valueTagKey = "valueTag";
-
 - (nullable NSString *)valueTag {
-    return objc_getAssociatedObject(self, valueTagKey);
+    return [WebRTCValueManager valueTagForObject: self];
 }
 
-- (void)setValueTag:(nullable NSString *)valueTag {
-    objc_setAssociatedObject(self, valueTagKey, valueTag, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (void)setValueTag:(nullable NSString *)valueTag
+{
+    [WebRTCValueManager setValueTag: valueTag forObject: self];
 }
 
 - (nullable RTCMediaStreamTrack *)trackForTrackId:(NSString *)trackId
@@ -48,14 +48,13 @@ static void *valueTagKey = "valueTag";
 
 @implementation RTCMediaStreamTrack (ReactNativeWebRTCKit)
 
-static void *trackValueTagKey = "valueTag";
-
 - (nullable NSString *)valueTag {
-    return objc_getAssociatedObject(self, trackValueTagKey);
+    return [WebRTCValueManager valueTagForObject: self];
 }
 
-- (void)setValueTag:(nullable NSString *)valueTag {
-    objc_setAssociatedObject(self, trackValueTagKey, valueTag, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (void)setValueTag:(nullable NSString *)valueTag
+{
+    [WebRTCValueManager setValueTag: valueTag forObject: self];
 }
 
 - (id)json

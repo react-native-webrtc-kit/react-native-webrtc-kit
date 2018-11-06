@@ -4,6 +4,7 @@
 #import "WebRTCModule+RTCPeerConnection.h"
 #import "WebRTCModule+getUserMedia.h"
 #import "WebRTCUtils.h"
+#import "WebRTCValueManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -63,31 +64,26 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation RTCRtpSender (ReactNativeWebRTCKit)
 
-static void *senderValueTagKey = "senderValueTag";
-
 - (nullable NSString *)valueTag {
-    return objc_getAssociatedObject(self, senderValueTagKey);
+    return [WebRTCValueManager valueTagForObject: self];
 }
 
-- (void)setValueTag:(nullable NSString *)valueTag {
-    objc_setAssociatedObject(self, senderValueTagKey, valueTag, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (void)setValueTag:(nullable NSString *)valueTag
+{
+    [WebRTCValueManager setValueTag: valueTag forObject: self];
 }
 
 @end
 
 @implementation RTCRtpReceiver (ReactNativeWebRTCKit)
 
-static void *receiverValueTagKey = "receiverValueTag";
-
 - (nullable NSString *)valueTag {
-    return objc_getAssociatedObject(self, receiverValueTagKey);
+    return [WebRTCValueManager valueTagForObject: self];
 }
 
-- (void)setValueTag:(nullable NSString *)valueTag {
-    objc_setAssociatedObject(self,
-                             receiverValueTagKey,
-                             valueTag,
-                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (void)setValueTag:(nullable NSString *)valueTag
+{
+    [WebRTCValueManager setValueTag: valueTag forObject: self];
 }
 
 - (id)json
@@ -526,6 +522,8 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
     NSMutableArray *tracks = [NSMutableArray array];
     for (RTCVideoTrack *track in stream.videoTracks) {
         peerConnection.remoteTracks[track.trackId] = track;
+        track.valueTag = [self createNewValueTag];
+        self.localTracks[track.valueTag] = track;
         [tracks addObject:@{@"id": track.trackId,
                             @"kind": track.kind,
                             @"label": track.trackId,
@@ -535,6 +533,8 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
     }
     for (RTCAudioTrack *track in stream.audioTracks) {
         peerConnection.remoteTracks[track.trackId] = track;
+        track.valueTag = [self createNewValueTag];
+        self.localTracks[track.valueTag] = track;
         [tracks addObject:@{@"id": track.trackId,
                             @"kind": track.kind,
                             @"label": track.trackId,
@@ -582,7 +582,7 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
                streams:(NSArray<RTCMediaStream *> *)mediaStreams
 {
     rtpReceiver.valueTag = [self createNewValueTag];
-    rtpReceiver.track.valueTag = [self createNewValueTag];
+    [WebRTCValueManager addNewObject: rtpReceiver];
     self.receivers[rtpReceiver.valueTag] = rtpReceiver;
     peerConnection.remoteTracks[rtpReceiver.track.trackId] = rtpReceiver.track;
     
@@ -595,9 +595,11 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
      didRemoveReceiver:(RTCRtpReceiver *)rtpReceiver
 {
-    self.receivers[rtpReceiver.valueTag] = nil;
     peerConnection.remoteTracks[rtpReceiver.track.trackId] = nil;
     
+    self.receivers[rtpReceiver.valueTag] = nil;
+    [WebRTCValueManager removeValueTagForObject: rtpReceiver];
+
     [self.bridge.eventDispatcher
      sendDeviceEventWithName: @"peerConnectionRemoveReceiver"
      body:@{@"valueTag": peerConnection.valueTag,
