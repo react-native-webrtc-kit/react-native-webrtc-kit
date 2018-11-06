@@ -92,9 +92,16 @@ static void *receiverValueTagKey = "receiverValueTag";
 
 - (id)json
 {
+    // RTCRtpSender/Receiver の track プロパティは
+    // RTCMediaStreamTrcak を動的に生成するので、
+    // 新しい value tag を割り当てる
+    RTCMediaStreamTrack *track = self.track;
+    track.valueTag = [[WebRTCModule shared] createNewValueTag];
+    [WebRTCModule shared].localTracks[track.valueTag] = track;
+    
     return @{@"receiverId": self.receiverId,
              @"parameters": [self.parameters json],
-             @"track": [self.track json]};
+             @"track": [track json]};
 }
 
 @end
@@ -570,6 +577,32 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
                                                            @"streamValueTag": streamValueTag}];
 }
 
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+        didAddReceiver:(RTCRtpReceiver *)rtpReceiver
+               streams:(NSArray<RTCMediaStream *> *)mediaStreams
+{
+    rtpReceiver.valueTag = [self createNewValueTag];
+    rtpReceiver.track.valueTag = [self createNewValueTag];
+    self.receivers[rtpReceiver.valueTag] = rtpReceiver;
+    peerConnection.remoteTracks[rtpReceiver.track.trackId] = rtpReceiver.track;
+    
+    [self.bridge.eventDispatcher
+     sendDeviceEventWithName: @"peerConnectionAddedReceiver"
+     body:@{@"valueTag": peerConnection.valueTag,
+            @"receiver": [rtpReceiver json]}];
+}
+
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+     didRemoveReceiver:(RTCRtpReceiver *)rtpReceiver
+{
+    self.receivers[rtpReceiver.valueTag] = nil;
+    peerConnection.remoteTracks[rtpReceiver.track.trackId] = nil;
+    
+    [self.bridge.eventDispatcher
+     sendDeviceEventWithName: @"peerConnectionRemoveReceiver"
+     body:@{@"valueTag": peerConnection.valueTag,
+            @"receiver": [rtpReceiver json]}];
+}
 - (void)peerConnectionShouldNegotiate:(RTCPeerConnection *)peerConnection {
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionShouldNegotiate"
                                                     body:@{@"valueTag": peerConnection.valueTag}];
