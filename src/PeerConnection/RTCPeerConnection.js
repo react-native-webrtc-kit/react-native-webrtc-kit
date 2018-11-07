@@ -5,7 +5,7 @@ import { DeviceEventEmitter } from 'react-native';
 import * as RTCUtil from '../Util/RTCUtil';
 import RTCMediaStream from '../MediaStream/RTCMediaStream';
 import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
-import { RTCEvent, RTCMediaStreamEvent, RTCIceCandidateEvent } from '../Event/RTCEvents';
+import { RTCEvent, RTCMediaStreamEvent, RTCMediaStreamTrackEvent, RTCIceCandidateEvent } from '../Event/RTCEvents';
 import RTCIceCandidate from './RTCIceCandidate';
 import RTCPeerConnectionEventTarget from './RTCPeerConnectionEventTarget';
 import RTCSessionDescription from './RTCSessionDescription';
@@ -441,6 +441,18 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
         let receiver = new RTCRtpReceiver(ev.receiver);
         this.receivers.push(receiver);
         this.dispatchEvent(new RTCMediaStreamTrackEvent('addtrack',
+          { track: receiver.track, receiver: receiver }));
+      }),
+
+      DeviceEventEmitter.addListener('peerConnectionRemovedReceiver', ev => {
+        logger.log("# event: peerConnectionRemovedReceiver =>", ev.valueTag);
+        if (ev.valueTag !== this._valueTag) {
+          return;
+        }
+
+        let receiver = new RTCRtpReceiver(ev.receiver);
+        this.receivers.push(receiver);
+        this.dispatchEvent(new RTCMediaStreamTrackEvent('removetrack',
           { track: receiver.track, receiver: receiver }));
       }),
 
