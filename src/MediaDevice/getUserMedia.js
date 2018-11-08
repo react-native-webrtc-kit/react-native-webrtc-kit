@@ -7,6 +7,11 @@ import RTCMediaStreamConstraints from '../MediaStream/RTCMediaStreamConstraints'
 import RTCMediaStreamError from '../MediaStream/RTCMediaStreamError';
 import logger from '../Util/RTCLogger';
 
+export type RTCUserMedia = {
+  tracks: Array<RTCMediaStreamTrack>,
+  streamId: String
+}
+
 /** 
  * カメラやマイクなどのメディア情報入力デバイスのストリームを生成します。
  * この関数を実行するとデバイスの使用許可がユーザーに要求され、
@@ -28,18 +33,19 @@ import logger from '../Util/RTCLogger';
  * @returns {Promise<RTCMediaStream>} ストリームの取得の結果を表す Promise 。
  *  エラー時は {@link RTCMediaStreamError} が渡されます。
  */
-export function getUserMedia(constraints: RTCMediaStreamConstraints | null): Promise<RTCMediaStream> {
+export function getUserMedia(constraints: RTCMediaStreamConstraints | null):
+  Promise<RTCUserMedia> {
   logger.log("# get user media");
   if (constraints == null) {
     constraints = new RTCMediaStreamConstraints();
   }
   return WebRTC.getUserMedia(constraints)
     .then(ev => {
-      const stream = new RTCMediaStream(ev.streamId, ev.valueTag);
+      var tracks = [];
       for (const track of ev.tracks) {
-        stream._addTrack(new RTCMediaStreamTrack(track));
+        tracks.push(new RTCMediaStreamTrack(track));
       }
-      return stream;
+      return { tracks, streamId: ev.streamId };
     })
     .catch(({ message, code }) => {
       let error;
