@@ -182,16 +182,6 @@ static void* remoteStreamsKey = "remoteStreams";
     objc_setAssociatedObject(self, remoteStreamsKey, remoteStreams, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-static void* remoteTracksKey = "remoteTracks";
-
-- (NSMutableDictionary<NSString *, RTCMediaStreamTrack *> *)remoteTracks {
-    return objc_getAssociatedObject(self, remoteTracksKey);
-}
-
-- (void)setRemoteTracks:(NSMutableDictionary<NSString *, RTCMediaStreamTrack *> *)remoteTracks {
-    objc_setAssociatedObject(self, remoteTracksKey, remoteTracks, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
 static void *connectionStateKey = "connectionState";
 
 - (RTCPeerConnectionState)connectionState
@@ -239,7 +229,6 @@ static void *connectionStateKey = "connectionState";
     }
     
     [self.remoteStreams removeAllObjects];
-    [self.remoteTracks removeAllObjects];
     
     [self close];
 
@@ -301,7 +290,6 @@ RCT_EXPORT_METHOD(peerConnectionInit:(nonnull RTCConfiguration *)configuration
     peerConnection.connectionState = RTCPeerConnectionStateNew;
     peerConnection.valueTag = valueTag;
     peerConnection.remoteStreams = [NSMutableDictionary dictionary];
-    peerConnection.remoteTracks = [NSMutableDictionary dictionary];
     self.peerConnections[valueTag] = peerConnection;
 }
 
@@ -515,7 +503,6 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
 - (void)peerConnection:(RTCPeerConnection *)peerConnection didAddStream:(RTCMediaStream *)stream {
     NSMutableArray *tracks = [NSMutableArray array];
     for (RTCVideoTrack *track in stream.videoTracks) {
-        peerConnection.remoteTracks[track.trackId] = track;
         track.valueTag = [self createNewValueTag];
         self.localTracks[track.valueTag] = track;
         [tracks addObject:@{@"id": track.trackId,
@@ -526,7 +513,6 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
                             @"readyState": @"live"}];
     }
     for (RTCAudioTrack *track in stream.audioTracks) {
-        peerConnection.remoteTracks[track.trackId] = track;
         track.valueTag = [self createNewValueTag];
         self.localTracks[track.valueTag] = track;
         [tracks addObject:@{@"id": track.trackId,
@@ -559,10 +545,10 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
         return;
     }
     for (RTCVideoTrack *track in stream.videoTracks) {
-        [peerConnection.remoteTracks removeObjectForKey:track.trackId];
+        [self.localTracks removeObjectForKey: track.valueTag];
     }
     for (RTCAudioTrack *track in stream.audioTracks) {
-        [peerConnection.remoteTracks removeObjectForKey:track.trackId];
+        [self.localTracks removeObjectForKey: track.valueTag];
     }
     [peerConnection.remoteStreams removeObjectForKey:streamValueTag];
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionRemovedStream"
@@ -578,7 +564,6 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
     rtpReceiver.valueTag = [self createNewValueTag];
     [WebRTCValueManager addNewObject: rtpReceiver];
     self.receivers[rtpReceiver.valueTag] = rtpReceiver;
-    peerConnection.remoteTracks[rtpReceiver.track.trackId] = rtpReceiver.track;
     
     [self.bridge.eventDispatcher
      sendDeviceEventWithName: @"peerConnectionAddedReceiver"
@@ -589,7 +574,6 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
      didRemoveReceiver:(RTCRtpReceiver *)rtpReceiver
 {
-    peerConnection.remoteTracks[rtpReceiver.track.trackId] = nil;
     
     self.receivers[rtpReceiver.valueTag] = nil;
     [WebRTCValueManager removeValueTagForObject: rtpReceiver];
