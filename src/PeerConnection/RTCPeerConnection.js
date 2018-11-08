@@ -303,11 +303,9 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
     throw new Error("removeLocalStream() is deprecated")
   }
 
-  addTrack(track: RTCMediaStreamTrack, streams: Array<RTCMediaStream>): RTCRtpSender {
+  addTrack(track: RTCMediaStreamTrack, streamIds: Array<String>): Promise<RTCRtpSender> {
     var streamValueTags = [];
-    streams.forEach(stream => streamValueTags.push(stream._valueTag));
-    WebRTC.peerConnectionAddTrack(this._valueTag, track._valueTag,
-      streamValueTags)
+    return WebRTC.peerConnectionAddTrack(this._valueTag, track._valueTag, streamIds)
       .then((info) => {
         console.log("addTrack: sender => ", info);
         let sender = new RTCRtpSender(info);
