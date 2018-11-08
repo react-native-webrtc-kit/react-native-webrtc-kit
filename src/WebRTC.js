@@ -3,7 +3,7 @@
 import { NativeModules } from 'react-native';
 import RTCConfiguration from './PeerConnection/RTCConfiguration';
 import RTCIceCandidate from './PeerConnection/RTCIceCandidate';
-import RTCMediaStream from './MediaStream/RTCMediaStream';
+import RTCMediaStreamTrack from './MediaStream/RTCMediaStreamTrack';
 import RTCMediaStreamTrackEventTarget from './MediaStream/RTCMediaStreamTrackEventTarget';
 import RTCMediaConstraints from './PeerConnection/RTCMediaConstraints';
 import RTCMediaStreamConstraints from './MediaStream/RTCMediaStreamConstraints';
@@ -26,7 +26,7 @@ export default class WebRTC {
     WebRTCModule.finishLoading();
   }
 
-  static getUserMedia(constraints: RTCMediaStreamConstraints): Promise<RTCMediaStream> {
+  static getUserMedia(constraints: RTCMediaStreamConstraints): Promise<Object> {
     return WebRTCModule.getUserMedia(constraints.toJSON());
   }
 
