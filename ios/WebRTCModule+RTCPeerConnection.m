@@ -319,10 +319,10 @@ RCT_EXPORT_METHOD(peerConnectionSetConfiguration:(nonnull RTCConfiguration *)con
 
 // TODO: deprecated
 
-// MARK: -peerConnectionAddTrack:streamValueTag:valueTag:
+// MARK: -peerConnectionAddTrack:streamIds:valueTag:
 
 RCT_EXPORT_METHOD(peerConnectionAddTrack:(nonnull NSString *)trackValueTag
-                  streamValueTags:(nonnull NSArray *)streamValueTags
+                  streamIds:(nonnull NSArray *)streamIds
                   valueTag:(nonnull NSString *)valueTag
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
@@ -336,19 +336,13 @@ RCT_EXPORT_METHOD(peerConnectionAddTrack:(nonnull NSString *)trackValueTag
         reject(@"NotFoundError", @"track is not found", nil);
         return;
     }
-    NSMutableArray *streamIds = [[NSMutableArray alloc]
-                               initWithCapacity: [streamValueTags count]];
-    for (NSString *tag in streamValueTags) {
-        RTCMediaStream *stream = self.localStreams[tag];
-        if (!stream) {
-            reject(@"NotFoundError", @"stream is not found", nil);
-            return;
-        }
-        [streamIds addObject: stream.streamId];
-    }
 
     RTCRtpSender *sender = [peerConnection addTrack: track
                                           streamIds: streamIds];
+    if (!sender) {
+        reject(@"PeerConnectionError", @"cannot add the track", nil);
+        return;
+    }
     sender.valueTag = [self createNewValueTag];
     self.senders[sender.valueTag] = sender;
     
