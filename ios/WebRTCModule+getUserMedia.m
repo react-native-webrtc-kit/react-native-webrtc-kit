@@ -262,7 +262,6 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
     
     // JS に処理を戻す
     resolve(@{@"streamId": mediaStream.streamId,
-              @"valueTag": streamValueTag,
               @"tracks": tracks});
 }
 

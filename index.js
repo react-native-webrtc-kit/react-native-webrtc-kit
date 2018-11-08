@@ -34,6 +34,7 @@ export type { RTCRtpEncodingParameters } from './src/PeerConnection/RTCRtpParame
 export type { RTCRtpCodecParameters } from './src/PeerConnection/RTCRtpParameters';
 export type { RTCFacingMode } from './src/MediaStream/RTCMediaStreamConstraints';
 export type { RTCSdpType } from './src/PeerConnection/RTCSessionDescription';
+export type { RTCUserMedia } from './src/MediaDevice/getUserMedia';
 
 // ネイティブモジュールに JS レイヤーのロードを知らせる。
 // デバッグモードでのリロード時に古い接続の終了処理を行う。
