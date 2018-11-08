@@ -305,8 +305,6 @@ RCT_EXPORT_METHOD(peerConnectionSetConfiguration:(nonnull RTCConfiguration *)con
     [peerConnection setConfiguration:configuration];
 }
 
-// TODO: deprecated
-
 // MARK: -peerConnectionAddTrack:streamIds:valueTag:
 
 RCT_EXPORT_METHOD(peerConnectionAddTrack:(nonnull NSString *)trackValueTag
