@@ -47,7 +47,7 @@ static WebRTCModule *sharedModule;
          decoderFactory: decoderFactory];
         self.peerConnections = [NSMutableDictionary dictionary];
         self.localStreams = [NSMutableDictionary dictionary];
-        self.localTracks = [NSMutableDictionary dictionary];
+        self.tracks = [NSMutableDictionary dictionary];
         self.senders = [NSMutableDictionary dictionary];
         self.receivers = [NSMutableDictionary dictionary];
         self.transceivers = [NSMutableDictionary dictionary];
@@ -121,7 +121,7 @@ RCT_EXPORT_METHOD(finishLoading) {
     }
     
     [_peerConnections removeAllObjects];
-    [_localTracks removeAllObjects];
+    [_tracks removeAllObjects];
     [_localStreams removeAllObjects];
     [_senders removeAllObjects];
     [_receivers removeAllObjects];

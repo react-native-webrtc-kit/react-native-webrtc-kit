@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) NSMutableDictionary<NSString *, RTCPeerConnection *> *peerConnections;
 @property (nonatomic) NSMutableDictionary<NSString *, RTCMediaStream *> *localStreams;
-@property (nonatomic) NSMutableDictionary<NSString *, RTCMediaStreamTrack *> *localTracks;
+@property (nonatomic) NSMutableDictionary<NSString *, RTCMediaStreamTrack *> *tracks;
 @property (nonatomic) NSMutableDictionary<NSString*, RTCRtpSender *> *senders;
 @property (nonatomic) NSMutableDictionary<NSString*, RTCRtpReceiver *> *receivers;
 @property (nonatomic) NSMutableDictionary<NSString*, RTCRtpTransceiver *> *transceivers;
