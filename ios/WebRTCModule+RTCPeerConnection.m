@@ -172,16 +172,6 @@ static void *peerConnectionValueTagKey = "peerConnectionValueTag";
                              OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-static void* remoteStreamsKey = "remoteStreams";
-
-- (NSMutableDictionary<NSString *, RTCMediaStream *> *)remoteStreams {
-    return objc_getAssociatedObject(self, remoteStreamsKey);
-}
-
-- (void)setRemoteStreams:(NSMutableDictionary<NSNumber *,RTCMediaStream *> *)remoteStreams {
-    objc_setAssociatedObject(self, remoteStreamsKey, remoteStreams, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
 static void *connectionStateKey = "connectionState";
 
 - (RTCPeerConnectionState)connectionState
@@ -209,21 +199,6 @@ static void *connectionStateKey = "connectionState";
     [SharedModule.peerConnections removeObjectForKey: self.valueTag];
     
     self.connectionState = RTCPeerConnectionStateDisconnecting;
-    
-    // ストリームを外してから接続を閉じる
-    NSMutableArray *localStreams = [[NSMutableArray alloc] initWithArray: self.localStreams];
-    for (RTCMediaStream *stream in localStreams) {
-        [self removeStream: stream];
-    }
-    
-    NSMutableArray *remoteStreamKeys = [[NSMutableArray alloc] initWithArray: self.remoteStreams.allKeys];
-    for (NSString *key in remoteStreamKeys) {
-        RTCMediaStream *stream = self.remoteStreams[key];
-        if (stream)
-            [self removeStream: stream];
-    }
-    
-    [self.remoteStreams removeAllObjects];
     
     [self close];
 
@@ -284,7 +259,6 @@ RCT_EXPORT_METHOD(peerConnectionInit:(nonnull RTCConfiguration *)configuration
                                                        delegate: self];
     peerConnection.connectionState = RTCPeerConnectionStateNew;
     peerConnection.valueTag = valueTag;
-    peerConnection.remoteStreams = [NSMutableDictionary dictionary];
     self.peerConnections[valueTag] = peerConnection;
 }
 
@@ -491,63 +465,6 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionSignalingStateChanged"
                                                     body:@{@"valueTag": peerConnection.valueTag,
                                                            @"signalingState": [WebRTCUtils stringForSignalingState:newState]}];
-}
-
-- (void)peerConnection:(RTCPeerConnection *)peerConnection didAddStream:(RTCMediaStream *)stream {
-    NSMutableArray *tracks = [NSMutableArray array];
-    for (RTCVideoTrack *track in stream.videoTracks) {
-        track.valueTag = [self createNewValueTag];
-        self.tracks[track.valueTag] = track;
-        [tracks addObject:@{@"id": track.trackId,
-                            @"kind": track.kind,
-                            @"label": track.trackId,
-                            @"enabled": @(track.isEnabled),
-                            @"remote": @(YES),
-                            @"readyState": @"live"}];
-    }
-    for (RTCAudioTrack *track in stream.audioTracks) {
-        track.valueTag = [self createNewValueTag];
-        self.tracks[track.valueTag] = track;
-        [tracks addObject:@{@"id": track.trackId,
-                            @"kind": track.kind,
-                            @"label": track.trackId,
-                            @"enabled": @(track.isEnabled),
-                            @"remote": @(YES),
-                            @"readyState": @"live"}];
-    }
-    
-    stream.valueTag = [self createNewValueTag];
-    peerConnection.remoteStreams[stream.valueTag] = stream;
-    [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionAddedStream"
-                                                    body:@{@"valueTag": peerConnection.valueTag,
-                                                           @"streamId": stream.streamId,
-                                                           @"streamValueTag": stream.valueTag,
-                                                           @"tracks": tracks}];
-}
-
-- (void)peerConnection:(RTCPeerConnection *)peerConnection didRemoveStream:(RTCMediaStream *)stream {
-    // ストリームに対応するキーが複数あればエラー
-    NSArray *keysArray = [peerConnection.remoteStreams allKeysForObject:stream];
-    if (keysArray.count > 1) {
-        NSLog(@"didRemoveStream - more than one stream entry found for stream instance with id: %@", stream.streamId);
-    }
-    
-    NSString *streamValueTag = keysArray.count ? keysArray[0] : nil;
-    if (!streamValueTag) {
-        NSLog(@"didRemoveStream - stream not found, streamId: %@", stream.streamId);
-        return;
-    }
-    for (RTCVideoTrack *track in stream.videoTracks) {
-        [self.tracks removeObjectForKey: track.valueTag];
-    }
-    for (RTCAudioTrack *track in stream.audioTracks) {
-        [self.tracks removeObjectForKey: track.valueTag];
-    }
-    [peerConnection.remoteStreams removeObjectForKey:streamValueTag];
-    [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionRemovedStream"
-                                                    body:@{@"valueTag": peerConnection.valueTag,
-                                                           @"streamId": stream.streamId,
-                                                           @"streamValueTag": streamValueTag}];
 }
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection

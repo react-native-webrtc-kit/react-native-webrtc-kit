@@ -50,9 +50,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, nullable) NSString *valueTag;
 
- // key = valueTag, not MediaStream.id
-@property (nonatomic) NSMutableDictionary<NSString *, RTCMediaStream *> *remoteStreams;
-
 @property (nonatomic) RTCPeerConnectionState connectionState;
 
 /**

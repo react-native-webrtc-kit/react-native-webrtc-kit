@@ -73,7 +73,7 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
             return;
         }
         this._enabled = enabled;
-        WebRTC.trackSetEnabled(this.id, this.streamValueTag, enabled);
+        WebRTC.trackSetEnabled(this._valueTag, enabled);
     }
 
     get aspectRatio(): number | null {
@@ -86,7 +86,7 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
             return;
         }
         this._aspectRatio = value;
-        WebRTC.trackSetAspectRatio(this.id, this.streamValueTag, value);
+        WebRTC.trackSetAspectRatio(this._valueTag, value);
     }
 
     /**
