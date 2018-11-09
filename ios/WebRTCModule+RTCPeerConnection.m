@@ -93,7 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
     // 新しい value tag を割り当てる
     RTCMediaStreamTrack *track = self.track;
     track.valueTag = [[WebRTCModule shared] createNewValueTag];
-    [WebRTCModule shared].localTracks[track.valueTag] = track;
+    [WebRTCModule shared].tracks[track.valueTag] = track;
     
     return @{@"receiverId": self.receiverId,
              @"parameters": [self.parameters json],
@@ -312,7 +312,7 @@ RCT_EXPORT_METHOD(peerConnectionAddTrack:(nonnull NSString *)trackValueTag
         reject(@"NotFoundError", @"peer connection is not found", nil);
         return;
     }
-    RTCMediaStreamTrack *track = self.localTracks[trackValueTag];
+    RTCMediaStreamTrack *track = self.tracks[trackValueTag];
     if (!track) {
         reject(@"NotFoundError", @"track is not found", nil);
         return;
@@ -497,7 +497,7 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
     NSMutableArray *tracks = [NSMutableArray array];
     for (RTCVideoTrack *track in stream.videoTracks) {
         track.valueTag = [self createNewValueTag];
-        self.localTracks[track.valueTag] = track;
+        self.tracks[track.valueTag] = track;
         [tracks addObject:@{@"id": track.trackId,
                             @"kind": track.kind,
                             @"label": track.trackId,
@@ -507,7 +507,7 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
     }
     for (RTCAudioTrack *track in stream.audioTracks) {
         track.valueTag = [self createNewValueTag];
-        self.localTracks[track.valueTag] = track;
+        self.tracks[track.valueTag] = track;
         [tracks addObject:@{@"id": track.trackId,
                             @"kind": track.kind,
                             @"label": track.trackId,
@@ -538,10 +538,10 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
         return;
     }
     for (RTCVideoTrack *track in stream.videoTracks) {
-        [self.localTracks removeObjectForKey: track.valueTag];
+        [self.tracks removeObjectForKey: track.valueTag];
     }
     for (RTCAudioTrack *track in stream.audioTracks) {
-        [self.localTracks removeObjectForKey: track.valueTag];
+        [self.tracks removeObjectForKey: track.valueTag];
     }
     [peerConnection.remoteStreams removeObjectForKey:streamValueTag];
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionRemovedStream"
