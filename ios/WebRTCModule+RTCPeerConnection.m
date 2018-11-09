@@ -213,11 +213,6 @@ static void *connectionStateKey = "connectionState";
     // ストリームを外してから接続を閉じる
     NSMutableArray *localStreams = [[NSMutableArray alloc] initWithArray: self.localStreams];
     for (RTCMediaStream *stream in localStreams) {
-        // カメラの映像を扱うストリームから外す
-        if (stream.valueTag) {
-            [WebRTCCamera removeStreamForValueTag: stream.valueTag];
-            [SharedModule.localStreams removeObjectForKey: stream.valueTag];
-        }
         [self removeStream: stream];
     }
     
