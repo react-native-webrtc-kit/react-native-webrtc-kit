@@ -89,14 +89,13 @@ export default class WebRTC {
     return WebRTCModule.peerConnectionSetRemoteDescription(sdp.toJSON(), valueTag);
   }
 
-  static trackSetEnabled(valueTag: ValueTag, streamValueTag: ValueTag, enabled: boolean) {
-    WebRTCModule.trackSetEnabled(enabled, valueTag, streamValueTag);
+  static trackSetEnabled(valueTag: ValueTag, enabled: boolean) {
+    WebRTCModule.trackSetEnabled(enabled, valueTag);
   }
 
   static trackSetAspectRatio(valueTag: ValueTag,
-    streamValueTag: ValueTag,
     aspectRatio: number) {
-    WebRTCModule.trackSetAspectRatio(aspectRatio, valueTag, streamValueTag);
+    WebRTCModule.trackSetAspectRatio(aspectRatio, valueTag);
   }
 
   static transceiverCurrentDirection(valueTag: ValueTag):

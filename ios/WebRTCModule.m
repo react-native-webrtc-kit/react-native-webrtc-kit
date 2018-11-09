@@ -46,7 +46,6 @@ static WebRTCModule *sharedModule;
          initWithEncoderFactory: encoderFactory
          decoderFactory: decoderFactory];
         self.peerConnections = [NSMutableDictionary dictionary];
-        self.localStreams = [NSMutableDictionary dictionary];
         self.tracks = [NSMutableDictionary dictionary];
         self.senders = [NSMutableDictionary dictionary];
         self.receivers = [NSMutableDictionary dictionary];
@@ -73,25 +72,7 @@ static WebRTCModule *sharedModule;
 #pragma mark - Methods
 
 - (NSString *)createNewValueTag {
-    NSString *valueTag;
-    // Make sure ID does not exist across local and remote streams (for any peerConnection)
-    do {
-        valueTag = [[NSUUID UUID] UUIDString];
-    } while ([self streamForValueTag: valueTag]);
-    return valueTag;
-}
-
-- (nullable RTCMediaStream *)streamForValueTag:(NSString *)valueTag {
-    __block RTCMediaStream *stream = self.localStreams[valueTag];
-    if (!stream) {
-        [self.peerConnections enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, RTCPeerConnection * _Nonnull obj, BOOL * _Nonnull stop) {
-            stream = obj.remoteStreams[valueTag];
-            if (stream) {
-                *stop = YES;
-            }
-        }];
-    }
-    return stream;
+    return [[NSUUID UUID] UUIDString];
 }
 
 #pragma mark - React Native Exports
@@ -122,7 +103,6 @@ RCT_EXPORT_METHOD(finishLoading) {
     
     [_peerConnections removeAllObjects];
     [_tracks removeAllObjects];
-    [_localStreams removeAllObjects];
     [_senders removeAllObjects];
     [_receivers removeAllObjects];
     [_transceivers removeAllObjects];

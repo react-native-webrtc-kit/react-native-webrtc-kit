@@ -90,29 +90,21 @@ static void *aspectRatioKey = "aspectRatio";
 // MARK: -trackSetEnabled:trackId:valueTag:
 
 RCT_EXPORT_METHOD(trackSetEnabled:(nonnull NSNumber *)isEnabled
-                  trackId:(nonnull NSString *)trackId
                   valueTag:(nonnull NSString *)valueTag)
 {
-    RTCMediaStream *stream = [self streamForValueTag: valueTag];
-    if (stream) {
-        RTCMediaStreamTrack *track = [stream trackForTrackId: trackId];
-        if (track)
-            track.isEnabled = [isEnabled boolValue];
-    }
+    RTCMediaStreamTrack *track = self.tracks[valueTag];
+    if (track)
+        track.isEnabled = [isEnabled boolValue];
 }
 
 // MARK: -trackSetAspectRatio:trackId:valueTag:
 
 RCT_EXPORT_METHOD(trackSetAspectRatio:(nonnull NSNumber *)aspectRatio
-                  trackId:(nonnull NSString *)trackId
                   valueTag:(nonnull NSString *)valueTag)
 {
-    RTCMediaStream *stream = [self streamForValueTag: valueTag];
-    if (stream) {
-        RTCMediaStreamTrack *track = [stream trackForTrackId: trackId];
-        if ([track isKindOfClass: [RTCVideoTrack class]]) {
-            ((RTCVideoTrack *)track).aspectRatio = [aspectRatio doubleValue];
-        }
+    RTCMediaStreamTrack *track = self.tracks[valueTag];
+    if ([track isKindOfClass: [RTCVideoTrack class]]) {
+        ((RTCVideoTrack *)track).aspectRatio = [aspectRatio doubleValue];
     }
 }
 
