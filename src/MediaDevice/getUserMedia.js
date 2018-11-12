@@ -13,25 +13,28 @@ export type RTCUserMedia = {
 }
 
 /** 
- * カメラやマイクなどのメディア情報入力デバイスのストリームを生成します。
+ * カメラやマイクなどのメディア情報入力デバイスのトラックを生成します。
  * この関数を実行するとデバイスの使用許可がユーザーに要求され、
- * ユーザーが許可すると、 Promise はストリームを引数として解決されます。
+ * ユーザーが許可すると、 Promise は {@link RTCUserMedia} を引数として解決されます。
+ * {@link RTCPeerConnection} でトラックを利用するには `addTrack()` で追加します。
  * 
- * このストリームが追加された RTCPeerConnection の接続を解除すると
- * ストリームも閉じられます。
- * 再び入力デバイスのストリームを使う場合は、再度この関数を実行して
- * ストリームを生成する必要があります。
+ * この関数で生成されるトラックの使用は一度きりです。
+ * 再び入力デバイスを使う場合は、再度この関数を実行して
+ * 新しいトラックを生成する必要があります。
  * 
  * @example
- * getUserMedia(null).then((stream) => {
+ * getUserMedia(null).then((info) => {
  *   var pc = new RTCPeerConnection(constraints);
- *   pc.addLocalStream(stream);
+ *   info.tracks.forEach(track =>
+ *     this._pc.addTrack(track, [info.streamId])
+ *   );
  *   ...
  * });
  * 
- * @param {RTCMediaStreamConstraints|null} constraints ストリームの制約
- * @returns {Promise<RTCMediaStream>} ストリームの取得の結果を表す Promise 。
+ * @param {RTCMediaStreamConstraints|null} constraints トラックの制約
+ * @returns {Promise<RTCUserMedia>} トラックの取得の結果を表す Promise 。
  *  エラー時は {@link RTCMediaStreamError} が渡されます。
+ * @version 1.1.0
  */
 export function getUserMedia(constraints: RTCMediaStreamConstraints | null):
   Promise<RTCUserMedia> {
