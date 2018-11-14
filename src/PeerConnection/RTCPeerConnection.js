@@ -144,10 +144,25 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    */
   remoteDescription: RTCSessionDescription | null;
 
+  /**
+   * センダーのリスト
+   * 
+   * @since 1.1.0
+   */
   senders: Array<RTCRtpSender> = [];
 
+  /**
+   * レシーバーのリスト
+   * 
+   * @since 1.1.0
+   */
   receivers: Array<RTCRtpReceiver> = [];
 
+  /**
+   * トランシーバーのリスト
+   * 
+   * @since 1.1.0
+   */
   transceivers: Array<RTCRtpTransceiver> = [];
 
   _valueTag: ValueTag;
@@ -277,6 +292,8 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * @deprecated ストリームの操作は廃止されました。 receivers を使用してください。
+   * 
+   * @version 1.1.0
    */
   getRemoteStreams(): Array<RTCMediaStream> {
     return this._remoteStreams.slice();
@@ -284,6 +301,8 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * @deprecated ストリームの操作は廃止されました。 addTrack() を使用してください。
+   * 
+   * @version 1.1.0
    */
   addStream(stream: RTCMediaStream): void {
     throw new Error("addStream() is deprecated");
@@ -291,6 +310,8 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * @deprecated ストリームの操作は廃止されました。 addTrack() を使用してください。
+   * 
+   * @version 1.1.0
    */
   addLocalStream(stream: RTCMediaStream): void {
     throw new Error("addLocalStream() is deprecated");
@@ -298,11 +319,22 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * @deprecated ストリームの操作は廃止されました。 removeTrack() を使用してください。
+   * 
+   * @version 1.1.0
    */
   removeLocalStream(stream: RTCMediaStream): void {
     throw new Error("removeLocalStream() is deprecated")
   }
 
+  /**
+   * 指定したストリームにトラックを追加します。
+   * 
+   * @param {RTCMediaStreamTrack} track 追加するトラック
+   * @param {Array<String>} streamIds トラックを追加するストリーム ID
+   * @return {Promise<RTCRtpSender>} 結果を表す Promise 。追加されたトラックを返す
+   * 
+   * @since 1.1.0
+   */
   addTrack(track: RTCMediaStreamTrack, streamIds: Array<String>): Promise<RTCRtpSender> {
     var streamValueTags = [];
     return WebRTC.peerConnectionAddTrack(this._valueTag, track._valueTag, streamIds)
@@ -314,6 +346,13 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
       });
   }
 
+  /**
+   * 送信用のトラックを取り除きます。
+   * 
+   * @param {RTCRtpSender} sender 取り除くトラック
+   * 
+   * @since 1.1.0
+   */
   removeTrack(sender: RTCRtpSender) {
     this.senders = this.senders.filter(
       e => e.id != sender.id);
