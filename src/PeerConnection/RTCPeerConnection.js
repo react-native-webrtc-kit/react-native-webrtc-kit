@@ -435,40 +435,6 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
         this.dispatchEvent(new RTCEvent('signalingstatechange'));
       }),
 
-      DeviceEventEmitter.addListener('peerConnectionAddedStream', ev => {
-        logger.log("# event: peerConnectionAddedStream =>", ev.streamId, ev.streamValueTag);
-        if (ev.valueTag !== this._valueTag) {
-          return;
-        }
-        const stream: RTCMediaStream = new RTCMediaStream(ev.streamId, ev.streamValueTag);
-        const tracks: Array<any> = ev.tracks;
-        for (let i = 0; i < tracks.length; i++) {
-          let track = new RTCMediaStreamTrack(tracks[i]);
-          if (track.kind == 'video') {
-            if (this._constraints.video) {
-              track.aspectRatio = this._constraints.video.aspectRatio;
-            }
-          }
-          stream._addTrack(track);
-        }
-        this._remoteStreams.push(stream);
-        this.dispatchEvent(new RTCMediaStreamEvent('addstream', { stream }));
-      }),
-
-      DeviceEventEmitter.addListener('peerConnectionRemovedStream', ev => {
-        logger.log("# event: peerConnectionRemovedStream =>", ev.valueTag);
-        if (ev.valueTag !== this._valueTag) {
-          return;
-        }
-        const stream = this._remoteStreams.find(s => s._valueTag === ev.valueTag);
-        if (stream) {
-          const index = this._remoteStreams.indexOf(stream);
-          if (index > -1) {
-            this._remoteStreams.splice(index, 1);
-          }
-        }
-        this.dispatchEvent(new RTCMediaStreamEvent('removestream', { stream }));
-      }),
       DeviceEventEmitter.addListener('peerConnectionAddedReceiver', ev => {
         logger.log("# event: peerConnectionAddedReceiver =>", ev.valueTag);
         if (ev.valueTag !== this._valueTag) {
