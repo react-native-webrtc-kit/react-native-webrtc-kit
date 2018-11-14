@@ -521,13 +521,21 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
                                                                    @"sdpMid": candidate.sdpMid}}];
 }
 
+- (void)peerConnection:(RTCPeerConnection*)peerConnection didOpenDataChannel:(RTCDataChannel*)dataChannel {
+    // DataChannel は現在対応しない
+}
+
+// MARK: Deprecated
+
 - (void)peerConnection:(RTCPeerConnection *)peerConnection didRemoveIceCandidates:(NSArray<RTCIceCandidate *> *)candidates {
     [peerConnection removeIceCandidates: candidates];
 }
 
-- (void)peerConnection:(RTCPeerConnection*)peerConnection didOpenDataChannel:(RTCDataChannel*)dataChannel {
-    // DataChannel は現在対応しない
-}
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+          didAddStream:(RTCMediaStream *)stream {}
+
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+       didRemoveStream:(RTCMediaStream *)stream {}
 
 @end
 
