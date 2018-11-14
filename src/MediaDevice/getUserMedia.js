@@ -7,9 +7,27 @@ import RTCMediaStreamConstraints from '../MediaStream/RTCMediaStreamConstraints'
 import RTCMediaStreamError from '../MediaStream/RTCMediaStreamError';
 import logger from '../Util/RTCLogger';
 
-export type RTCUserMedia = {
-  tracks: Array<RTCMediaStreamTrack>,
-  streamId: String
+/**
+ * {@link getUserMedia} で取得できるメディア情報入力トラックの情報です。
+ * 
+ * @since 1.1.0
+ */
+export class RTCUserMedia {
+
+  /** 入力トラックのリスト */
+  tracks: Array<RTCMediaStreamTrack>;
+
+  /** トラックが属するストリーム ID */
+  streamId: String;
+
+  /**
+   * @ignore
+   */
+  constructor(tracks: Array<RTCMediaStreamTrack>, streamId: String) {
+    self.tracks = tracks;
+    self.streamId = streamId;
+  }
+
 }
 
 /** 
@@ -48,7 +66,7 @@ export function getUserMedia(constraints: RTCMediaStreamConstraints | null):
       for (const track of ev.tracks) {
         tracks.push(new RTCMediaStreamTrack(track));
       }
-      return { tracks, streamId: ev.streamId };
+      return new RTCUserMedia(tracks, ev.streamId);
     })
     .catch(({ message, code }) => {
       let error;
