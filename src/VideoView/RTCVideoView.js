@@ -77,6 +77,8 @@ export class RTCVideoView extends React.Component<Props> {
 
   /**
    * 描画する映像トラック
+   * 
+   * @since 1.1.0
    */
   track: RTCMediaStreamTrack | null;
 
