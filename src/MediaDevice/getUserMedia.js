@@ -24,8 +24,8 @@ export class RTCUserMedia {
    * @ignore
    */
   constructor(tracks: Array<RTCMediaStreamTrack>, streamId: String) {
-    self.tracks = tracks;
-    self.streamId = streamId;
+    this.tracks = tracks;
+    this.streamId = streamId;
   }
 
 }
