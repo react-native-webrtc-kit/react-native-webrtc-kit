@@ -181,8 +181,10 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * @listens {icegatheringstatechange} `RTCIceCandidateEvent` | `RTCIceCandidateEvent`: `iceGatheringState` が変更されると送信されるイベント
    * @listens {negotiationneeded} `RTCEvent`: ネゴシエーションが必要になったときに送信されます。
    * @listens {signalingstatechange} `RTCEvent`: `signalingState` が変更されると送信されます。
-   * @listens {addstream} `RTCEvent`: RTCPeerConnection にストリームが追加されると送信されます。
-   * @listens {removestream} `RTCEvent`: RTCPeerConnection からストリームが削除されると送信されます。
+   * @listens {addtrack} `RTCEvent`: RTCPeerConnection にトラックが追加されると送信されます。
+   * @listens {removetrack} `RTCEvent`: RTCPeerConnection からトラックが削除されると送信されます。
+   * @listens {addstream} このイベントは廃止されました。
+   * @listens {removestream} このイベントは廃止されました。
    */
   constructor(configuration: RTCConfiguration | null = null,
     constraints: RTCMediaConstraints | null = null) {
