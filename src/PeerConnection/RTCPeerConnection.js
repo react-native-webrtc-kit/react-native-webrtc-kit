@@ -287,6 +287,8 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * @deprecated ストリームの操作は廃止されました。 senders を使用してください。
+   * 
+   * @version 1.1.0
    */
   getLocalStreams(): Array<RTCMediaStream> {
     throw new Error("getLocalStream() is deprecated")
