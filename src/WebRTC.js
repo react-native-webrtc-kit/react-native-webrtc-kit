@@ -98,9 +98,16 @@ export default class WebRTC {
     WebRTCModule.trackSetAspectRatio(aspectRatio, valueTag);
   }
 
-  static transceiverCurrentDirection(valueTag: ValueTag):
-    Promise<RTCRtpTransceiverDirection | null> {
-    return WebRTCModule.transceiverCurrentDirection(valueTag);
+  static transceiverDirection(valueTag: ValueTag): Promise<RTCRtpTransceiverDirection> {
+    return WebRTCModule.transceiverDirection(valueTag)
+  }
+
+  static transceiverSetDirection(valueTag: ValueTag, value: RTCRtpTransceiverDirection) {
+    WebRTCModule.transceiverSetDirection(valueTag, value)
+  }
+
+  static transceiverCurrentDirection(valueTag: ValueTag): Promise<RTCRtpTransceiverDirection> {
+    return WebRTCModule.transceiverCurrentDirection(valueTag)
   }
 
   static transceiverStop(valueTag: ValueTag) {
