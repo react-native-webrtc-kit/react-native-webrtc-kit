@@ -18,9 +18,6 @@ export const PEER_CONNECTION_EVENTS = [
   'signalingstatechange',
   'addtrack',
   'removetrack',
-  // DEPRECATED events
-  'addstream',
-  'removestream'
 ];
 
 /**
