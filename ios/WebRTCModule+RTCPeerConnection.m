@@ -123,8 +123,7 @@ static void *transceiverValueTagKey = "transceiverValueTagKey";
              @"mid": self.mid,
              @"sender": [self.sender json],
              @"receiver": [self.receiver json],
-             @"stopped": [NSNumber numberWithBool: self.isStopped],
-             @"direction": [RTCRtpTransceiver directionDescription: self.direction]};
+             @"stopped": [NSNumber numberWithBool: self.isStopped]};
 }
 
 + (NSString *)directionDescription:(RTCRtpTransceiverDirection)direction
@@ -153,6 +152,68 @@ static void *transceiverValueTagKey = "transceiverValueTagKey";
         return RTCRtpTransceiverDirectionInactive;
     else
         NSAssert(NO, @"invalid direction %@", string);
+}
+
+// MARK: - React Native Exports
+
+// MARK: transceiverDirection:resolver:rejecter:
+
+RCT_EXPORT_METHOD(transceiverDirection:(nonnull NSString *)valueTag
+                  resolver:(nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject) {
+    RTCRtpTransceiver *transceiver = [WebRTCModule shared].transceivers[valueTag];
+    if (!transceiver) {
+        reject(@"NotFoundError", @"transceiver is not found", nil);
+    }
+    resolve([RTCRtpTransceiver
+             directionDescription: transceiver.direction]);
+}
+
+// MARK: transceiverSetDirection:value:resolver:rejecter:
+
+RCT_EXPORT_METHOD(transceiverSetDirection:(nonnull NSString *)valueTag
+                  value:(nonnull NSString *)value
+                  resolver:(nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject) {
+    RTCRtpTransceiver *transceiver = [WebRTCModule shared].transceivers[valueTag];
+    if (!transceiver) {
+        reject(@"NotFoundError", @"transceiver is not found", nil);
+    }
+    transceiver.direction = [RTCRtpTransceiver directionFromString: value];
+    resolve([NSNull null]);
+}
+
+// MARK: transceiverCurrentDirection:resolver:rejecter:
+
+RCT_EXPORT_METHOD(transceiverCurrentDirection:(nonnull NSString *)valueTag
+                  resolver:(nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject) {
+    RTCRtpTransceiver *transceiver = [WebRTCModule shared].transceivers[valueTag];
+    if (!transceiver) {
+        reject(@"NotFoundError", @"transceiver is not found", nil);
+    }
+  
+    RTCRtpTransceiverDirection dir;
+    id ret;
+    if ([transceiver currentDirection: &dir]) {
+        ret = [RTCRtpTransceiver directionDescription: dir];
+    } else {
+        ret = [NSNull null];
+    }
+    resolve(ret);
+}
+
+// MARK: transceiverStop:resolver:rejecter:
+
+RCT_EXPORT_METHOD(transceiverStop:(nonnull NSString *)valueTag
+                  resolver:(nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject) {
+    RTCRtpTransceiver *transceiver = [WebRTCModule shared].transceivers[valueTag];
+    if (!transceiver) {
+        reject(@"NotFoundError", @"transceiver is not found", nil);
+    }
+    [transceiver stop];
+    resolve([NSNull null]);
 }
 
 @end
