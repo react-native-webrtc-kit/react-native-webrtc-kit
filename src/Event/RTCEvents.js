@@ -43,11 +43,15 @@ export class RTCMediaStreamTrackEvent {
 
     /**
      * レシーバー
+     * 
+     * @since 1.1.0
      */
     receiver: RTCRtpReceiver;
 
     /**
      * トランシーバー
+     * 
+     * @since 1.1.0
      */
     transceiver: RTCRtpTransceiver;
 
