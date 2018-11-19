@@ -12,7 +12,7 @@ export class RTCRtcpParameters {
 
 }
 
-export class RTCRtpHeaderExtension {
+export class RTCRtpHeaderExtensionParameters {
 
   uri: String;
   id: number;
@@ -63,7 +63,7 @@ export class RTCRtpParameters {
 
   transactionId: String;
   rtcp: RTCRtcpParameters;
-  headerExtensions: Array<RTCRtpHeaderExtension>;
+  headerExtensions: Array<RTCRtpHeaderExtensionParameters>;
   encodings: Array<RTCRtpEncodingParameters>;
   codecs: Array<RTCRtpCodecParameters>;
 
@@ -71,7 +71,7 @@ export class RTCRtpParameters {
     self.transactionId = info.transactionId;
     self.rtcp = new RTCRtcpParameters(info.rtcp);
     self.headerExtensions = info.headerExtensions.map(info =>
-      new RTCRtpHeaderExtension(info));
+      new RTCRtpHeaderExtensionParameters(info));
     self.encodings = info.encodings.map(info =>
       new RTCRtpEncodingParameters(info));
     self.codecs = info.codecs.map(info =>

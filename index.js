@@ -15,7 +15,7 @@ export { default as RTCRtpReceiver } from './src/PeerConnection/RTCRtpReceiver';
 export { default as RTCRtpTransceiver } from './src/PeerConnection/RTCRtpTransceiver';
 export { RTCRtcpParameters } from './src/PeerConnection/RTCRtpParameters';
 export { RTCRtpParameters } from './src/PeerConnection/RTCRtpParameters';
-export { RTCRtpHeaderExtension } from './src/PeerConnection/RTCRtpParameters';
+export { RTCRtpHeaderExtensionParameters } from './src/PeerConnection/RTCRtpParameters';
 export { RTCRtpEncodingParameters } from './src/PeerConnection/RTCRtpParameters';
 export { RTCRtpCodecParameters } from './src/PeerConnection/RTCRtpParameters';
 export { default as RTCSessionDescription } from './src/PeerConnection/RTCSessionDescription';
