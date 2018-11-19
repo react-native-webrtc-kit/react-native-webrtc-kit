@@ -5,7 +5,7 @@ import { DeviceEventEmitter } from 'react-native';
 import * as RTCUtil from '../Util/RTCUtil';
 import RTCMediaStream from '../MediaStream/RTCMediaStream';
 import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
-import { RTCEvent, RTCMediaStreamEvent, RTCMediaStreamTrackEvent, RTCIceCandidateEvent } from '../Event/RTCEvents';
+import { RTCEvent, RTCMediaStreamTrackEvent, RTCIceCandidateEvent } from '../Event/RTCEvents';
 import RTCIceCandidate from './RTCIceCandidate';
 import RTCPeerConnectionEventTarget from './RTCPeerConnectionEventTarget';
 import RTCSessionDescription from './RTCSessionDescription';

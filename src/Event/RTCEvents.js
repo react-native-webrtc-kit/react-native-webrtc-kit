@@ -27,31 +27,6 @@ export class RTCEvent {
 }
 
 /**
- * ストリームに関するイベントを表します。
- */
-export class RTCMediaStreamEvent {
-
-    /**
-     * イベントの種別
-     */
-    type: string;
-
-    /**
-     * ストリーム
-     */
-    stream: RTCMediaStream;
-
-    /**
-     * @package
-     */
-    constructor(type: string, eventInitDict?: Object) {
-        this.type = type.toString();
-        Object.assign(this, eventInitDict);
-    }
-
-}
-
-/**
  * トラックに関するイベントを表します。
  */
 export class RTCMediaStreamTrackEvent {

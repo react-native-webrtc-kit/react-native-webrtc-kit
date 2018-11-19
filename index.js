@@ -3,7 +3,6 @@
 import WebRTC from './src/WebRTC';
 
 export { RTCEvent } from './src/Event/RTCEvents';
-export { RTCMediaStreamEvent } from './src/Event/RTCEvents';
 export { RTCMediaStreamTrackEvent } from './src/Event/RTCEvents';
 export { RTCIceCandidateEvent } from './src/Event/RTCEvents';
 export { default as RTCConfiguration } from './src/PeerConnection/RTCConfiguration';
