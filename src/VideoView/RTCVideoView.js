@@ -72,6 +72,8 @@ export class RTCVideoView extends React.Component<Props> {
 
   /**
    * @deprecated track を使用してください。
+   * 
+   * @version 1.1.0
    */
   streamValueTag: ValueTag;
 
