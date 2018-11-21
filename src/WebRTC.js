@@ -114,4 +114,22 @@ export default class WebRTC {
     WebRTCModule.transceiverStop(valueTag);
   }
 
+  static rtpEncodingParametersSetActive(owner: ValueTag, ssrc: number | null, flag: boolean) {
+    WebRTCModule.rtpEncodingParametersSetActive(flag, ssrc, owner);
+  }
+
+  static rtpEncodingParametersSetMaxBitrate(owner: ValueTag, ssrc: number | null, value: number | null) {
+    if (value == null) {
+      value = -1;
+    }
+    WebRTCModule.rtpEncodingParametersSetMaxBitrate(value, ssrc, owner);
+  }
+
+  static rtpEncodingParametersSetMinBitrate(owner: ValueTag, ssrc: number | null, value: number | null) {
+    if (value == null) {
+      value = -1;
+    }
+    WebRTCModule.rtpEncodingParametersSetMinBitrate(value, ssrc, owner);
+  }
+
 }

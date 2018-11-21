@@ -1,5 +1,8 @@
 // @flow
 
+import WebRTC from '../WebRTC';
+import type { ValueTag } from './RTCPeerConnection';
+
 /**
  * RTCP に関するパラメーターです。
  * 
@@ -17,12 +20,15 @@ export class RTCRtcpParameters {
    */
   reducedSize: boolean;
 
+  _owner: ValueTag;
+
   /**
    * @package
    */
-  constructor(info: Object) {
-    self.cname = info.cname;
-    self.reducedSize = info.reducedSize;
+  constructor(owner: ValueTag, info: Object) {
+    this._owner = owner;
+    this.cname = info.cname;
+    this.reducedSize = info.reducedSize;
   }
 
 }
@@ -49,46 +55,89 @@ export class RTCRtpHeaderExtensionParameters {
    */
   encrypted: boolean;
 
+  _owner: ValueTag;
+
   /**
    * @package
    */
-  constructor(info: Object) {
-    self.uri = info.uri;
-    self.id = info.id;
-    self.encrypted = info.encrypted;
+  constructor(owner: ValueTag, info: Object) {
+    this._owner = owner;
+    this.uri = info.uri;
+    this.id = info.id;
+    this.encrypted = info.encrypted;
   }
 
 }
 
 /**
  * RTP エンコーディングに関するパラメーターです。
+ * このエンコーディングの設定はメディアデータの送信時に使われます。
  * 
  * @since 1.1.0
  */
 export class RTCRtpEncodingParameters {
 
-  active: boolean;
+  /**
+   * エンコーディングがメディアデータの送信時に使われるのであれば `true`
+   * 
+   * @type {boolean}
+   */
+  get active(): boolean {
+    return this._active;
+  }
+
+  set active(flag: boolean) {
+    this._active = flag;
+    WebRTC.rtpEncodingParametersSetActive(this._owner, this.ssrc, flag);
+  }
 
   /**
    * 最大ビットレート
+   *
+   * @type {number | null}
    */
-  maxBitrate: number | null;
+  get maxBitrate(): number | null {
+    return this._maxBitrate;
+  }
+
+  set maxBitrate(value: number | null) {
+    this._maxBitrate = value;
+    WebRTC.rtpEncodingParametersSetMaxBitrate(this._owner, this.ssrc, value);
+  }
 
   /**
    * 最小ビットレート
+   * 
+   * @type {number | null}
    */
-  minBitrate: number | null;
+  get minBitrate(): number | null {
+    return this._minBitrate;
+  }
+
+  set minBitrate(value: number | null) {
+    this._minBitrate = value;
+    WebRTC.rtpEncodingParametersSetMinBitrate(this._owner, this.ssrc, value);
+  }
 
   /**
    * SSRC
    */
   ssrc: number | null;
 
+  _owner: ValueTag;
+  _active: boolean;
+  _maxBitrate: number | null;
+  _minBitrate: number | null;
+
   /**
    * @package
    */
-  constructor(active: boolean) {
-    self.active = active;
+  constructor(owner: ValueTag, info: Object) {
+    this._owner = owner;
+    this._active = info.active;
+    this._maxBitrate = info.maxBitrate;
+    this._minBitrate = info.minBitrate;
+    this.ssrc = info.ssrc;
   }
 
 }
@@ -100,23 +149,43 @@ export class RTCRtpEncodingParameters {
  */
 export class RTCRtpCodecParameters {
 
+  /**
+   * RTP ペイロードの種別
+   */
   payloadType: number;
+
+  /**
+   * MIME タイプ
+   */
   mimeType: String;
+
+  /**
+   * クロックレート
+   */
   clockRate: String | null;
+
+  /**
+   * チャンネル数 (モノラルなら 1 、ステレオなら 2)
+   */
   channels: number | null;
 
-  // SDP fmtp parameters "a=fmtp"
+  /**
+   * SDP の "a=fmtp" 行に含まれる "format specific parameters"
+   */
   parameters: Map<String, String> = new Map();
+
+  _owner: ValueTag;
 
   /**
    * @package
    */
-  constructor(info: Object) {
-    self.payloadType = info.payloadType;
-    self.mimeType = info.mimeType;
-    self.clockRate = info.clockRate;
-    self.channels = info.channels;
-    self.parameters = info.parameters;
+  constructor(owner: ValueTag, info: Object) {
+    this._owner = owner;
+    this.payloadType = info.payloadType;
+    this.mimeType = info.mimeType;
+    this.clockRate = info.clockRate;
+    this.channels = info.channels;
+    this.parameters = info.parameters;
   }
 
 }
@@ -153,18 +222,21 @@ export class RTCRtpParameters {
    */
   codecs: Array<RTCRtpCodecParameters>;
 
+  _owner: ValueTag;
+
   /**
    * @package
    */
-  constructor(info: Object) {
-    self.transactionId = info.transactionId;
-    self.rtcp = new RTCRtcpParameters(info.rtcp);
-    self.headerExtensions = info.headerExtensions.map(info =>
-      new RTCRtpHeaderExtensionParameters(info));
-    self.encodings = info.encodings.map(info =>
-      new RTCRtpEncodingParameters(info));
-    self.codecs = info.codecs.map(info =>
-      new RTCRtpCodecParameters(info));
+  constructor(owner: ValueTag, info: Object) {
+    this._owner = owner;
+    this.transactionId = info.transactionId;
+    this.rtcp = new RTCRtcpParameters(owner, info.rtcp);
+    this.headerExtensions = info.headerExtensions.map(info =>
+      new RTCRtpHeaderExtensionParameters(owner, info));
+    this.encodings = info.encodings.map(info =>
+      new RTCRtpEncodingParameters(owner, info));
+    this.codecs = info.codecs.map(info =>
+      new RTCRtpCodecParameters(owner, info));
   }
 
 }

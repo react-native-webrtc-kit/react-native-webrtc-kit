@@ -95,7 +95,8 @@ NS_ASSUME_NONNULL_BEGIN
     track.valueTag = [[WebRTCModule shared] createNewValueTag];
     [WebRTCModule shared].tracks[track.valueTag] = track;
     
-    return @{@"receiverId": self.receiverId,
+    return @{@"valueTag": self.valueTag,
+             @"receiverId": self.receiverId,
              @"parameters": [self.parameters json],
              @"track": [track json]};
 }
@@ -298,6 +299,39 @@ static void *connectionStateKey = "connectionState";
 @end
 
 @implementation WebRTCModule (RTCPeerConnection)
+
+- (nullable RTCRtpParameters *)rtpParametersForValueTag:(NSString *)valueTag
+{
+    for (NSString *name in [self.senders keyEnumerator]) {
+        RTCRtpSender *sender = self.senders[name];
+        NSLog(@"# rtpParametersForValueTag: sender %@", [sender description]);
+        if (sender) {
+            if ([sender.valueTag isEqualToString: valueTag])
+                return sender.parameters;
+        }
+    }
+    for (NSString *name in [self.receivers keyEnumerator]) {
+        RTCRtpReceiver *receiver = self.receivers[name];
+        NSLog(@"# rtpParametersForValueTag: receiver %@", [receiver description]);
+        if (receiver) {
+            if ([receiver.valueTag isEqualToString: valueTag])
+                return receiver.parameters;
+        }
+    }
+    return nil;
+}
+
+- (nullable RTCRtpEncodingParameters *)rtpEncodingParametersForValueTag:(nonnull NSString *)valueTag ssrc:(nullable NSNumber *)ssrc
+{
+    RTCRtpParameters *params = [self rtpParametersForValueTag: valueTag];
+    if (!params)
+        return nil;
+    for (RTCRtpEncodingParameters *encParams in params.encodings) {
+        if ([encParams.ssrc isEqualToNumber: ssrc])
+            return encParams;
+    }
+    return nil;
+}
 
 #pragma mark - React Native Exports
 
@@ -516,6 +550,54 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
     if (peerConnection.connectionState == RTCPeerConnectionStateConnecting ||
          peerConnection.connectionState == RTCPeerConnectionStateConnected) {
         [peerConnection closeAndFinish];
+    }
+}
+
+// MARK: -rtpEncodingParametersSetActive:ssrc:ownerValueTag:
+
+RCT_EXPORT_METHOD(rtpEncodingParametersSetActive:(BOOL)flag
+                  ssrc:(nonnull NSNumber *)ssrc
+                  ownerValueTag:(nonnull NSString *)ownerValueTag)
+{
+    RTCRtpEncodingParameters *params =
+    [self rtpEncodingParametersForValueTag: ownerValueTag
+                                      ssrc: ssrc];
+    if (params && [params.ssrc isEqualToNumber: ssrc]) {
+        params.isActive = flag;
+    }
+}
+
+// MARK: -rtpEncodingParametersSetMaxBitrate:ssrc:ownerValueTag:
+
+RCT_EXPORT_METHOD(rtpEncodingParametersSetMaxBitrate:(nonnull NSNumber *)bitrate
+                  ssrc:(nonnull NSNumber *)ssrc
+                  ownerValueTag:(nonnull NSString *)ownerValueTag)
+{
+    RTCRtpEncodingParameters *params =
+    [self rtpEncodingParametersForValueTag: ownerValueTag
+                                      ssrc: ssrc];
+    if (params && [params.ssrc isEqualToNumber: ssrc]) {
+        if ([bitrate intValue] >= 0)
+            params.maxBitrateBps = bitrate;
+        else
+            params.maxBitrateBps = nil;
+    }
+}
+
+// MARK: -rtpEncodingParametersSetMinBitrate:ssrc:ownerValueTag:
+
+RCT_EXPORT_METHOD(rtpEncodingParametersSetMinBitrate:(nonnull NSNumber *)bitrate
+                  ssrc:(nonnull NSNumber *)ssrc
+                  ownerValueTag:(nonnull NSString *)ownerValueTag)
+{
+    RTCRtpEncodingParameters *params =
+    [self rtpEncodingParametersForValueTag: ownerValueTag
+                                      ssrc: ssrc];
+    if (params && [params.ssrc isEqualToNumber: ssrc]) {
+        if ([bitrate intValue] >= 0)
+            params.minBitrateBps = bitrate;
+        else
+            params.minBitrateBps = nil;
     }
 }
 

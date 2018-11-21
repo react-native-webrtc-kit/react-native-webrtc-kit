@@ -34,7 +34,7 @@ export default class RTCRtpSender {
   constructor(info: Object) {
     this.id = info.id;
     this._valueTag = info.valueTag;
-    this.parameters = new RTCRtpParameters(info.parameters);
+    this.parameters = new RTCRtpParameters(info.valueTag, info.parameters);
     this.track = new RTCMediaStreamTrack(info.track);
   }
 
