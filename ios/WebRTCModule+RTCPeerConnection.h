@@ -59,8 +59,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-
 @interface WebRTCModule (RTCPeerConnection) <RTCPeerConnectionDelegate>
+
+- (nullable RTCRtpParameters *)rtpParametersForValueTag:(nonnull NSString *)valueTag;
+- (nullable RTCRtpEncodingParameters *)rtpEncodingParametersForValueTag:(nonnull NSString *)valueTag ssrc:(nullable NSNumber *)ssrc;
 
 @end
 
