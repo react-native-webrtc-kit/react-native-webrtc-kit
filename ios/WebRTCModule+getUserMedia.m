@@ -21,7 +21,7 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
     if (self) {
         _nativeCapturer = [[RTCCameraVideoCapturer alloc] initWithDelegate: self];
         _isRunning = NO;
-        _streamValueTags = [[NSMutableArray alloc] init];
+        _trackValueTags = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -142,36 +142,30 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
     // ただし、すべてのタグを一度に消すために
     // 毎回チェック用の配列を用意すると重いので、一度に一つずつ消す
     NSString *tagToRemove = nil;
-    for (NSString *valueTag in _streamValueTags) {
-        RTCMediaStream *stream = [WebRTCModule shared].localStreams[valueTag];
-        if (!stream) {
+    for (NSString *valueTag in _trackValueTags) {
+        RTCMediaStreamTrack *track = [WebRTCModule shared].tracks[valueTag];
+        if ([track isKindOfClass: [RTCVideoTrack class]] &&
+            track.readyState == RTCMediaStreamTrackStateLive) {
+            RTCVideoTrack *video = (RTCVideoTrack *)track;
+            [video.source capturer: capturer didCaptureVideoFrame: frame];
+        } else {
             tagToRemove = valueTag;
-        } else if (stream.videoTracks.count > 0) {
-            RTCVideoTrack *track = stream.videoTracks[0];
-            if (track) {
-                [track.source capturer: capturer didCaptureVideoFrame: frame];
-            }
         }
     }
     
     if (tagToRemove) {
         dispatch_sync(dispatch_get_main_queue(), ^() {
-            NSMutableArray *newTags = [[NSMutableArray alloc] initWithArray: _streamValueTags];
+            NSMutableArray *newTags = [[NSMutableArray alloc] initWithArray: _trackValueTags];
             [newTags removeObject: tagToRemove];
-            _streamValueTags = newTags;
+            _trackValueTags = newTags;
         });
     }
-}
-
-- (void)removeStreamForValueTag:(NSString *)valueTag
-{
-    [_streamValueTags removeObjectIdenticalTo: valueTag];
 }
 
 - (void)reloadApplication
 {
     [self stopCapture];
-    [_streamValueTags removeAllObjects];
+    [_trackValueTags removeAllObjects];
 }
 
 @end
@@ -221,25 +215,32 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
         [WebRTCCamera startCaptureWithAllDevices];
     }
     
-    // ストリームを生成して、カメラの映像の出力先に指定する
-    NSString *valueTag = [self createNewValueTag];
-    RTCMediaStream *mediaStream = [self.peerConnectionFactory mediaStreamWithStreamId: valueTag];
-    mediaStream.valueTag = valueTag;
-    [WebRTCCamera.streamValueTags addObject: valueTag];
-    
-    // JS からアクセスできるようにするため、
-    // ストリームに対するモジュール ID をグローバルに保持する
-    self.localStreams[valueTag] = mediaStream;
+    // カメラ用のトラックを持つストリームを生成する
+    // このストリームを管理する必要はなく、
+    // ストリーム ID のみ getUserMedia に渡せればよい
+    RTCMediaStream *mediaStream =
+    [self.peerConnectionFactory
+     mediaStreamWithStreamId: [self createNewValueTag]];
 
     // 映像と音声のトラックをストリームに追加する
     RTCVideoSource *videoSource = [self.peerConnectionFactory videoSource];
     RTCVideoTrack *videoTrack =
-    [self.peerConnectionFactory videoTrackWithSource: videoSource
-                                             trackId: [self createNewValueTag]];
-    RTCAudioSource *audioSource = [self.peerConnectionFactory audioSourceWithConstraints: nil];
-    RTCAudioTrack *audioTrack = [self.peerConnectionFactory audioTrackWithSource: audioSource trackId: [self createNewValueTag]];
+    [self.peerConnectionFactory
+     videoTrackWithSource: videoSource
+     trackId: [self createNewValueTag]];
+    RTCAudioSource *audioSource = [self.peerConnectionFactory
+                                   audioSourceWithConstraints: nil];
+    RTCAudioTrack *audioTrack = [self.peerConnectionFactory
+                                 audioTrackWithSource: audioSource
+                                 trackId: [self createNewValueTag]];
+    videoTrack.valueTag = [self createNewValueTag];
+    audioTrack.valueTag = [self createNewValueTag];
+    self.tracks[videoTrack.valueTag] = videoTrack;
+    self.tracks[audioTrack.valueTag] = audioTrack;
     [mediaStream addVideoTrack: videoTrack];
     [mediaStream addAudioTrack: audioTrack];
+    [[WebRTCCameraVideoCapturer shared].trackValueTags
+     addObject: videoTrack.valueTag];
     
     // constraints の指定に従ってトラックの可否を決める
     videoTrack.isEnabled = constraints.video ? YES : NO;
@@ -248,28 +249,10 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
     // アスペクト比の設定
     videoTrack.aspectRatio = constraints.video.aspectRatio;
     
-    // トラックの情報を集める
-    NSMutableArray *tracks = [NSMutableArray array];
-    for (NSString *propertyName in @[ @"audioTracks", @"videoTracks" ]) {
-        SEL sel = NSSelectorFromString(propertyName);
-        for (RTCMediaStreamTrack *track in [mediaStream performSelector:sel]) {
-            NSString *trackId = track.trackId;
-            
-            self.localTracks[trackId] = track;
-            [tracks addObject:@{@"valueTag": valueTag,
-                                @"enabled": @(track.isEnabled),
-                                @"id": trackId,
-                                @"kind": track.kind,
-                                @"readyState": @"live",
-                                @"remote": @(NO)
-                                }];
-        }
-    }
-    
     // JS に処理を戻す
     resolve(@{@"streamId": mediaStream.streamId,
-              @"valueTag": valueTag,
-              @"tracks": tracks});
+              @"tracks": @[[videoTrack json],
+                           [audioTrack json]]});
 }
 
 RCT_EXPORT_METHOD(stopUserMedia) {

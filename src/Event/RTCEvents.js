@@ -3,6 +3,8 @@
 import RTCMediaStream from '../MediaStream/RTCMediaStream';
 import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
 import RTCIceCandidate from '../PeerConnection/RTCIceCandidate';
+import RTCRtpReceiver from '../PeerConnection/RTCRtpReceiver';
+import RTCRtpTransceiver from '../PeerConnection/RTCRtpTransceiver';
 
 /**
  * 特にプロパティを持たない一般的なイベントを表します。
@@ -13,31 +15,6 @@ export class RTCEvent {
      * イベントの種別
      */
     type: string;
-
-    /**
-     * @package
-     */
-    constructor(type: string, eventInitDict?: Object) {
-        this.type = type.toString();
-        Object.assign(this, eventInitDict);
-    }
-
-}
-
-/**
- * ストリームに関するイベントを表します。
- */
-export class RTCMediaStreamEvent {
-
-    /**
-     * イベントの種別
-     */
-    type: string;
-
-    /**
-     * ストリーム
-     */
-    stream: RTCMediaStream;
 
     /**
      * @package
@@ -63,6 +40,20 @@ export class RTCMediaStreamTrackEvent {
      * トラック
      */
     track: RTCMediaStreamTrack;
+
+    /**
+     * レシーバー
+     * 
+     * @since 1.1.0
+     */
+    receiver: RTCRtpReceiver | null;
+
+    /**
+     * トランシーバー
+     * 
+     * @since 1.1.0
+     */
+    transceiver: RTCRtpTransceiver | null;
 
     /**
      * @package

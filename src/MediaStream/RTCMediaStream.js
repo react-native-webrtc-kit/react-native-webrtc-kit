@@ -8,95 +8,46 @@ import RTCMediaStreamTrack from './RTCMediaStreamTrack';
 import type { ValueTag } from '../PeerConnection/RTCPeerConnection';
 
 /**
- * メディアストリームを表すオブジェクトです。
+ * @deprecated ストリームの操作は廃止されました。
+ * 
+ * @version 1.1.0
  */
 export default class RTCMediaStream extends RTCMediaStreamEventTarget {
 
   /**
-   * ストリーム ID
+   * @deprecated
+   * @version 1.1.0
    */
   id: string;
 
   /**
-   * ストリームが有効であれば `true`
+   * @deprecated
+   * @version 1.1.0
    */
   active: boolean = true;
 
   /**
-   * ネイティブのオブジェクトと関連付けられたタグ
-   */
-  valueTag: ValueTag;
-
-  _tracks: Array<RTCMediaStreamTrack> = [];
-
-  /**
-   * @private
-   */
-  constructor(id: string, valueTag: string) {
-    super();
-    this.id = id;
-    this.valueTag = valueTag;
-  }
-
-  /**
-   * TODO: ネイティブにトラックを追加する
-   * @ignore
-   */
-  addTrack(track: RTCMediaStreamTrack): void {
-    this._tracks.push(track);
-  }
-
-  /**
-   * TODO: ネイティブからトラックを削除する
-   * @ignore
-   */
-  removeTrack(track: RTCMediaStreamTrack): void {
-  }
-
-  /**
-   * トラックのリストを返します。
-   * 
-   * @return {Array<RTCMediaStreamTrack>} トラックのリスト
+   * @deprecated
+   * @version 1.1.0
    */
   getTracks(): Array<RTCMediaStreamTrack> {
-    return this._tracks;
+    throw new Error("getTracks() is deprecated");
   }
 
   /**
-   * 映像トラックのリストを返します。
-   * 
-   * @return {Array<RTCMediaStreamTrack>} トラックのリスト
+   * @deprecated
+   * @version 1.1.0
    */
   getVideoTracks(): Array<RTCMediaStreamTrack> {
-    var tracks = [];
-    this._tracks.forEach(track => {
-      if (track.kind == 'video') {
-        tracks.push(track);
-      }
-    });
-    return tracks;
+    throw new Error("getVideoTracks() is deprecated");
   }
 
   /**
-   * 音声トラックのリストを返します。
-   * 
-   * @return {Array<RTCMediaStreamTrack>} トラックのリスト
+   * @deprecated
+   * @version 1.1.0
    */
   getAudioTracks(): Array<RTCMediaStreamTrack> {
-    var tracks = [];
-    this._tracks.forEach(track => {
-      if (track.kind == 'audio') {
-        tracks.push(track);
-      }
-    });
-    return tracks;
-  }
-
-  _close() {
-    this.active = false;
-    this._tracks.forEach(track => {
-      track._close();
-    });
+    throw new Error("getAudioTracks() is deprecated");
   }
 
 }

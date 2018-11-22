@@ -16,10 +16,8 @@ export const PEER_CONNECTION_EVENTS = [
   'negotiationneeded',
   'peeridentity',
   'signalingstatechange',
-  'track',
-  // DEPRECATED events
-  'addstream',
-  'removestream'
+  'addtrack',
+  'removetrack',
 ];
 
 /**
