@@ -86,6 +86,11 @@ export class RTCRtpEncodingParameters {
     return this._active;
   }
 
+  /**
+   * エンコーディングがメディアデータの送信時に使われるのであれば `true`
+   * 
+   * @type {boolean}
+   */
   set active(flag: boolean) {
     this._active = flag;
     WebRTC.rtpEncodingParametersSetActive(this._owner, this.ssrc, flag);
@@ -94,12 +99,17 @@ export class RTCRtpEncodingParameters {
   /**
    * 最大ビットレート
    *
-   * @type {number | null}
+   * @type {number|null}
    */
   get maxBitrate(): number | null {
     return this._maxBitrate;
   }
 
+  /**
+   * 最大ビットレート
+   *
+   * @type {number|null}
+   */
   set maxBitrate(value: number | null) {
     this._maxBitrate = value;
     WebRTC.rtpEncodingParametersSetMaxBitrate(this._owner, this.ssrc, value);
@@ -108,12 +118,17 @@ export class RTCRtpEncodingParameters {
   /**
    * 最小ビットレート
    * 
-   * @type {number | null}
+   * @type {number|null}
    */
   get minBitrate(): number | null {
     return this._minBitrate;
   }
 
+  /**
+   * 最小ビットレート
+   * 
+   * @type {number|null}
+   */
   set minBitrate(value: number | null) {
     this._minBitrate = value;
     WebRTC.rtpEncodingParametersSetMinBitrate(this._owner, this.ssrc, value);

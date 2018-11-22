@@ -12,6 +12,14 @@ export type RTCFacingMode =
     | 'user'
     | 'environment'
 
+/**
+ * アスペクト比を表します。
+ * 
+ * - `'4:3'`
+ * - `'16:9'`
+ *
+ * @typedef {string} RTCAspectRatio
+ */
 export type RTCAspectRatio =
     | '4:3'
     | '16:9'

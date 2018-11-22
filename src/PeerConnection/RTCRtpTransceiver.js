@@ -48,7 +48,7 @@ export default class RTCRtpTransceiver {
   receiver: RTCRtpReceiver;
 
   /**
-   * センダーとレシーバーが動作しており、データの送受信が可能であれば `true`
+   * センダーとレシーバーによるデータの送受信が停止されていれば `true`
    */
   stopped: boolean;
 
@@ -65,6 +65,10 @@ export default class RTCRtpTransceiver {
     this.stopped = nativeBoolean(info.stopped);
   }
 
+  /**
+   * センダーとレシーバーによるデータの送受信を停止します。
+   * 一旦停止すると、送受信を再開することはできません。
+   */
   stop() {
     WebRTC.transceiverStop(this._valueTag);
     this.stopped = true;
@@ -73,16 +77,23 @@ export default class RTCRtpTransceiver {
   /**
    * トランシーバーのデータ送受信の方向を表します。
    * この値は `RTCPeerConnection.createOffer` 及び
-   * `RTCPeerConnection.createAnswer` で参照されます。
+   * `RTCPeerConnection.createAnswer` の次回実行時に参照されます。
    */
   direction(): Promise<RTCRtpTransceiverDirection> {
     return WebRTC.transceiverDirection(this._valueTag)
   }
 
+  /**
+   * トランシーバーのデータ送受信の方向を指定します。
+   */
   setDirection(value: RTCRtpTransceiverDirection) {
     WebRTC.transceiverSetDirection(this._valueTag, value)
   }
 
+  /**
+   * トランシーバーのデータ送受信の方向を指定します。
+   * このメソッドの実行時点で使用されている値を返します。
+   */
   currentDirection(): Promise<RTCRtpTransceiverDirection> {
     return WebRTC.transceiverCurrentDirection(this._valueTag);
   }
