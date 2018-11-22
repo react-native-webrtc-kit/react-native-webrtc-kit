@@ -7,6 +7,15 @@ import aspectRatioValue from './RTCMediaStreamConstraints';
 import type { RTCAspectRatio } from './RTCMediaStreamConstraints';
 import type { ValueTag } from '../PeerConnection/RTCPeerConnection';
 
+/**
+ * トラックの種別を表します。
+ * 
+ * - `'video'` - 映像
+ * 
+ * - `'audio'` - 音声
+ * 
+ * @typedef {string} RTCMediaStreamTrackKind
+ */
 export type RTCMediaStreamTrackKind =
     | 'video'
     | 'audio';
@@ -76,10 +85,20 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
         WebRTC.trackSetEnabled(this._valueTag, enabled);
     }
 
+    /**
+     * アスペクト比
+     * 
+     * @type {number|null}
+     */
     get aspectRatio(): number | null {
         return this._aspectRatio;
     }
 
+    /**
+     * アスペクト比
+     * 
+     * @type {number|null}
+     */
     set aspectRatio(ratio: RTCAspectRatio | number | null): void {
         let value = aspectRatioValue(ratio);
         if (this._aspectRatio == value) {
