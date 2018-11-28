@@ -35,6 +35,9 @@ export type RTCMediaStreamTrackState =
     | 'live'
     | 'ended';
 
+/**
+ * トラックを表します。
+ */
 export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget {
 
     /**
