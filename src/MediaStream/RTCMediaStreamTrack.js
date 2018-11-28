@@ -15,6 +15,7 @@ import type { ValueTag } from '../PeerConnection/RTCPeerConnection';
  * - `'audio'` - 音声
  * 
  * @typedef {string} RTCMediaStreamTrackKind
+ * @since 1.1.0
  */
 export type RTCMediaStreamTrackKind =
     | 'video'
@@ -46,6 +47,8 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
      * 
      * - `'video'` - 映像トラック
      * - `'audio'` - 音声トラック
+     * 
+     * @since 1.1.0
      */
     kind: RTCMediaStreamTrackKind;
 
@@ -89,6 +92,7 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
      * アスペクト比
      * 
      * @type {number|null}
+     * @since 1.1.0
      */
     get aspectRatio(): number | null {
         return this._aspectRatio;
@@ -98,6 +102,7 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
      * アスペクト比
      * 
      * @type {number|null}
+     * @since 1.1.0
      */
     set aspectRatio(ratio: RTCAspectRatio | number | null): void {
         let value = aspectRatioValue(ratio);

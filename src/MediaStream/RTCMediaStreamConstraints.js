@@ -19,6 +19,7 @@ export type RTCFacingMode =
  * - `'16:9'`
  *
  * @typedef {string} RTCAspectRatio
+ * @since 1.1.0
  */
 export type RTCAspectRatio =
     | '4:3'
