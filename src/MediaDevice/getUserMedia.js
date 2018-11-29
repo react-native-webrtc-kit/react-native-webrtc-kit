@@ -42,9 +42,9 @@ export class RTCUserMedia {
  * 
  * @example
  * getUserMedia(null).then((info) => {
- *   var pc = new RTCPeerConnection(constraints);
+ *   var pc = new RTCPeerConnection();
  *   info.tracks.forEach(track =>
- *     this._pc.addTrack(track, [info.streamId])
+ *     pc.addTrack(track, [info.streamId])
  *   );
  *   ...
  * });
