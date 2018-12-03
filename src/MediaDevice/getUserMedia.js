@@ -14,7 +14,9 @@ import logger from '../Util/RTCLogger';
  */
 export class RTCUserMedia {
 
-  /** 入力トラックのリスト */
+  /** 入力トラックのリスト。
+   * リストの並びは順不同です。
+   */
   tracks: Array<RTCMediaStreamTrack>;
 
   /** トラックが属するストリーム ID */
