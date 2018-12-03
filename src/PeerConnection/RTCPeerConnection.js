@@ -145,21 +145,24 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   remoteDescription: RTCSessionDescription | null;
 
   /**
-   * センダーのリスト
+   * センダーのリスト。
+   * リストの並びは順不同です。
    * 
    * @since 1.1.0
    */
   senders: Array<RTCRtpSender> = [];
 
   /**
-   * レシーバーのリスト
+   * レシーバーのリスト。
+   * リストの並びは順不同です。
    * 
    * @since 1.1.0
    */
   receivers: Array<RTCRtpReceiver> = [];
 
   /**
-   * トランシーバーのリスト
+   * トランシーバーのリスト。
+   * リストの並びは順不同です。
    * 
    * @since 1.1.0
    */
