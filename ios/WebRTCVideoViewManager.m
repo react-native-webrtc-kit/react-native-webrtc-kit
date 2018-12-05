@@ -38,7 +38,7 @@ RCT_CUSTOM_VIEW_PROPERTY(streamValueTag, NSString *, WebRTCVideoView) {
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(track, id, WebRTCVideoView) {
-    RTCVideoTrack *videoTrack = nil;
+    RTCMediaStreamTrack *videoTrack = nil;
     if (json) {
         NSString *valueTag = (NSString *)[json objectForKey:@"_valueTag"];
         if (!valueTag) {
@@ -59,7 +59,7 @@ RCT_CUSTOM_VIEW_PROPERTY(track, id, WebRTCVideoView) {
         }
     }
     
-    view.videoTrack = videoTrack;
+    view.videoTrack = (RTCVideoTrack *)videoTrack;
 }
 
 @end
