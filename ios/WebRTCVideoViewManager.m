@@ -33,23 +33,33 @@ RCT_CUSTOM_VIEW_PROPERTY(objectFit, NSString *, WebRTCVideoView) {
     [view setNeedsLayout];
 }
 
-RCT_CUSTOM_VIEW_PROPERTY(streamValueTag, NSString, WebRTCVideoView) {
-    RTCVideoTrack *videoTrack = nil;
-    
+RCT_CUSTOM_VIEW_PROPERTY(streamValueTag, NSString *, WebRTCVideoView) {
+    NSAssert(NO, @"RTCVideoView: 'streamValueTag' property is deprecated. use 'track' property");
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(track, id, WebRTCVideoView) {
+    RTCMediaStreamTrack *videoTrack = nil;
     if (json) {
-        NSString *valueTag = (NSString *)json;
+        NSString *valueTag = (NSString *)[json objectForKey:@"_valueTag"];
+        if (!valueTag) {
+            NSLog(@"not found _valueTag property for %@", [json description]);
+            return;
+        }
         
         WebRTCModule *module = [self.bridge moduleForName:@"WebRTCModule"];
-        RTCMediaStream *stream = [module streamForValueTag: valueTag];
-        NSArray *videoTracks = stream ? stream.videoTracks : nil;
-        
-        videoTrack = videoTracks && videoTracks.count ? videoTracks[0] : nil;
+        videoTrack = module.tracks[valueTag];
         if (!videoTrack) {
-            NSLog(@"No video track found for stream, streamId: %@ valueTag: %@", stream.streamId, valueTag);
+            NSLog(@"track for value tag %@ is not found", valueTag);
+            return;
+        }
+        if (![videoTrack.kind
+             isEqualToString: kRTCMediaStreamTrackKindVideo]) {
+            NSLog(@"not video track %@", videoTrack.kind);
+            return;
         }
     }
     
-    view.videoTrack = videoTrack;
+    view.videoTrack = (RTCVideoTrack *)videoTrack;
 }
 
 @end

@@ -3,6 +3,23 @@
 import { NativeModules } from 'react-native';
 import RTCMediaStreamTrackEventTarget from './RTCMediaStreamTrackEventTarget';
 import WebRTC from '../WebRTC';
+import aspectRatioValue from './RTCMediaStreamConstraints';
+import type { RTCAspectRatio } from './RTCMediaStreamConstraints';
+import type { ValueTag } from '../PeerConnection/RTCPeerConnection';
+
+/**
+ * トラックの種別を表します。
+ * 
+ * - `'video'` - 映像
+ * 
+ * - `'audio'` - 音声
+ * 
+ * @typedef {string} RTCMediaStreamTrackKind
+ * @since 1.1.0
+ */
+export type RTCMediaStreamTrackKind =
+    | 'video'
+    | 'audio';
 
 /**
  * トラックの状態を表します。
@@ -18,12 +35,10 @@ export type RTCMediaStreamTrackState =
     | 'live'
     | 'ended';
 
+/**
+ * トラックを表します。
+ */
 export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget {
-
-    /**
-     * 所属するストリームのタグ
-     */
-    streamValueTag: string;
 
     /**
      * トラック ID
@@ -35,8 +50,10 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
      * 
      * - `'video'` - 映像トラック
      * - `'audio'` - 音声トラック
+     * 
+     * @since 1.1.0
      */
-    kind: string;
+    kind: RTCMediaStreamTrackKind;
 
     /**
      * トラックの状態
@@ -48,7 +65,9 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
      */
     remote: boolean;
 
+    _valueTag: ValueTag;
     _enabled: boolean;
+    _aspectRatio: number | null;
 
     /**
      * トラックの出力の可否
@@ -69,7 +88,32 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
             return;
         }
         this._enabled = enabled;
-        WebRTC.trackSetEnabled(this.id, this.streamValueTag, enabled);
+        WebRTC.trackSetEnabled(this._valueTag, enabled);
+    }
+
+    /**
+     * アスペクト比
+     * 
+     * @type {number|null}
+     * @since 1.1.0
+     */
+    get aspectRatio(): number | null {
+        return this._aspectRatio;
+    }
+
+    /**
+     * アスペクト比
+     * 
+     * @type {number|null}
+     * @since 1.1.0
+     */
+    set aspectRatio(ratio: RTCAspectRatio | number | null): void {
+        let value = aspectRatioValue(ratio);
+        if (this._aspectRatio == value) {
+            return;
+        }
+        this._aspectRatio = value;
+        WebRTC.trackSetAspectRatio(this._valueTag, value);
     }
 
     /**
@@ -77,11 +121,11 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
      */
     constructor(info: Object) {
         super();
-        this.streamValueTag = info.valueTag;
         this.id = info.id;
         this.kind = info.kind;
         this.readyState = info.readyState;
         this.remote = info.remote;
+        this._valueTag = info.valueTag;
         this._enabled = info.enabled;
     }
 

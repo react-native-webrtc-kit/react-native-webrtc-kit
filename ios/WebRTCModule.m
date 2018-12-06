@@ -37,11 +37,20 @@ static WebRTCModule *sharedModule;
         RTCEnableMetrics();
         sharedModule = self;
         
-        self.peerConnectionFactory = [[RTCPeerConnectionFactory alloc] init];
+        RTCDefaultVideoEncoderFactory *encoderFactory =
+        [[RTCDefaultVideoEncoderFactory alloc] init];
+        RTCDefaultVideoDecoderFactory *decoderFactory =
+        [[RTCDefaultVideoDecoderFactory alloc] init];
+        self.peerConnectionFactory =
+        [[RTCPeerConnectionFactory alloc]
+         initWithEncoderFactory: encoderFactory
+         decoderFactory: decoderFactory];
         self.peerConnections = [NSMutableDictionary dictionary];
-        self.localStreams = [NSMutableDictionary dictionary];
-        self.localTracks = [NSMutableDictionary dictionary];
-        
+        self.tracks = [NSMutableDictionary dictionary];
+        self.senders = [NSMutableDictionary dictionary];
+        self.receivers = [NSMutableDictionary dictionary];
+        self.transceivers = [NSMutableDictionary dictionary];
+
         dispatch_queue_attr_t attributes =
         dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL,
                                                 QOS_CLASS_USER_INITIATED, -1);
@@ -63,25 +72,7 @@ static WebRTCModule *sharedModule;
 #pragma mark - Methods
 
 - (NSString *)createNewValueTag {
-    NSString *valueTag;
-    // Make sure ID does not exist across local and remote streams (for any peerConnection)
-    do {
-        valueTag = [[NSUUID UUID] UUIDString];
-    } while ([self streamForValueTag: valueTag]);
-    return valueTag;
-}
-
-- (nullable RTCMediaStream *)streamForValueTag:(NSString *)valueTag {
-    __block RTCMediaStream *stream = self.localStreams[valueTag];
-    if (!stream) {
-        [self.peerConnections enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, RTCPeerConnection * _Nonnull obj, BOOL * _Nonnull stop) {
-            stream = obj.remoteStreams[valueTag];
-            if (stream) {
-                *stop = YES;
-            }
-        }];
-    }
-    return stream;
+    return [[NSUUID UUID] UUIDString];
 }
 
 #pragma mark - React Native Exports
@@ -111,8 +102,10 @@ RCT_EXPORT_METHOD(finishLoading) {
     }
     
     [_peerConnections removeAllObjects];
-    [_localTracks removeAllObjects];
-    [_localStreams removeAllObjects];
+    [_tracks removeAllObjects];
+    [_senders removeAllObjects];
+    [_receivers removeAllObjects];
+    [_transceivers removeAllObjects];
 }
 
 @end

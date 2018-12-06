@@ -13,6 +13,32 @@ export type RTCFacingMode =
     | 'environment'
 
 /**
+ * アスペクト比を表します。
+ * 
+ * - `'4:3'`
+ * - `'16:9'`
+ *
+ * @typedef {string} RTCAspectRatio
+ * @since 1.1.0
+ */
+export type RTCAspectRatio =
+    | '4:3'
+    | '16:9'
+
+/**
+ * @package
+ */
+export function aspectRatioValue(ratio: RTCAspectRatio | number | null): number | null {
+    if (ratio === '4:3') {
+        return 1.3333333333;
+    } else if (ratio === '16:9') {
+        return 1.7777777778;
+    } else {
+        return ratio;
+    }
+}
+
+/**
  * 映像に関する制約です。
  */
 export class RTCMediaStreamVideoConstraints {
@@ -36,6 +62,11 @@ export class RTCMediaStreamVideoConstraints {
      * 映像のフレームレート
      */
     frameRate: number | null;
+
+    /**
+     * アスペクト比
+     */
+    aspectRatio: RTCAspectRatio | number | null;
 
 }
 
@@ -101,7 +132,8 @@ export default class RTCMediaStreamConstraints {
                 facingMode: video.facingMode,
                 width: video.width,
                 height: video.height,
-                frameRate: video.frameRate
+                frameRate: video.frameRate,
+                aspectRatio: aspectRatioValue(video.aspectRatio)
             };
         }
         var audio = this.audio;

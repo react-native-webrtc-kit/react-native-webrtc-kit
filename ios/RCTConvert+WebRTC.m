@@ -119,9 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     NSString *semantics = Nullable(json[@"sdpSemantics"]);
     if (semantics) {
-        if ([semantics isEqualToString: @"default"])
-            config.sdpSemantics = RTCSdpSemanticsDefault;
-        else if ([semantics isEqualToString: @"planb"])
+        if ([semantics isEqualToString: @"planb"])
             config.sdpSemantics = RTCSdpSemanticsPlanB;
         else if ([semantics isEqualToString: @"unified"])
             config.sdpSemantics = RTCSdpSemanticsUnifiedPlan;
@@ -151,6 +149,8 @@ NS_ASSUME_NONNULL_BEGIN
                        NSNumber, videoConsts[@"height"]);
         AssertNullable(@"RTCMediaStreamConstraints.video.frameRate",
                        NSNumber, videoConsts[@"frameRate"]);
+        AssertNullable(@"RTCMediaStreamConstraints.video.aspectRatio",
+                       NSNumber, videoConsts[@"aspectRatio"]);
         AssertNullable(@"RTCMediaStreamConstraints.video.sourceId",
                        NSString, videoConsts[@"sourceId"]);
         
@@ -176,6 +176,10 @@ NS_ASSUME_NONNULL_BEGIN
         NSNumber *frameRate = videoConsts[@"frameRate"];
         if (frameRate)
             consts.video.frameRate = [frameRate intValue];
+        
+        NSNumber *aspectRatio = videoConsts[@"aspectRatio"];
+        if (aspectRatio)
+            consts.video.aspectRatio = (CGFloat)[aspectRatio doubleValue];
         
         NSString *sourceId = videoConsts[@"sourceId"];
         if (sourceId)

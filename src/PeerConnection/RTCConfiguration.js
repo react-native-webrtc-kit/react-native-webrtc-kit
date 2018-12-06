@@ -1,17 +1,18 @@
+// @flow
+
 import RTCIceServer from './RTCIceServer';
-import RTCIceTransportPolicy from './RTCIceTransportPolicy';
+import type { RTCIceTransportPolicy } from './RTCIceTransportPolicy';
 
 /**
  * SDP でのマルチストリームの記述方式です。
  * 
- * - `'default'` - デフォルト
- * - `'planb'` - Plan B
+ * - `'planb'` - Plan B (デフォルト)
  * - `'unified'` - Unified Plan
 
  * @typedef {string} RTCSdpSemantics
+ * @version 1.1.0
  */
 export type RTCSdpSemantics =
-  | 'default'
   | 'planb'
   | 'unified'
 

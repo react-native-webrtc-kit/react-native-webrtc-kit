@@ -1,6 +1,7 @@
 @import Foundation;
 
 #import "WebRTCModule.h"
+#import "WebRTCValueManager.h"
 
 typedef NS_ENUM(NSUInteger, RTCPeerConnectionState) {
     RTCPeerConnectionStateNew,
@@ -12,15 +13,42 @@ typedef NS_ENUM(NSUInteger, RTCPeerConnectionState) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RTCPeerConnection (ReactNativeWebRTCKit)
+@interface RTCRtpParameters (ReactNativeWebRTCKit)
+
+- (id)json;
+
+@end
+
+@interface RTCRtpSender (ReactNativeWebRTCKit)
 
 @property (nonatomic, nullable) NSString *valueTag;
 
- // key = valueTag, not MediaStream.id
-@property (nonatomic) NSMutableDictionary<NSString *, RTCMediaStream *> *remoteStreams;
+- (id)json;
 
- // key = MediaStreamTrack.id
-@property (nonatomic) NSMutableDictionary<NSString*, RTCMediaStreamTrack *> *remoteTracks;
+@end
+
+@interface RTCRtpReceiver (ReactNativeWebRTCKit)
+
+@property (nonatomic, nullable) NSString *valueTag;
+
+- (id)json;
+
++ (NSString *)directionDescription:(RTCRtpTransceiverDirection)direction;
++ (RTCRtpTransceiverDirection)directionFromString:(NSString *)string;
+
+@end
+
+@interface RTCRtpTransceiver (ReactNativeWebRTCKit)
+
+@property (nonatomic, nullable) NSString *valueTag;
+
+- (id)json;
+
+@end
+
+@interface RTCPeerConnection (ReactNativeWebRTCKit) <WebRTCExportable>
+
+@property (nonatomic, nullable) NSString *valueTag;
 
 @property (nonatomic) RTCPeerConnectionState connectionState;
 
@@ -31,8 +59,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-
 @interface WebRTCModule (RTCPeerConnection) <RTCPeerConnectionDelegate>
+
+- (nullable RTCRtpParameters *)rtpParametersForValueTag:(nonnull NSString *)valueTag;
+- (nullable RTCRtpEncodingParameters *)rtpEncodingParametersForValueTag:(nonnull NSString *)valueTag ssrc:(nullable NSNumber *)ssrc;
 
 @end
 

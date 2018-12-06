@@ -1,18 +1,18 @@
 #import <objc/runtime.h>
 #import "WebRTCModule+RTCMediaStream.h"
+#import "WebRTCValueManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation RTCMediaStream (ReactNativeWebRTCKit)
 
-static void *valueTagKey = "valueTag";
-
 - (nullable NSString *)valueTag {
-    return objc_getAssociatedObject(self, valueTagKey);
+    return [WebRTCValueManager valueTagForObject: self];
 }
 
-- (void)setValueTag:(nullable NSString *)valueTag {
-    objc_setAssociatedObject(self, valueTagKey, valueTag, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (void)setValueTag:(nullable NSString *)valueTag
+{
+    [WebRTCValueManager setValueTag: valueTag forObject: self];
 }
 
 - (nullable RTCMediaStreamTrack *)trackForTrackId:(NSString *)trackId
@@ -30,19 +30,81 @@ static void *valueTagKey = "valueTag";
 
 @end
 
+@implementation RTCMediaStreamTrack (ReactNativeWebRTCKit)
+
+- (nullable NSString *)valueTag {
+    return [WebRTCValueManager valueTagForObject: self];
+}
+
+- (void)setValueTag:(nullable NSString *)valueTag
+{
+    [WebRTCValueManager setValueTag: valueTag forObject: self];
+}
+
+- (id)json
+{
+    NSString *state;
+    switch (self.readyState) {
+        case RTCMediaStreamTrackStateLive:
+            state = @"live";
+            break;
+        case RTCMediaStreamTrackStateEnded:
+            state = @"ended";
+            break;
+        default:
+            NSAssert(NO, @"invalid ready state");
+    }
+    return @{@"valueTag": self.valueTag,
+             @"enabled": @(self.isEnabled),
+             @"id": self.trackId,
+             @"kind": self.kind,
+             @"readyState": state};
+}
+
+@end
+
+@implementation RTCVideoTrack (ReactNativeWebRTCKit)
+
+static void *aspectRatioKey = "aspectRatio";
+
+- (CGFloat)aspectRatio
+{
+    NSNumber *ratio = objc_getAssociatedObject(self, aspectRatioKey);
+    if (ratio)
+        return (CGFloat)[ratio doubleValue];
+    else
+        return -1;
+}
+
+- (void)setAspectRatio:(CGFloat)aspectRatio
+{
+    objc_setAssociatedObject(self, aspectRatioKey,
+                             [[NSNumber alloc] initWithDouble: aspectRatio],
+                             OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+@end
+
 @implementation WebRTCModule (RTCMediaStream)
 
 // MARK: -trackSetEnabled:trackId:valueTag:
 
 RCT_EXPORT_METHOD(trackSetEnabled:(nonnull NSNumber *)isEnabled
-                  trackId:(nonnull NSString *)trackId
                   valueTag:(nonnull NSString *)valueTag)
 {
-    RTCMediaStream *stream = [self streamForValueTag: valueTag];
-    if (stream) {
-        RTCMediaStreamTrack *track = [stream trackForTrackId: trackId];
-        if (track)
-            track.isEnabled = [isEnabled boolValue];
+    RTCMediaStreamTrack *track = self.tracks[valueTag];
+    if (track)
+        track.isEnabled = [isEnabled boolValue];
+}
+
+// MARK: -trackSetAspectRatio:trackId:valueTag:
+
+RCT_EXPORT_METHOD(trackSetAspectRatio:(nonnull NSNumber *)aspectRatio
+                  valueTag:(nonnull NSString *)valueTag)
+{
+    RTCMediaStreamTrack *track = self.tracks[valueTag];
+    if ([track isKindOfClass: [RTCVideoTrack class]]) {
+        ((RTCVideoTrack *)track).aspectRatio = [aspectRatio doubleValue];
     }
 }
 

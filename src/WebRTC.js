@@ -3,12 +3,14 @@
 import { NativeModules } from 'react-native';
 import RTCConfiguration from './PeerConnection/RTCConfiguration';
 import RTCIceCandidate from './PeerConnection/RTCIceCandidate';
-import RTCMediaStream from './MediaStream/RTCMediaStream';
+import RTCMediaStreamTrack from './MediaStream/RTCMediaStreamTrack';
 import RTCMediaStreamTrackEventTarget from './MediaStream/RTCMediaStreamTrackEventTarget';
 import RTCMediaConstraints from './PeerConnection/RTCMediaConstraints';
 import RTCMediaStreamConstraints from './MediaStream/RTCMediaStreamConstraints';
+import RTCRtpSender from './PeerConnection/RTCRtpSender';
 import RTCSessionDescription from './PeerConnection/RTCSessionDescription';
 import type { ValueTag } from './PeerConnection/RTCPeerConnection';
+import type { RTCRtpTransceiverDirection } from './PeerConnection/RTCRtpTransceiver';
 
 const { WebRTCModule } = NativeModules;
 
@@ -24,7 +26,7 @@ export default class WebRTC {
     WebRTCModule.finishLoading();
   }
 
-  static getUserMedia(constraints: RTCMediaStreamConstraints): Promise<RTCMediaStream> {
+  static getUserMedia(constraints: RTCMediaStreamConstraints): Promise<Object> {
     return WebRTCModule.getUserMedia(constraints.toJSON());
   }
 
@@ -44,8 +46,15 @@ export default class WebRTC {
     return WebRTCModule.peerConnectionAddICECandidate(candidate.toJSON(), valueTag);
   }
 
-  static peerConnectionAddStream(valueTag: ValueTag, streamValueTag: ValueTag) {
-    WebRTCModule.peerConnectionAddStream(streamValueTag, valueTag);
+  static peerConnectionAddTrack(valueTag: ValueTag,
+    trackValueTag: ValueTag,
+    streamIds: Array<String>,
+  ): Promise<Object> {
+    return WebRTCModule.peerConnectionAddTrack(trackValueTag, streamIds, valueTag);
+  }
+
+  static peerConnectionRemoveTrack(valueTag: ValueTag, senderValueTag: ValueTag) {
+    WebRTCModule.peerConnectionRemoveTrack(senderValueTag, valueTag);
   }
 
   static peerConnectionClose(valueTag: ValueTag) {
@@ -80,8 +89,47 @@ export default class WebRTC {
     return WebRTCModule.peerConnectionSetRemoteDescription(sdp.toJSON(), valueTag);
   }
 
-  static trackSetEnabled(valueTag: ValueTag, streamValueTag: ValueTag, enabled: boolean) {
-    WebRTCModule.trackSetEnabled(enabled, valueTag, streamValueTag);
+  static trackSetEnabled(valueTag: ValueTag, enabled: boolean) {
+    WebRTCModule.trackSetEnabled(enabled, valueTag);
+  }
+
+  static trackSetAspectRatio(valueTag: ValueTag,
+    aspectRatio: number) {
+    WebRTCModule.trackSetAspectRatio(aspectRatio, valueTag);
+  }
+
+  static transceiverDirection(valueTag: ValueTag): Promise<RTCRtpTransceiverDirection> {
+    return WebRTCModule.transceiverDirection(valueTag)
+  }
+
+  static transceiverSetDirection(valueTag: ValueTag, value: RTCRtpTransceiverDirection) {
+    WebRTCModule.transceiverSetDirection(valueTag, value)
+  }
+
+  static transceiverCurrentDirection(valueTag: ValueTag): Promise<RTCRtpTransceiverDirection> {
+    return WebRTCModule.transceiverCurrentDirection(valueTag)
+  }
+
+  static transceiverStop(valueTag: ValueTag) {
+    WebRTCModule.transceiverStop(valueTag);
+  }
+
+  static rtpEncodingParametersSetActive(owner: ValueTag, ssrc: number | null, flag: boolean) {
+    WebRTCModule.rtpEncodingParametersSetActive(flag, ssrc, owner);
+  }
+
+  static rtpEncodingParametersSetMaxBitrate(owner: ValueTag, ssrc: number | null, value: number | null) {
+    if (value == null) {
+      value = -1;
+    }
+    WebRTCModule.rtpEncodingParametersSetMaxBitrate(value, ssrc, owner);
+  }
+
+  static rtpEncodingParametersSetMinBitrate(owner: ValueTag, ssrc: number | null, value: number | null) {
+    if (value == null) {
+      value = -1;
+    }
+    WebRTCModule.rtpEncodingParametersSetMinBitrate(value, ssrc, owner);
   }
 
 }

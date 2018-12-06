@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 import React from 'react';
+import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
 
 import type { ValueTag } from '../PeerConnection/RTCPeerConnection';
 
@@ -36,7 +37,7 @@ export type RTCObjectFit =
 type Props = {
 
   objectFit: RTCObjectFit,
-  streamValueTag: string
+  track: RTCMediaStreamTrack
 
 };
 
@@ -44,7 +45,7 @@ const NativeProps = {
   name: 'WebRTCVideoView',
   propTypes: {
     objectFit: PropTypes.oneOf(['fill', 'contain', 'cover']),
-    streamValueTag: PropTypes.string,
+    track: PropTypes.instanceOf(RTCMediaStreamTrack),
     ...ViewPropTypes
   }
 };
@@ -69,8 +70,18 @@ export class RTCVideoView extends React.Component<Props> {
    */
   objectFit: RTCObjectFit = 'contain';
 
-  /** ストリームのタグ
+  /**
+   * @deprecated track を使用してください。
+   * 
+   * @version 1.1.0
    */
   streamValueTag: ValueTag;
+
+  /**
+   * 描画する映像トラック
+   * 
+   * @since 1.1.0
+   */
+  track: RTCMediaStreamTrack | null;
 
 }

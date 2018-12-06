@@ -1,5 +1,6 @@
 @import AVFoundation;
 
+#import "WebRTCModule+RTCMediaStream.h"
 #import "WebRTCVideoView.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -73,6 +74,11 @@ NS_ASSUME_NONNULL_BEGIN
     CGRect newFrame;
     if (width <= 0 || height <= 0) {
         newFrame = CGRectZero;
+    } else if (self.videoTrack.aspectRatio > 0) {
+        CGFloat ratio = self.videoTrack.aspectRatio;
+        newFrame = self.bounds;
+        newFrame.size.width = newFrame.size.height * ratio;
+        newFrame.origin.x += (self.bounds.size.width - newFrame.size.width) / 2.0;
     } else if (self.contentMode == UIViewContentModeScaleToFill) {
         // objectFit: fill
         newFrame = self.bounds;
@@ -119,6 +125,12 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Public
 
 - (void)setVideoTrack:(nullable RTCVideoTrack *)videoTrack {
+    if (videoTrack) {
+        NSAssert([videoTrack.kind isEqualToString: kRTCMediaStreamTrackKindVideo],
+                 @"track must be video track %@",
+                 [videoTrack description]);
+    }
+
     RTCVideoTrack *oldValue = self.videoTrack;
     if (oldValue == videoTrack) {
         return;
