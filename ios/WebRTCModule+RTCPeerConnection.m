@@ -153,6 +153,7 @@ static void *transceiverValueTagKey = "transceiverValueTagKey";
         return RTCRtpTransceiverDirectionInactive;
     else
         NSAssert(NO, @"invalid direction %@", string);
+    return RTCRtpTransceiverDirectionInactive;
 }
 
 // MARK: - React Native Exports
