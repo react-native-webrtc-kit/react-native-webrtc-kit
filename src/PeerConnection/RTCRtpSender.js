@@ -26,6 +26,11 @@ export default class RTCRtpSender {
    */
   track: RTCMediaStreamTrack;
 
+  /**
+   * ストリーム ID のリスト
+   */
+  streamIds: Array<String>;
+
   _valueTag: ValueTag;
 
   /**
@@ -36,6 +41,7 @@ export default class RTCRtpSender {
     this._valueTag = info.valueTag;
     this.parameters = new RTCRtpParameters(info.valueTag, info.parameters);
     this.track = new RTCMediaStreamTrack(info.track);
+    this.streamIds = info.streamIds ? info.streamIds : [];
   }
 
 }

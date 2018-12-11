@@ -15,6 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
     [WebRTCValueManager setValueTag: valueTag forObject: self];
 }
 
+- (NSArray<RTCMediaStreamTrack *> *)allTracks
+{
+    return [self.videoTracks arrayByAddingObjectsFromArray: self.audioTracks];
+}
+
 - (nullable RTCMediaStreamTrack *)trackForTrackId:(NSString *)trackId
 {
     for (RTCMediaStreamTrack *track in self.videoTracks) {
