@@ -692,6 +692,19 @@ RCT_EXPORT_METHOD(rtpEncodingParametersSetMinBitrate:(nonnull NSNumber *)bitrate
      body:@{@"valueTag": peerConnection.valueTag,
             @"receiver": [rtpReceiver json]}];
 }
+
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+didStartReceivingOnTransceiver:(RTCRtpTransceiver *)transceiver
+{
+    self.transceivers[transceiver.valueTag] = nil;
+    [WebRTCValueManager removeValueTagForObject: transceiver];
+    
+    [self.bridge.eventDispatcher
+     sendDeviceEventWithName: @"peerConnectionStartTransceiver"
+     body:@{@"valueTag": peerConnection.valueTag,
+            @"transceiver": [transceiver json]}];
+}
+
 - (void)peerConnectionShouldNegotiate:(RTCPeerConnection *)peerConnection {
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionShouldNegotiate"
                                                     body:@{@"valueTag": peerConnection.valueTag}];

@@ -465,6 +465,18 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
           { track: receiver.track, receiver: receiver }));
       }),
 
+      DeviceEventEmitter.addListener('peerConnectionStartTransceiver', ev => {
+        logger.log("# event: peerConnectionStartTransceiver =>", ev.valueTag);
+        if (ev.valueTag !== this._valueTag) {
+          return;
+        }
+
+        let trans = new RTCRtpTransceiver(ev.transceiver);
+        this.transceivers.push(trans);
+        this.dispatchEvent(new RTCMediaStreamTrackEvent('track',
+          { track: trans.sender.track, transceiver: trans }));
+      }),
+
       DeviceEventEmitter.addListener('peerConnectionGotICECandidate', ev => {
         logger.log("# event: peerConnectionGotICECandidate =>", ev.valueTag);
         if (ev.valueTag !== this._valueTag) {
