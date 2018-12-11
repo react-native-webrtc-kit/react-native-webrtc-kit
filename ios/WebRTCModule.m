@@ -46,6 +46,7 @@ static WebRTCModule *sharedModule;
          initWithEncoderFactory: encoderFactory
          decoderFactory: decoderFactory];
         self.peerConnections = [NSMutableDictionary dictionary];
+        self.streams = [NSMutableDictionary dictionary];
         self.tracks = [NSMutableDictionary dictionary];
         self.senders = [NSMutableDictionary dictionary];
         self.receivers = [NSMutableDictionary dictionary];
