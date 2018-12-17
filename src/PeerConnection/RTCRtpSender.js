@@ -40,7 +40,9 @@ export default class RTCRtpSender {
     this.id = info.id;
     this._valueTag = info.valueTag;
     this.parameters = new RTCRtpParameters(info.valueTag, info.parameters);
-    this.track = new RTCMediaStreamTrack(info.track);
+    if (info.track) {
+      this.track = new RTCMediaStreamTrack(info.track);
+    }
     this.streamIds = info.streamIds ? info.streamIds : [];
   }
 

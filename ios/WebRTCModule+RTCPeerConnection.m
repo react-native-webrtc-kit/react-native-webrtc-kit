@@ -75,16 +75,39 @@ static const char *streamIdsKey = "streamIds";
     [WebRTCValueManager setValueTag: valueTag forObject: self];
 }
 
-- (nullable NSArray<NSString *> *)streamIds
+- (NSArray<NSString *> *)streamIds
 {
-    return objc_getAssociatedObject(self, streamIdsKey);
+    id ids = objc_getAssociatedObject(self, streamIdsKey);
+    return ids ? ids : @[];
 }
 
-- (void)setStreamIds:(nullable NSArray<NSString *> *)streamIds
+- (void)setStreamIds:(NSArray<NSString *> *)streamIds
 {
     objc_setAssociatedObject(self, streamIdsKey,
                              streamIds,
                              OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (id)json
+{
+    // RTCRtpSender/Receiver の track プロパティは
+    // RTCMediaStreamTrcak を動的に生成するので、
+    // 新しい value tag を割り当てる
+    RTCMediaStreamTrack *track = self.track;
+    if (track) {
+        track.valueTag = [[WebRTCModule shared] createNewValueTag];
+        [WebRTCModule shared].tracks[track.valueTag] = track;
+    }
+
+    NSMutableDictionary *json = [[NSMutableDictionary alloc] init];
+    json[@"id"] = self.senderId;
+    json[@"parameters"] = [self.parameters json];
+    json[@"streamIds"] = self.streamIds;
+    if (self.valueTag)
+        json[@"valueTag"] = self.valueTag;
+    if (track)
+        json[@"track"] = [track json];
+    return json;
 }
 
 @end
@@ -100,12 +123,13 @@ static const char *streamIdsKey = "streamIds";
     [WebRTCValueManager setValueTag: valueTag forObject: self];
 }
 
-- (nullable NSArray<NSString *> *)streamIds
+- (NSArray<NSString *> *)streamIds
 {
-    return objc_getAssociatedObject(self, streamIdsKey);
+    id ids = objc_getAssociatedObject(self, streamIdsKey);
+    return ids ? ids : @[];
 }
 
-- (void)setStreamIds:(nullable NSArray<NSString *> *)streamIds
+- (void)setStreamIds:(NSArray<NSString *> *)streamIds
 {
     objc_setAssociatedObject(self, streamIdsKey,
                              streamIds,
@@ -118,14 +142,20 @@ static const char *streamIdsKey = "streamIds";
     // RTCMediaStreamTrcak を動的に生成するので、
     // 新しい value tag を割り当てる
     RTCMediaStreamTrack *track = self.track;
-    track.valueTag = [[WebRTCModule shared] createNewValueTag];
-    [WebRTCModule shared].tracks[track.valueTag] = track;
+    if (track) {
+        track.valueTag = [[WebRTCModule shared] createNewValueTag];
+        [WebRTCModule shared].tracks[track.valueTag] = track;
+    }
     
-    return @{@"valueTag": self.valueTag,
-             @"receiverId": self.receiverId,
-             @"parameters": [self.parameters json],
-             @"track": [track json],
-             @"streamIds": self.streamIds};
+    NSMutableDictionary *json = [[NSMutableDictionary alloc] init];
+    json[@"id"] = self.receiverId;
+    json[@"parameters"] = [self.parameters json];
+    json[@"streamIds"] = self.streamIds;
+    if (self.valueTag)
+        json[@"valueTag"] = self.valueTag;
+    if (track)
+        json[@"track"] = [track json];
+    return json;
 }
 
 @end
@@ -147,11 +177,16 @@ static void *transceiverValueTagKey = "transceiverValueTagKey";
 
 - (id)json
 {
-    return @{@"valueTag": self.valueTag,
-             @"mid": self.mid,
-             @"sender": [self.sender json],
-             @"receiver": [self.receiver json],
-             @"stopped": [NSNumber numberWithBool: self.isStopped]};
+    NSMutableDictionary *json =
+    [[NSMutableDictionary alloc]
+     initWithDictionary:
+     @{@"mid": self.mid,
+       @"sender": [self.sender json],
+       @"receiver": [self.receiver json],
+       @"stopped": [NSNumber numberWithBool: self.isStopped]}];
+    if (self.valueTag)
+        json[@"valueTag"] = self.valueTag;
+    return json;
 }
 
 + (NSString *)directionDescription:(RTCRtpTransceiverDirection)direction
@@ -426,11 +461,7 @@ RCT_EXPORT_METHOD(peerConnectionAddTrack:(nonnull NSString *)trackValueTag
     self.senders[sender.valueTag] = sender;
     sender.streamIds = streamIds;
     
-    resolve(@{@"id": sender.senderId,
-              @"valueTag": sender.valueTag,
-              @"parameters": [sender.parameters json],
-              @"track": [track json],
-              @"streamIds": sender.streamIds});
+    resolve([sender json]);
 }
 
 // MARK: -peerConnectionRemoveTrack:valueTag:
@@ -696,6 +727,7 @@ RCT_EXPORT_METHOD(rtpEncodingParametersSetMinBitrate:(nonnull NSNumber *)bitrate
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
 didStartReceivingOnTransceiver:(RTCRtpTransceiver *)transceiver
 {
+    transceiver.valueTag = [self createNewValueTag];
     self.transceivers[transceiver.valueTag] = nil;
     [WebRTCValueManager removeValueTagForObject: transceiver];
     

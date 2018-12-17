@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RTCRtpSender (ReactNativeWebRTCKit)
 
 @property (nonatomic, nullable) NSString *valueTag;
-@property (nonatomic, nullable) NSArray<NSString *> *streamIds;
+@property (nonatomic) NSArray<NSString *> *streamIds;
 
 - (id)json;
 
@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RTCRtpReceiver (ReactNativeWebRTCKit)
 
 @property (nonatomic, nullable) NSString *valueTag;
-@property (nonatomic, nullable) NSArray<NSString *> *streamIds;
+@property (nonatomic) NSArray<NSString *> *streamIds;
 
 - (id)json;
 
