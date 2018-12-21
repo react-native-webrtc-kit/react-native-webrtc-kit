@@ -109,6 +109,28 @@ RCT_EXPORT_METHOD(finishLoading) {
     [_transceivers removeAllObjects];
 }
 
+RCT_EXPORT_METHOD(enableMetrics) {
+    RTCEnableMetrics();
+}
+
+RCT_EXPORT_METHOD(getAndResetMetrics:(nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject) {
+    NSMutableArray *infos = [[NSMutableArray alloc] init];
+    for (RTCMetricsSampleInfo *info in RTCGetAndResetMetrics()) {
+        NSMutableDictionary *samples = [[NSMutableDictionary alloc] init];
+        for (NSNumber *key in [info.samples keyEnumerator]) {
+            samples[[key stringValue]] = info.samples[key];
+        }
+        [infos addObject:
+         @{@"name": info.name,
+           @"min": [NSNumber numberWithInt: info.min],
+           @"max": [NSNumber numberWithInt: info.max],
+           @"bucketCount": [NSNumber numberWithInt: info.bucketCount],
+           @"samples": samples}];
+    }
+    resolve(infos);
+}
+
 @end
 
 NS_ASSUME_NONNULL_END
