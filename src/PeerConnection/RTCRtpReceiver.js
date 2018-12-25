@@ -28,6 +28,8 @@ export default class RTCRtpReceiver {
 
   /**
    * ストリーム ID のリスト
+   * 
+   * @since 2.0.0
    */
   streamIds: Array<String>;
 
