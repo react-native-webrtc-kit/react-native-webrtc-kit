@@ -9,6 +9,26 @@
 - FIX
     - バグ修正
 
+## 2.0.0
+
+- [CHANGE] iOS: システム条件を変更した
+
+    - iOS 10
+
+- [CHANGE] メトリクスに関する次の API を追加した
+
+    - ``enableMetrics``
+
+    - ``getAndResetMetrics``
+
+    - ``RTCMetricsSampleInfo``
+
+- [CHANGE] API: ``RTCPeerConnection``: ``onaddtrack``, ``onremovetrack`` イベントハンドラを ``ontrack`` にまとめた
+
+- [CHANGE] API: ``RTCRtpSender``: ``streamIds``: 追加した
+
+- [CHANGE] API: ``RTCRtpReceiver``: ``streamIds``: 追加した
+
 ## 1.1.0
 
 - [CHANGE] iOS: システム条件を変更した
