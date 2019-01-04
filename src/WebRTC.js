@@ -132,4 +132,12 @@ export default class WebRTC {
     WebRTCModule.rtpEncodingParametersSetMinBitrate(value, ssrc, owner);
   }
 
+  static enableMetrics() {
+    WebRTCModule.enableMetrics();
+  }
+
+  static getAndResetMetrics(): Promise<Array<RTCMetricsSampleInfo>> {
+    return WebRTCModule.getAndResetMetrics();
+  }
+
 }

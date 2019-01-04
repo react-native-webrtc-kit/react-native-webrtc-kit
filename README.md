@@ -42,7 +42,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ### iOS アプリケーションの開発
 
-- iOS 12.0 以降
+- iOS 10.0 以降
 
 - Xcode 10
 

@@ -46,6 +46,7 @@ static WebRTCModule *sharedModule;
          initWithEncoderFactory: encoderFactory
          decoderFactory: decoderFactory];
         self.peerConnections = [NSMutableDictionary dictionary];
+        self.streams = [NSMutableDictionary dictionary];
         self.tracks = [NSMutableDictionary dictionary];
         self.senders = [NSMutableDictionary dictionary];
         self.receivers = [NSMutableDictionary dictionary];
@@ -106,6 +107,28 @@ RCT_EXPORT_METHOD(finishLoading) {
     [_senders removeAllObjects];
     [_receivers removeAllObjects];
     [_transceivers removeAllObjects];
+}
+
+RCT_EXPORT_METHOD(enableMetrics) {
+    RTCEnableMetrics();
+}
+
+RCT_EXPORT_METHOD(getAndResetMetrics:(nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject) {
+    NSMutableArray *infos = [[NSMutableArray alloc] init];
+    for (RTCMetricsSampleInfo *info in RTCGetAndResetMetrics()) {
+        NSMutableDictionary *samples = [[NSMutableDictionary alloc] init];
+        for (NSNumber *key in [info.samples keyEnumerator]) {
+            samples[[key stringValue]] = info.samples[key];
+        }
+        [infos addObject:
+         @{@"name": info.name,
+           @"min": [NSNumber numberWithInt: info.min],
+           @"max": [NSNumber numberWithInt: info.max],
+           @"bucketCount": [NSNumber numberWithInt: info.bucketCount],
+           @"samples": samples}];
+    }
+    resolve(infos);
 }
 
 @end
