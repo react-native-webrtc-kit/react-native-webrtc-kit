@@ -343,7 +343,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    */
   addTrack(track: RTCMediaStreamTrack, streamIds: Array<String>): Promise<RTCRtpSender> {
     var streamValueTags = [];
-    return WebRTC.peerConnectionAddTrack(this._valueTag, track._valueTag, streamIds)
+    return WebRTC.peerConnectionAddTrack(this._valueTag, stramIds, track._valueTag)
       .then((info) => {
         console.log("addTrack: sender => ", info);
         let sender = new RTCRtpSender(info);
