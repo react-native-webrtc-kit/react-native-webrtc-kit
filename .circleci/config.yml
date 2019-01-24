@@ -21,6 +21,9 @@ jobs:
           command: yarn install
           working_directory: test/Touchstone
       - run:
+          command: rm -rf node_modules/react-native-webrtc-kit
+          working_directory: test/Touchstone
+      - run:
           command: git clone ../../../react-native-webrtc-kit node_modules/react-native-webrtc-kit
           working_directory: test/Touchstone
       - run:
