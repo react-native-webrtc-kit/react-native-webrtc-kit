@@ -77,6 +77,10 @@ export class RTCRtpHeaderExtensionParameters {
  */
 export class RTCRtpEncodingParameters {
 
+  _active: boolean;
+  _maxBitrate: number | null;
+  _minBitrate: number | null;
+
   /**
    * エンコーディングがメディアデータの送信時に使われるのであれば `true`
    * 
