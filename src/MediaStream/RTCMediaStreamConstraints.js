@@ -77,12 +77,14 @@ export class RTCMediaStreamAudioConstraints {
 
 }
 
+/** @private */
 const DEFAULT_VIDEO_CONSTRAINTS = new RTCMediaStreamVideoConstraints();
 DEFAULT_VIDEO_CONSTRAINTS.facingMode = "user";
 DEFAULT_VIDEO_CONSTRAINTS.width = 1280;
 DEFAULT_VIDEO_CONSTRAINTS.height = 720;
 DEFAULT_VIDEO_CONSTRAINTS.frameRate = 30;
 
+/** @private */
 const DEFAULT_AUDIO_CONSTRAINTS = true;
 
 /**
