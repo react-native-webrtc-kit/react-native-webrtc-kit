@@ -16,8 +16,7 @@ export const PEER_CONNECTION_EVENTS = [
   'negotiationneeded',
   'peeridentity',
   'signalingstatechange',
-  'addtrack',
-  'removetrack',
+  'track',
 ];
 
 /**

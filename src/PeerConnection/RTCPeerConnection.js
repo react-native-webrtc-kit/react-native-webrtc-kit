@@ -184,8 +184,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * @listens {icegatheringstatechange} `RTCIceCandidateEvent` | `RTCIceCandidateEvent`: `iceGatheringState` が変更されると送信されるイベント
    * @listens {negotiationneeded} `RTCEvent`: ネゴシエーションが必要になったときに送信されます。
    * @listens {signalingstatechange} `RTCEvent`: `signalingState` が変更されると送信されます。
-   * @listens {addtrack} `RTCEvent`: RTCPeerConnection にトラックが追加されると送信されます。
-   * @listens {removetrack} `RTCEvent`: RTCPeerConnection からトラックが削除されると送信されます。
+   * @listens {track} `RTCEvent`: RTCPeerConnection にトラックが追加・削除されると送信されます。
    * @listens {addstream} このイベントは廃止されました。
    * @listens {removestream} このイベントは廃止されました。
    */
@@ -206,12 +205,16 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
     this._registerEventsFromNative();
   }
 
-  // connectionState の状態を変更します。
+  /** @private
+   * connectionState の状態を変更します。
+   */
   _beginConnect(): void {
     this._setConnectionState('connecting');
   }
 
-  // peer connection の状態を判断します。
+  /** @private
+   * peer connection の状態を判断します。
+   */
   _updateConnectionState(): void {
     logger.group("# update connection state");
     logger.log("# signaling state => ", this.signalingState);
@@ -450,7 +453,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
         let receiver = new RTCRtpReceiver(ev.receiver);
         this.receivers.push(receiver);
-        this.dispatchEvent(new RTCMediaStreamTrackEvent('addtrack',
+        this.dispatchEvent(new RTCMediaStreamTrackEvent('track',
           { track: receiver.track, receiver: receiver }));
       }),
 
@@ -462,8 +465,20 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
         let receiver = new RTCRtpReceiver(ev.receiver);
         this.receivers.push(receiver);
-        this.dispatchEvent(new RTCMediaStreamTrackEvent('removetrack',
+        this.dispatchEvent(new RTCMediaStreamTrackEvent('track',
           { track: receiver.track, receiver: receiver }));
+      }),
+
+      DeviceEventEmitter.addListener('peerConnectionStartTransceiver', ev => {
+        logger.log("# event: peerConnectionStartTransceiver =>", ev.valueTag);
+        if (ev.valueTag !== this._valueTag) {
+          return;
+        }
+
+        let trans = new RTCRtpTransceiver(ev.transceiver);
+        this.transceivers.push(trans);
+        this.dispatchEvent(new RTCMediaStreamTrackEvent('track',
+          { track: trans.sender.track, transceiver: trans }));
       }),
 
       DeviceEventEmitter.addListener('peerConnectionGotICECandidate', ev => {

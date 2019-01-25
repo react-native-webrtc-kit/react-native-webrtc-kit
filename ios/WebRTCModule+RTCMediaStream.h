@@ -9,6 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RTCMediaStream (ReactNativeWebRTCKit) <WebRTCExportable>
 
 @property (nonatomic, nullable) NSString *valueTag;
+@property (nonatomic, readonly) NSArray<RTCMediaStreamTrack *> *allTracks;
 
 - (nullable RTCMediaStreamTrack *)trackForTrackId:(NSString *)trackId;
 

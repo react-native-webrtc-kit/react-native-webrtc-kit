@@ -41,6 +41,7 @@ type Props = {
 
 };
 
+/** @private */
 const NativeProps = {
   name: 'WebRTCVideoView',
   propTypes: {

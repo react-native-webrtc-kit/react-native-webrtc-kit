@@ -12,6 +12,7 @@ import RTCSessionDescription from './PeerConnection/RTCSessionDescription';
 import type { ValueTag } from './PeerConnection/RTCPeerConnection';
 import type { RTCRtpTransceiverDirection } from './PeerConnection/RTCRtpTransceiver';
 
+/** @private */
 const { WebRTCModule } = NativeModules;
 
 /**
@@ -130,6 +131,14 @@ export default class WebRTC {
       value = -1;
     }
     WebRTCModule.rtpEncodingParametersSetMinBitrate(value, ssrc, owner);
+  }
+
+  static enableMetrics() {
+    WebRTCModule.enableMetrics();
+  }
+
+  static getAndResetMetrics(): Promise<Array<RTCMetricsSampleInfo>> {
+    return WebRTCModule.getAndResetMetrics();
   }
 
 }
