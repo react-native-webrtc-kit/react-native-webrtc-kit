@@ -1,5 +1,8 @@
 // @flow
 
+/**
+ * RTCMediaStream に関するエラーを表します。
+ */
 export default class RTCMediaStreamError {
 
   /**

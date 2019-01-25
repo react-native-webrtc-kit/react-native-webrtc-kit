@@ -205,12 +205,16 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
     this._registerEventsFromNative();
   }
 
-  // connectionState の状態を変更します。
+  /** @private
+   * connectionState の状態を変更します。
+   */
   _beginConnect(): void {
     this._setConnectionState('connecting');
   }
 
-  // peer connection の状態を判断します。
+  /** @private
+   * peer connection の状態を判断します。
+   */
   _updateConnectionState(): void {
     logger.group("# update connection state");
     logger.log("# signaling state => ", this.signalingState);

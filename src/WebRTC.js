@@ -12,6 +12,7 @@ import RTCSessionDescription from './PeerConnection/RTCSessionDescription';
 import type { ValueTag } from './PeerConnection/RTCPeerConnection';
 import type { RTCRtpTransceiverDirection } from './PeerConnection/RTCRtpTransceiver';
 
+/** @private */
 const { WebRTCModule } = NativeModules;
 
 /**
