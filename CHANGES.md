@@ -15,6 +15,8 @@
 
     - iOS 10
 
+- [CHANGE] Unified Plan に対応した
+
 - [CHANGE] メトリクスに関する次の API を追加した
 
     - ``enableMetrics``
