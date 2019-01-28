@@ -394,6 +394,10 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
       });
   }
 
+  speakerRouteChange(isSpeaker: boolean): <void> {
+    return WebRTC.onSpeakerRouteChange();
+  }
+
   /**
    * リモートの SDP を設定します。
    * 

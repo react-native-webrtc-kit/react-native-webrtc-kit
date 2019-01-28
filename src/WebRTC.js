@@ -141,4 +141,7 @@ export default class WebRTC {
     return WebRTCModule.getAndResetMetrics();
   }
 
+  static onSpeakerRouteChange(isSpeaker: boolean): void {
+    return WebRTCModule.onSpeakerRouteChange(isSpeaker);
+  }
 }

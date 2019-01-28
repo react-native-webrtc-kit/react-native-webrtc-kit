@@ -663,6 +663,30 @@ RCT_EXPORT_METHOD(rtpEncodingParametersSetMinBitrate:(nonnull NSNumber *)bitrate
     }
 }
 
+// MARK: -onSpeakerRouteChange:isSpeaker:
+
+RCT_EXPORT_METHOD(onSpeakerRouteChange:(nonnull BOOL *)isSpeaker)
+{
+    AVAudioSessionPortOverride override = AVAudioSessionPortOverrideNone;
+    if (isSpeaker) {
+        override = AVAudioSessionPortOverrideSpeaker;
+    }
+    [RTCDispatcher dispatchAsyncOnType:RTCDispatcherTypeAudioSession
+                                 block:^{
+                                     RTCAudioSession *session = [RTCAudioSession sharedInstance];
+                                     [session lockForConfiguration];
+                                     NSError *error = nil;
+                                     if ([session overrideOutputAudioPort:override error:&error]) {
+                                         self.portOverride = override;
+                                     } else {
+                                         RTCLogError(@"Error overriding output port: %@",
+                                                     error.localizedDescription);
+                                     }
+                                     [session unlockForConfiguration];
+                                 }];
+}
+
+
 #pragma mark - RTCPeerConnectionDelegate
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection didChangeSignalingState:(RTCSignalingState)newState {
