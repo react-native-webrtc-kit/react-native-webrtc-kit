@@ -394,10 +394,6 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
       });
   }
 
-  speakerRouteChange(isSpeaker: boolean): <void> {
-    return WebRTC.onSpeakerRouteChange();
-  }
-
   /**
    * リモートの SDP を設定します。
    * 
@@ -508,6 +504,25 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
       })
     ]
   }
+
+  /*
+   * オーディオの出力ポートを取得します。
+   * @return {Promise<string>} ポートの種類。Speaker | None | Unknown
+   */
+  getAudioPort(): Promise<string> {
+    return WebRTC.getAudioPort();
+  }
+
+  /*
+   * オーディオの出力ポートを指定します。
+   * @param {isSpeaker} Audio Port を Speaker にするか None にするかの指定 
+   * @return {Promise<void>} セットした結果を示す Promise
+   */
+  setAudioRoute(isSpeaker: boolean): Promise<void> {
+    logger.log("# audio route change");
+    WebRTC.onAudioRouteChange(isSpeaker);
+  }
+
 
   _unregisterEventsFromNative(): void {
     logger.log("# unregister events from native");

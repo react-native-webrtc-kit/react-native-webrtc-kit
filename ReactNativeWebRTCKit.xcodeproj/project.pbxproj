@@ -17,7 +17,6 @@
 		918CE50220F3A7D100F74D70 /* WebRTCUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 918CE50120F3A7D100F74D70 /* WebRTCUtils.m */; };
 		91CB344620EE02D300B6ABC4 /* WebRTCMediaStreamConstraints.m in Sources */ = {isa = PBXBuildFile; fileRef = 91CB344520EE02D300B6ABC4 /* WebRTCMediaStreamConstraints.m */; };
 		C50AB2C120886F6F005BF7F4 /* WebRTCModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C50AB2C020886F6F005BF7F4 /* WebRTCModule.m */; };
-		D4256E3421FEF10800A67172 /* WebRTCVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D4256E3321FEF10800A67172 /* WebRTCVideoViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -54,8 +53,6 @@
 		91CB344520EE02D300B6ABC4 /* WebRTCMediaStreamConstraints.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WebRTCMediaStreamConstraints.m; path = ios/WebRTCMediaStreamConstraints.m; sourceTree = "<group>"; };
 		C50AB2BF20886F6F005BF7F4 /* WebRTCModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebRTCModule.h; path = ios/WebRTCModule.h; sourceTree = "<group>"; };
 		C50AB2C020886F6F005BF7F4 /* WebRTCModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebRTCModule.m; path = ios/WebRTCModule.m; sourceTree = "<group>"; };
-		D4256E3321FEF10800A67172 /* WebRTCVideoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WebRTCVideoViewController.m; path = ios/WebRTCVideoViewController.m; sourceTree = "<group>"; };
-		D4256E3521FEF11B00A67172 /* WebRTCVideoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WebRTCVideoViewController.h; path = ios/WebRTCVideoViewController.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,8 +98,6 @@
 				0E781C1820B00A95003050A2 /* WebRTCVideoView.m */,
 				0E781C1520B00A94003050A2 /* WebRTCVideoViewManager.h */,
 				0E781C1720B00A95003050A2 /* WebRTCVideoViewManager.m */,
-				D4256E3321FEF10800A67172 /* WebRTCVideoViewController.m */,
-				D4256E3521FEF11B00A67172 /* WebRTCVideoViewController.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -166,7 +161,6 @@
 				C50AB2C120886F6F005BF7F4 /* WebRTCModule.m in Sources */,
 				918CE50220F3A7D100F74D70 /* WebRTCUtils.m in Sources */,
 				0E781C1A20B00A95003050A2 /* WebRTCVideoView.m in Sources */,
-				D4256E3421FEF10800A67172 /* WebRTCVideoViewController.m in Sources */,
 				0E3F98BA20BAC562006E109D /* RCTConvert+WebRTC.m in Sources */,
 				91CB344620EE02D300B6ABC4 /* WebRTCMediaStreamConstraints.m in Sources */,
 				916C008E219022A400C689F3 /* WebRTCValueManager.m in Sources */,

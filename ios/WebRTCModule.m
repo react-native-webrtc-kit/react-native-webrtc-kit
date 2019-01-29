@@ -51,7 +51,7 @@ static WebRTCModule *sharedModule;
         self.senders = [NSMutableDictionary dictionary];
         self.receivers = [NSMutableDictionary dictionary];
         self.transceivers = [NSMutableDictionary dictionary];
-
+        self.portOverride = AVAudioSessionPortOverrideNone;
         dispatch_queue_attr_t attributes =
         dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL,
                                                 QOS_CLASS_USER_INITIATED, -1);
@@ -130,6 +130,43 @@ RCT_EXPORT_METHOD(getAndResetMetrics:(nonnull RCTPromiseResolveBlock)resolve
     }
     resolve(infos);
 }
+
+// MARK: -getAudioPort:resolver:rejecter:
+RCT_REMAP_METHOD(getAudioPort, resolver: (RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+    if(self.portOverride == AVAudioSessionPortOverrideSpeaker){
+        resolve(@"Speaker");
+    }else if(self.portOverride == AVAudioSessionPortOverrideNone){
+        resolve(@"None");
+    }else{
+        resolve(@"Unknown");
+    }
+}
+
+// MARK: -onAudioRouteChange:isSpeaker:
+RCT_EXPORT_METHOD(onAudioRouteChange:(BOOL)isSpeaker
+                  resolver: (nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject) {
+    AVAudioSessionPortOverride override = AVAudioSessionPortOverrideNone;
+    if (isSpeaker) {
+        override = AVAudioSessionPortOverrideSpeaker;
+    }
+    [RTCDispatcher dispatchAsyncOnType:RTCDispatcherTypeAudioSession
+                                 block:^{
+                                     RTCAudioSession *session = [RTCAudioSession sharedInstance];
+                                     [session lockForConfiguration];
+                                     NSError *error = nil;
+                                     if ([session overrideOutputAudioPort:override error:&error]) {
+                                         self.portOverride = override;
+                                         resolve(nil);
+                                     } else {
+                                         RTCLogError(@"Error overriding output port: %@",
+                                                     error.localizedDescription);
+                                     }
+                                     [session unlockForConfiguration];
+                                 }];
+}
+
 
 @end
 

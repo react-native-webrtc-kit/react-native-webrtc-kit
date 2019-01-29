@@ -141,7 +141,11 @@ export default class WebRTC {
     return WebRTCModule.getAndResetMetrics();
   }
 
-  static onSpeakerRouteChange(isSpeaker: boolean): void {
-    return WebRTCModule.onSpeakerRouteChange(isSpeaker);
+  static getAudioPort(): Promise<string> {
+    return WebRTCModule.getAudioPort();
+  }
+
+  static onAudioRouteChange(isSpeaker: boolean): Promise<void> {
+    return WebRTCModule.onAudioRouteChange(isSpeaker);
   }
 }
