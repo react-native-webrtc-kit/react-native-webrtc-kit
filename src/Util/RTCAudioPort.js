@@ -27,6 +27,6 @@ export function getAudioPort(): Promise<RTCAudioPorts> {
  */
 export function setAudioPort(isSpeaker: boolean): Promise<void> {
   logger.log("# audio route change");
-  WebRTC.setAudioPort(isSpeaker);
+  return WebRTC.setAudioPort(isSpeaker);
 }
 
