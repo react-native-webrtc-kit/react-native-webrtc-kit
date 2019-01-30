@@ -25,8 +25,8 @@ export function getAudioPort(): Promise<RTCAudioPorts> {
  * オーディオの出力先を指定します。
  * @param {isSpeaker} Audio Port を speaker にするか None にするかの指定 
  */
-export function setAudioRoute(isSpeaker: boolean): Promise<void> {
+export function setAudioPort(isSpeaker: boolean): Promise<void> {
   logger.log("# audio route change");
-  WebRTC.onAudioRouteChange(isSpeaker);
+  WebRTC.setAudioPort(isSpeaker);
 }
 

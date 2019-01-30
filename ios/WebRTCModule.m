@@ -143,8 +143,8 @@ RCT_REMAP_METHOD(getAudioPort, resolver: (RCTPromiseResolveBlock)resolve
     }
 }
 
-// MARK: -onAudioRouteChange:isSpeaker:
-RCT_EXPORT_METHOD(onAudioRouteChange:(BOOL)isSpeaker
+// MARK: -setAudioPort:isSpeaker:resolver:rejecter:
+RCT_EXPORT_METHOD(setAudioPort:(BOOL)isSpeaker
                   resolver: (nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
     AVAudioSessionPortOverride override = AVAudioSessionPortOverrideNone;

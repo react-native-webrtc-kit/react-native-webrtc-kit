@@ -25,7 +25,7 @@ export { default as RTCMediaStreamTrack } from './src/MediaStream/RTCMediaStream
 export { default as RTCMediaStreamConstraints } from './src/MediaStream/RTCMediaStreamConstraints';
 export { default as RTCLogger } from './src/Util/RTCLogger';
 export { enableMetrics, getAndResetMetrics, RTCMetricsSampleInfo } from './src/Util/RTCMetrics';
-export { getAudioPort, setAudioRoute } from './src/Util/RTCAudioPort';
+export { getAudioPort, setAudioPort } from './src/Util/RTCAudioPort';
 export { getUserMedia } from './src/MediaDevice/getUserMedia';
 export { stopUserMedia } from './src/MediaDevice/getUserMedia';
 
