@@ -6,18 +6,18 @@ import logger from './RTCLogger';
  * - `'None'` - None (デフォルト)
  * - `'Speaker'` - スピーカー
  * - `'Unknown'` - 不明
- * @typedef {string} RTCAudioPorts
+ * @typedef {string} RTCAudioPort
  * @version 2.0.0
  */
-export type RTCAudioPorts =
+export type RTCAudioPort =
   | 'None'
   | 'Speaker'
   | 'Unknown'
 /*
  * オーディオの出力元を取得します。
- * @return {Promise<RTCAudioPorts>}
+ * @return {Promise<RTCAudioPort>}
  */
-export function getAudioPort(): Promise<RTCAudioPorts> {
+export function getAudioPort(): Promise<RTCAudioPort> {
   return WebRTC.getAudioPort();
 }
 

@@ -36,7 +36,7 @@ export type { RTCIceConnectionState } from './src/PeerConnection/RTCPeerConnecti
 export type { RTCFacingMode } from './src/MediaStream/RTCMediaStreamConstraints';
 export type { RTCSdpType } from './src/PeerConnection/RTCSessionDescription';
 export type { RTCUserMedia } from './src/MediaDevice/getUserMedia';
-export type { RTCAudioPorts } from './src/Util/RTCAudioPort';
+export type { RTCAudioPort } from './src/Util/RTCAudioPort';
 
 // ネイティブモジュールに JS レイヤーのロードを知らせる。
 // デバッグモードでのリロード時に古い接続の終了処理を行う。
