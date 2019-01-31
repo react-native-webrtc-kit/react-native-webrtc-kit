@@ -27,7 +27,7 @@ export function getAudioPort(): Promise<RTCAudioPort> {
 
 /**
  * オーディオの出力先を指定します。
- * @param {boolean} Audio Port を Speaker にするか None にするかの指定 
+ * @param {boolean} isSpeaker Audio Port を Speaker にするか None にするかの指定 
  * 
  * @since 2.1.0
  */
