@@ -135,11 +135,11 @@ RCT_EXPORT_METHOD(getAndResetMetrics:(nonnull RCTPromiseResolveBlock)resolve
 RCT_REMAP_METHOD(getAudioPort, resolver: (RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject){
     if(self.portOverride == AVAudioSessionPortOverrideSpeaker){
-        resolve(@"Speaker");
+        resolve(@"speaker");
     }else if(self.portOverride == AVAudioSessionPortOverrideNone){
-        resolve(@"None");
+        resolve(@"none");
     }else{
-        resolve(@"Unknown");
+        resolve(@"unknown");
     }
 }
 

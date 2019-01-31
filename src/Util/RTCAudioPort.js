@@ -3,16 +3,16 @@ import logger from './RTCLogger';
 
 /**
  * Audio Port の種別です。
- * - `'None'` - None (デフォルト)
- * - `'Speaker'` - スピーカー
- * - `'Unknown'` - 不明
+ * - `'none'` - None (デフォルト)
+ * - `'speaker'` - スピーカー
+ * - `'unknown'` - 不明
  * @typedef {string} RTCAudioPort
  * @version 2.0.0
  */
 export type RTCAudioPort =
-  | 'None'
-  | 'Speaker'
-  | 'Unknown'
+  | 'none'
+  | 'speaker'
+  | 'unknown'
 /*
  * オーディオの出力元を取得します。
  * @return {Promise<RTCAudioPort>}
@@ -23,7 +23,7 @@ export function getAudioPort(): Promise<RTCAudioPort> {
 
 /*
  * オーディオの出力先を指定します。
- * @param {isSpeaker} Audio Port を speaker にするか None にするかの指定 
+ * @param {isSpeaker} Audio Port を Speaker にするか None にするかの指定 
  */
 export function setAudioPort(isSpeaker: boolean): Promise<void> {
   logger.log("# audio route change");
