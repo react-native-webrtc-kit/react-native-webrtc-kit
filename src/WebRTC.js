@@ -11,7 +11,7 @@ import RTCRtpSender from './PeerConnection/RTCRtpSender';
 import RTCSessionDescription from './PeerConnection/RTCSessionDescription';
 import type { ValueTag } from './PeerConnection/RTCPeerConnection';
 import type { RTCRtpTransceiverDirection } from './PeerConnection/RTCRtpTransceiver';
-import type { RTCAudioPort } from './Utils/RTCAudioPort';
+import type { RTCAudioPort } from './MediaDevice/RTCAudioPort';
 
 /** @private */
 const { WebRTCModule } = NativeModules;

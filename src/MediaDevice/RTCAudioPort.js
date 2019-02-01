@@ -1,5 +1,5 @@
 import WebRTC from '../WebRTC';
-import logger from './RTCLogger';
+import logger from '../Util/RTCLogger';
 
 /**
  * Audio Port の種別です。
