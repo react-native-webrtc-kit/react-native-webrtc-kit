@@ -16,7 +16,8 @@ export type RTCAudioPort =
   | 'unknown'
 
 /**
- * オーディオの出力元を取得します。
+ * 音声の出力元を取得します。
+ * 
  * @return {Promise<RTCAudioPort>}
  * 
  * @since 2.1.0
@@ -26,13 +27,15 @@ export function getAudioPort(): Promise<RTCAudioPort> {
 }
 
 /**
- * オーディオの出力先を指定します。
- * @param {boolean} isSpeaker Audio Port を Speaker にするか None にするかの指定 
+ * 音声の出力先を指定します。
+ * 
+ * @param {RTCAudioPort} port 音声の出力先
+ * @returns {void}
  * 
  * @since 2.1.0
  */
-export function setAudioPort(isSpeaker: boolean): Promise<void> {
-  logger.log("# audio route change");
-  return WebRTC.setAudioPort(isSpeaker);
+export function setAudioPort(port: RTCAudioPort): Promise<void> {
+  logger.log("# audio route change => ", port);
+  return WebRTC.setAudioPort(port);
 }
 

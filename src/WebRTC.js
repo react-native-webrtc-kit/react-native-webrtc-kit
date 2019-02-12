@@ -146,7 +146,7 @@ export default class WebRTC {
     return WebRTCModule.getAudioPort();
   }
 
-  static setAudioPort(isSpeaker: boolean): Promise<void> {
-    return WebRTCModule.setAudioPort(isSpeaker);
+  static setAudioPort(port: RTCAudioPort): Promise<void> {
+    return WebRTCModule.setAudioPort(port);
   }
 }

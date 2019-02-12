@@ -143,12 +143,12 @@ RCT_REMAP_METHOD(getAudioPort, resolver: (RCTPromiseResolveBlock)resolve
     }
 }
 
-// MARK: -setAudioPort:isSpeaker:resolver:rejecter:
-RCT_EXPORT_METHOD(setAudioPort:(BOOL)isSpeaker
+// MARK: -setAudioPort:resolver:rejecter:
+RCT_EXPORT_METHOD(setAudioPort:(NSString *)port
                   resolver: (nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
     AVAudioSessionPortOverride override = AVAudioSessionPortOverrideNone;
-    if (isSpeaker) {
+    if ([port isEqualToString: @"speaker"]) {
         override = AVAudioSessionPortOverrideSpeaker;
     }
     [RTCDispatcher dispatchAsyncOnType:RTCDispatcherTypeAudioSession
