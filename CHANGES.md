@@ -9,6 +9,16 @@
 - FIX
     - バグ修正
 
+## 2.1.0
+
+- [CHANGE] 音声の出力先を変更できるようにした。次の API を追加した。
+
+    - ``getAudioPort()``
+
+    - ``setAudioPort()``
+
+    - ``enum RTCAudioPort``
+
 ## 2.0.0
 
 - [CHANGE] iOS: システム条件を変更した
