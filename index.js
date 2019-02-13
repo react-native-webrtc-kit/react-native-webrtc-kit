@@ -25,6 +25,7 @@ export { default as RTCMediaStreamTrack } from './src/MediaStream/RTCMediaStream
 export { default as RTCMediaStreamConstraints } from './src/MediaStream/RTCMediaStreamConstraints';
 export { default as RTCLogger } from './src/Util/RTCLogger';
 export { enableMetrics, getAndResetMetrics, RTCMetricsSampleInfo } from './src/Util/RTCMetrics';
+export { getAudioPort, setAudioPort } from './src/MediaDevice/RTCAudioPort';
 export { getUserMedia } from './src/MediaDevice/getUserMedia';
 export { stopUserMedia } from './src/MediaDevice/getUserMedia';
 
@@ -35,6 +36,7 @@ export type { RTCIceConnectionState } from './src/PeerConnection/RTCPeerConnecti
 export type { RTCFacingMode } from './src/MediaStream/RTCMediaStreamConstraints';
 export type { RTCSdpType } from './src/PeerConnection/RTCSessionDescription';
 export type { RTCUserMedia } from './src/MediaDevice/getUserMedia';
+export type { RTCAudioPort } from './src/MediaDevice/RTCAudioPort';
 
 // ネイティブモジュールに JS レイヤーのロードを知らせる。
 // デバッグモードでのリロード時に古い接続の終了処理を行う。

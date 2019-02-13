@@ -3,6 +3,8 @@ import WebRTC from '../WebRTC';
 /**
  * メトリクスの計測を有効にします。
  * 
+ * @returns {void}
+ * 
  * @since 2.0.0
  */
 export function enableMetrics() {
@@ -12,6 +14,8 @@ export function enableMetrics() {
 /**
  * 計測中のメトリクスを取得します。
  * メトリクスはリセットされます。
+ * 
+ * @return {Promise<Array<RTCMetricsSampleInfo>>}
  * 
  * @since 2.0.0
  */

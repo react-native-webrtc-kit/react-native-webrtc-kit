@@ -11,6 +11,7 @@ import RTCRtpSender from './PeerConnection/RTCRtpSender';
 import RTCSessionDescription from './PeerConnection/RTCSessionDescription';
 import type { ValueTag } from './PeerConnection/RTCPeerConnection';
 import type { RTCRtpTransceiverDirection } from './PeerConnection/RTCRtpTransceiver';
+import type { RTCAudioPort } from './MediaDevice/RTCAudioPort';
 
 /** @private */
 const { WebRTCModule } = NativeModules;
@@ -141,4 +142,11 @@ export default class WebRTC {
     return WebRTCModule.getAndResetMetrics();
   }
 
+  static getAudioPort(): Promise<RTCAudioPort> {
+    return WebRTCModule.getAudioPort();
+  }
+
+  static setAudioPort(port: RTCAudioPort): Promise<void> {
+    return WebRTCModule.setAudioPort(port);
+  }
 }
