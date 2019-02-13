@@ -142,7 +142,9 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
     // ただし、すべてのタグを一度に消すために
     // 毎回チェック用の配列を用意すると重いので、一度に一つずつ消す
     NSString *tagToRemove = nil;
-    for (NSString *valueTag in _trackValueTags) {
+    // 配列を一旦コピーする
+    NSArray<NSString *> *trackValueTags = [_trackValueTags copy];
+    for (NSString *valueTag in trackValueTags) {
         RTCMediaStreamTrack *track = [WebRTCModule shared].tracks[valueTag];
         if ([track isKindOfClass: [RTCVideoTrack class]] &&
             track.readyState == RTCMediaStreamTrackStateLive) {
