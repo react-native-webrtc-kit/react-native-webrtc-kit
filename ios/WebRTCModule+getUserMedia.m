@@ -6,6 +6,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
 
+@interface WebRTCCameraVideoCapturer ()
+
+@property (nonatomic, readonly, nonnull) dispatch_queue_t lock;
+
+@end
+
 @implementation WebRTCCameraVideoCapturer
 
 + (WebRTCCameraVideoCapturer *)shared
@@ -19,6 +25,8 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
 {
     self = [super init];
     if (self) {
+        _lock = dispatch_queue_create("WebRTCCameraVideoCapturer",
+                                      DISPATCH_QUEUE_SERIAL);
         _nativeCapturer = [[RTCCameraVideoCapturer alloc] initWithDelegate: self];
         _isRunning = NO;
         _trackValueTags = [[NSMutableArray alloc] init];
@@ -139,9 +147,8 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
 
     // すべてのローカルストリームに対して映像フレームを渡し、
     // タグに対するストリームが存在しない場合はタグを消す。
-    // ただし、すべてのタグを一度に消すために
-    // 毎回チェック用の配列を用意すると重いので、一度に一つずつ消す
-    NSString *tagToRemove = nil;
+    NSMutableArray *tagsToRemove = nil;
+
     for (NSString *valueTag in _trackValueTags) {
         RTCMediaStreamTrack *track = [WebRTCModule shared].tracks[valueTag];
         if ([track isKindOfClass: [RTCVideoTrack class]] &&
@@ -149,23 +156,45 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
             RTCVideoTrack *video = (RTCVideoTrack *)track;
             [video.source capturer: capturer didCaptureVideoFrame: frame];
         } else {
-            tagToRemove = valueTag;
+            if (!tagsToRemove)
+                tagsToRemove = [[NSMutableArray alloc] init];
+            [tagsToRemove addObject: valueTag];
         }
     }
     
-    if (tagToRemove) {
-        dispatch_sync(dispatch_get_main_queue(), ^() {
-            NSMutableArray *newTags = [[NSMutableArray alloc] initWithArray: _trackValueTags];
-            [newTags removeObject: tagToRemove];
-            _trackValueTags = newTags;
-        });
+    if (tagsToRemove) {
+        for (NSString *tag in tagsToRemove) {
+            [self removeTrackValueTag: tag];
+        }
     }
 }
 
 - (void)reloadApplication
 {
     [self stopCapture];
-    [_trackValueTags removeAllObjects];
+    
+    dispatch_sync(self.lock, ^{
+        _trackValueTags = @[];
+    });
+}
+
+- (void)addTrackValueTag:(NSString *)valueTag
+{
+    dispatch_sync(self.lock, ^{
+        _trackValueTags = [_trackValueTags arrayByAddingObject: valueTag];
+    });
+}
+
+- (void)removeTrackValueTag:(NSString *)valueTag
+{
+    dispatch_sync(self.lock, ^{
+        NSMutableArray *new = [[NSMutableArray alloc] init];
+        for (NSString *old in _trackValueTags) {
+            if (![old isEqualToString: valueTag])
+                [new addObject: valueTag];
+        }
+        _trackValueTags = new;
+    });
 }
 
 @end
@@ -239,8 +268,7 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
     self.tracks[audioTrack.valueTag] = audioTrack;
     [mediaStream addVideoTrack: videoTrack];
     [mediaStream addAudioTrack: audioTrack];
-    [[WebRTCCameraVideoCapturer shared].trackValueTags
-     addObject: videoTrack.valueTag];
+    [[WebRTCCameraVideoCapturer shared] addTrackValueTag: videoTrack.valueTag];
     
     // constraints の指定に従ってトラックの可否を決める
     videoTrack.isEnabled = constraints.video ? YES : NO;
