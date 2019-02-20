@@ -47,7 +47,7 @@ RCT_CUSTOM_VIEW_PROPERTY(track, id, WebRTCVideoView) {
         }
         
         WebRTCModule *module = [self.bridge moduleForName:@"WebRTCModule"];
-        videoTrack = module.tracks[valueTag];
+        videoTrack = [module trackForKey: valueTag];
         if (!videoTrack) {
             NSLog(@"track for value tag %@ is not found", valueTag);
             return;

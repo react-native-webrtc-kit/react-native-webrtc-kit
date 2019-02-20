@@ -150,7 +150,7 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
     NSMutableArray *tagsToRemove = nil;
 
     for (NSString *valueTag in _trackValueTags) {
-        RTCMediaStreamTrack *track = [WebRTCModule shared].tracks[valueTag];
+        RTCMediaStreamTrack *track = [[WebRTCModule shared] trackForKey: valueTag];
         if ([track isKindOfClass: [RTCVideoTrack class]] &&
             track.readyState == RTCMediaStreamTrackStateLive) {
             RTCVideoTrack *video = (RTCVideoTrack *)track;
@@ -264,8 +264,8 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
                                  trackId: [self createNewValueTag]];
     videoTrack.valueTag = [self createNewValueTag];
     audioTrack.valueTag = [self createNewValueTag];
-    self.tracks[videoTrack.valueTag] = videoTrack;
-    self.tracks[audioTrack.valueTag] = audioTrack;
+    [self addTrack: videoTrack forKey: videoTrack.valueTag];
+    [self addTrack: audioTrack forKey: audioTrack.valueTag];
     [mediaStream addVideoTrack: videoTrack];
     [mediaStream addAudioTrack: audioTrack];
     [[WebRTCCameraVideoCapturer shared] addTrackValueTag: videoTrack.valueTag];
