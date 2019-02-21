@@ -97,7 +97,7 @@ static void *aspectRatioKey = "aspectRatio";
 RCT_EXPORT_METHOD(trackSetEnabled:(nonnull NSNumber *)isEnabled
                   valueTag:(nonnull NSString *)valueTag)
 {
-    RTCMediaStreamTrack *track = self.tracks[valueTag];
+    RTCMediaStreamTrack *track = [self trackForKey: valueTag];
     if (track)
         track.isEnabled = [isEnabled boolValue];
 }
@@ -107,7 +107,7 @@ RCT_EXPORT_METHOD(trackSetEnabled:(nonnull NSNumber *)isEnabled
 RCT_EXPORT_METHOD(trackSetAspectRatio:(nonnull NSNumber *)aspectRatio
                   valueTag:(nonnull NSString *)valueTag)
 {
-    RTCMediaStreamTrack *track = self.tracks[valueTag];
+    RTCMediaStreamTrack *track = [self trackForKey: valueTag];
     if ([track isKindOfClass: [RTCVideoTrack class]]) {
         ((RTCVideoTrack *)track).aspectRatio = [aspectRatio doubleValue];
     }
