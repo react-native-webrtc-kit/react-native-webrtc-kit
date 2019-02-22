@@ -1,6 +1,6 @@
 {
   "name": "react-native-webrtc-kit",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "WebRTC for React Native",
   "main": "index.js",
   "keywords": [
