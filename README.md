@@ -77,4 +77,4 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 # Copyright
 
-Copyright 2018, Shiguredo Inc. and Masashi Ono (akisute)
+Copyright 2018-2019, Shiguredo Inc. and Masashi Ono (akisute)

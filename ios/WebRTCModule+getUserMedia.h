@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly, nonnull) RTCCameraVideoCapturer *nativeCapturer;
 @property (nonatomic, readonly) BOOL isRunning;
-@property (nonatomic, readonly, nonnull) NSMutableArray<NSString *> *trackValueTags;
+@property (nonatomic, readonly, nonnull) NSArray<NSString *> *trackValueTags;
 
 + (WebRTCCameraVideoCapturer *)shared;
 + (NSArray<AVCaptureDevice *> *)captureDevices;
@@ -34,6 +34,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stopCaptureWithCompletionHandler:(nullable void (^)(void))completionHandler;
 
 - (void)reloadApplication;
+
+- (void)addTrackValueTag:(NSString *)valueTag;
+- (void)removeTrackValueTag:(NSString *)valueTag;
 
 @end
 

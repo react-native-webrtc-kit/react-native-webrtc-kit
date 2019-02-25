@@ -28,18 +28,48 @@ NS_ASSUME_NONNULL_BEGIN
 @interface WebRTCModule : NSObject <RCTBridgeModule>
 
 @property (nonatomic) RTCPeerConnectionFactory *peerConnectionFactory;
+@property (nonatomic, readonly) NSArray <RTCPeerConnection *> *peerConnections;
+@property (nonatomic, readonly) NSArray <RTCMediaStream *> *streams;
+@property (nonatomic, readonly) NSArray <RTCMediaStreamTrack *> *tracks;
+@property (nonatomic, readonly) NSArray <RTCRtpSender *> *senders;
+@property (nonatomic, readonly) NSArray <RTCRtpReceiver *> *receivers;
+@property (nonatomic, readonly) NSArray <RTCRtpTransceiver *> *transceivers;
 
-@property (nonatomic) NSMutableDictionary<NSString *, RTCPeerConnection *> *peerConnections;
-@property (nonatomic) NSMutableDictionary<NSString *, RTCMediaStream *> *streams;
-@property (nonatomic) NSMutableDictionary<NSString *, RTCMediaStreamTrack *> *tracks;
-@property (nonatomic) NSMutableDictionary<NSString*, RTCRtpSender *> *senders;
-@property (nonatomic) NSMutableDictionary<NSString*, RTCRtpReceiver *> *receivers;
-@property (nonatomic) NSMutableDictionary<NSString*, RTCRtpTransceiver *> *transceivers;
 @property(nonatomic, assign) AVAudioSessionPortOverride portOverride;
 
 + (WebRTCModule *)shared;
 
 - (NSString *)createNewValueTag;
+
+- (nullable RTCPeerConnection *)peerConnectionForKey:(NSString *)key;
+- (void)addPeerConnection:(RTCPeerConnection *)peerConn
+                   forKey:(NSString *)key;
+- (void)removePeerConnectionForKey:(NSString *)key;
+
+- (nullable RTCMediaStream *)streamForKey:(NSString *)key;
+- (void)addStream:(RTCMediaStream *)stream
+           forKey:(NSString *)key;
+- (void)removeStreamForKey:(NSString *)key;
+
+- (nullable RTCMediaStreamTrack *)trackForKey:(NSString *)key;
+- (void)addTrack:(RTCMediaStreamTrack *)track
+          forKey:(NSString *)key;
+- (void)removeTrackForKey:(NSString *)key;
+
+- (nullable RTCRtpSender *)senderForKey:(NSString *)key;
+- (void)addSender:(RTCRtpSender *)sender
+           forKey:(NSString *)key;
+- (void)removeSenderForKey:(NSString *)key;
+
+- (nullable RTCRtpReceiver *)receiverForKey:(NSString *)key;
+- (void)addReceiver:(RTCRtpReceiver *)receiver
+             forKey:(NSString *)key;
+- (void)removeReceiverForKey:(NSString *)key;
+
+- (nullable RTCRtpTransceiver *)transceiverForKey:(NSString *)key;
+- (void)addTransceiver:(RTCRtpTransceiver *)transceiver
+                forKey:(NSString *)key;
+- (void)removeTransceiverForKey:(NSString *)key;
 
 @end
 

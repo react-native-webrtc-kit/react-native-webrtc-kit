@@ -66,13 +66,15 @@ static const char *streamIdsKey = "streamIds";
 
 @implementation RTCRtpSender (ReactNativeWebRTCKit)
 
-- (nullable NSString *)valueTag {
-    return [WebRTCValueManager valueTagForObject: self];
+- (nullable NSString *)valueTag
+{
+    return [WebRTCValueManager valueTagForString: self.senderId];
 }
 
 - (void)setValueTag:(nullable NSString *)valueTag
 {
-    [WebRTCValueManager setValueTag: valueTag forObject: self];
+    [WebRTCValueManager setValueTag: valueTag
+                          forString: self.senderId];
 }
 
 - (NSArray<NSString *> *)streamIds
@@ -96,7 +98,7 @@ static const char *streamIdsKey = "streamIds";
     RTCMediaStreamTrack *track = self.track;
     if (track) {
         track.valueTag = [[WebRTCModule shared] createNewValueTag];
-        [WebRTCModule shared].tracks[track.valueTag] = track;
+        [[WebRTCModule shared] addTrack: track forKey: track.valueTag];
     }
 
     NSMutableDictionary *json = [[NSMutableDictionary alloc] init];
@@ -114,13 +116,15 @@ static const char *streamIdsKey = "streamIds";
 
 @implementation RTCRtpReceiver (ReactNativeWebRTCKit)
 
-- (nullable NSString *)valueTag {
-    return [WebRTCValueManager valueTagForObject: self];
+- (nullable NSString *)valueTag
+{
+    return [WebRTCValueManager valueTagForString: self.receiverId];
 }
 
 - (void)setValueTag:(nullable NSString *)valueTag
 {
-    [WebRTCValueManager setValueTag: valueTag forObject: self];
+    [WebRTCValueManager setValueTag: valueTag
+                          forString: self.receiverId];
 }
 
 - (NSArray<NSString *> *)streamIds
@@ -144,7 +148,7 @@ static const char *streamIdsKey = "streamIds";
     RTCMediaStreamTrack *track = self.track;
     if (track) {
         track.valueTag = [[WebRTCModule shared] createNewValueTag];
-        [WebRTCModule shared].tracks[track.valueTag] = track;
+        [[WebRTCModule shared] addTrack: track forKey: track.valueTag];
     }
     
     NSMutableDictionary *json = [[NSMutableDictionary alloc] init];
@@ -162,17 +166,21 @@ static const char *streamIdsKey = "streamIds";
 
 @implementation RTCRtpTransceiver (ReactNativeWebRTCKit)
 
-static void *transceiverValueTagKey = "transceiverValueTagKey";
-
-- (nullable NSString *)valueTag {
-    return objc_getAssociatedObject(self, transceiverValueTagKey);
+- (NSString *)valueTagKey
+{
+    return [NSString stringWithFormat: @"%@:%@",
+            self.sender.senderId, self.receiver.receiverId];
 }
 
-- (void)setValueTag:(nullable NSString *)valueTag {
-    objc_setAssociatedObject(self,
-                             transceiverValueTagKey,
-                             valueTag,
-                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (nullable NSString *)valueTag
+{
+    return [WebRTCValueManager valueTagForString: [self valueTagKey]];
+}
+
+- (void)setValueTag:(nullable NSString *)valueTag
+{
+    [WebRTCValueManager setValueTag: valueTag
+                          forString: [self valueTagKey]];
 }
 
 - (id)json
@@ -226,7 +234,8 @@ static void *transceiverValueTagKey = "transceiverValueTagKey";
 RCT_EXPORT_METHOD(transceiverDirection:(nonnull NSString *)valueTag
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
-    RTCRtpTransceiver *transceiver = [WebRTCModule shared].transceivers[valueTag];
+    RTCRtpTransceiver *transceiver =
+    [[WebRTCModule shared] transceiverForKey: valueTag];
     if (!transceiver) {
         reject(@"NotFoundError", @"transceiver is not found", nil);
     }
@@ -240,7 +249,8 @@ RCT_EXPORT_METHOD(transceiverSetDirection:(nonnull NSString *)valueTag
                   value:(nonnull NSString *)value
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
-    RTCRtpTransceiver *transceiver = [WebRTCModule shared].transceivers[valueTag];
+    RTCRtpTransceiver *transceiver = [[WebRTCModule shared] transceiverForKey: valueTag];
+
     if (!transceiver) {
         reject(@"NotFoundError", @"transceiver is not found", nil);
     }
@@ -253,7 +263,7 @@ RCT_EXPORT_METHOD(transceiverSetDirection:(nonnull NSString *)valueTag
 RCT_EXPORT_METHOD(transceiverCurrentDirection:(nonnull NSString *)valueTag
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
-    RTCRtpTransceiver *transceiver = [WebRTCModule shared].transceivers[valueTag];
+    RTCRtpTransceiver *transceiver = [[WebRTCModule shared] transceiverForKey: valueTag];
     if (!transceiver) {
         reject(@"NotFoundError", @"transceiver is not found", nil);
     }
@@ -273,7 +283,7 @@ RCT_EXPORT_METHOD(transceiverCurrentDirection:(nonnull NSString *)valueTag
 RCT_EXPORT_METHOD(transceiverStop:(nonnull NSString *)valueTag
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
-    RTCRtpTransceiver *transceiver = [WebRTCModule shared].transceivers[valueTag];
+    RTCRtpTransceiver *transceiver = [[WebRTCModule shared] transceiverForKey: valueTag];
     if (!transceiver) {
         reject(@"NotFoundError", @"transceiver is not found", nil);
     }
@@ -322,7 +332,7 @@ static void *connectionStateKey = "connectionState";
         return;
     
     // モジュールの管理から外す
-    [SharedModule.peerConnections removeObjectForKey: self.valueTag];
+    [SharedModule removePeerConnectionForKey: self.valueTag];
     
     self.connectionState = RTCPeerConnectionStateDisconnecting;
     
@@ -366,21 +376,15 @@ static void *connectionStateKey = "connectionState";
 
 - (nullable RTCRtpParameters *)rtpParametersForValueTag:(NSString *)valueTag
 {
-    for (NSString *name in [self.senders keyEnumerator]) {
-        RTCRtpSender *sender = self.senders[name];
+    for (RTCRtpSender *sender in self.senders) {
         NSLog(@"# rtpParametersForValueTag: sender %@", [sender description]);
-        if (sender) {
-            if ([sender.valueTag isEqualToString: valueTag])
-                return sender.parameters;
-        }
+        if ([sender.valueTag isEqualToString: valueTag])
+            return sender.parameters;
     }
-    for (NSString *name in [self.receivers keyEnumerator]) {
-        RTCRtpReceiver *receiver = self.receivers[name];
+    for (RTCRtpReceiver *receiver in self.receivers) {
         NSLog(@"# rtpParametersForValueTag: receiver %@", [receiver description]);
-        if (receiver) {
-            if ([receiver.valueTag isEqualToString: valueTag])
-                return receiver.parameters;
-        }
+        if ([receiver.valueTag isEqualToString: valueTag])
+            return receiver.parameters;
     }
     return nil;
 }
@@ -418,14 +422,14 @@ RCT_EXPORT_METHOD(peerConnectionInit:(nonnull RTCConfiguration *)configuration
                                                        delegate: self];
     peerConnection.connectionState = RTCPeerConnectionStateNew;
     peerConnection.valueTag = valueTag;
-    self.peerConnections[valueTag] = peerConnection;
+    [self addPeerConnection: peerConnection forKey: valueTag];
 }
 
 // MARK: -peerConnectionSetConfiguration:valueTag:
 
 RCT_EXPORT_METHOD(peerConnectionSetConfiguration:(nonnull RTCConfiguration *)configuration
                   valueTag:(nonnull NSString *)valueTag) {
-    RTCPeerConnection *peerConnection = self.peerConnections[valueTag];
+    RTCPeerConnection *peerConnection = [self peerConnectionForKey: valueTag];
     if (!peerConnection) {
         return;
     }
@@ -440,12 +444,12 @@ RCT_EXPORT_METHOD(peerConnectionAddTrack:(nonnull NSString *)trackValueTag
                   valueTag:(nonnull NSString *)valueTag
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
-    RTCPeerConnection *peerConnection = self.peerConnections[valueTag];
+    RTCPeerConnection *peerConnection = [self peerConnectionForKey: valueTag];
     if (!peerConnection) {
         reject(@"NotFoundError", @"peer connection is not found", nil);
         return;
     }
-    RTCMediaStreamTrack *track = self.tracks[trackValueTag];
+    RTCMediaStreamTrack *track = [self trackForKey: trackValueTag];
     if (!track) {
         reject(@"NotFoundError", @"track is not found", nil);
         return;
@@ -458,7 +462,7 @@ RCT_EXPORT_METHOD(peerConnectionAddTrack:(nonnull NSString *)trackValueTag
         return;
     }
     sender.valueTag = [self createNewValueTag];
-    self.senders[sender.valueTag] = sender;
+    [self addSender: sender forKey: sender.valueTag];
     sender.streamIds = streamIds;
     
     resolve([sender json]);
@@ -470,18 +474,18 @@ RCT_EXPORT_METHOD(peerConnectionRemoveTrack:(nonnull NSString *)senderValueTag
                   valueTag:(nonnull NSString *)valueTag
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
-    RTCPeerConnection *peerConnection = self.peerConnections[valueTag];
+    RTCPeerConnection *peerConnection = [self peerConnectionForKey: valueTag];
     if (!peerConnection) {
         reject(@"NotFoundError", @"peer connection is not found", nil);
         return;
     }
-    RTCRtpSender *sender = self.senders[senderValueTag];
+    RTCRtpSender *sender = [self senderForKey: senderValueTag];
     if (!sender) {
         reject(@"NotFoundError", @"sender is not found", nil);
         return;
     }
     
-    self.senders[sender.valueTag] = nil;
+    [self removeSenderForKey: senderValueTag];
     if ([peerConnection removeTrack: sender]) {
         resolve(nil);
     } else {
@@ -495,7 +499,8 @@ RCT_EXPORT_METHOD(peerConnectionCreateOffer:(nonnull NSString *)valueTag
                   constraints:(nullable NSDictionary *)constraints
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
-    RTCPeerConnection *peerConnection = self.peerConnections[valueTag];
+    RTCPeerConnection *peerConnection =
+    [self peerConnectionForKey: valueTag];
     if (!peerConnection) {
         return;
     }
@@ -517,7 +522,7 @@ RCT_EXPORT_METHOD(peerConnectionCreateAnswer:(nonnull NSString *)valueTag
                   constraints:(nullable NSDictionary *)constraints
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
-    RTCPeerConnection *peerConnection = self.peerConnections[valueTag];
+    RTCPeerConnection *peerConnection = [self peerConnectionForKey: valueTag];
     if (!peerConnection) {
         return;
     }
@@ -539,7 +544,7 @@ RCT_EXPORT_METHOD(peerConnectionSetLocalDescription:(nonnull RTCSessionDescripti
                   valueTag:(nonnull NSString *)valueTag
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
-    RTCPeerConnection *peerConnection = self.peerConnections[valueTag];
+    RTCPeerConnection *peerConnection = [self peerConnectionForKey: valueTag];
     if (!peerConnection) {
         return;
     }
@@ -565,7 +570,7 @@ RCT_EXPORT_METHOD(peerConnectionSetRemoteDescription:(nonnull RTCSessionDescript
                   valueTag:(nonnull NSString *)valueTag
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
-    RTCPeerConnection *peerConnection = self.peerConnections[valueTag];
+    RTCPeerConnection *peerConnection = [self peerConnectionForKey: valueTag];
     if (!peerConnection) {
         return;
     }
@@ -591,7 +596,7 @@ RCT_EXPORT_METHOD(peerConnectionAddICECandidate:(nonnull RTCIceCandidate*)candid
                   valueTag:(nonnull NSString *)valueTag
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject) {
-    RTCPeerConnection *peerConnection = self.peerConnections[valueTag];
+    RTCPeerConnection *peerConnection = [self peerConnectionForKey: valueTag];
     if (!peerConnection) {
         return;
     }
@@ -604,7 +609,7 @@ RCT_EXPORT_METHOD(peerConnectionAddICECandidate:(nonnull RTCIceCandidate*)candid
 
 RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
 {
-    RTCPeerConnection *peerConnection = self.peerConnections[valueTag];
+    RTCPeerConnection *peerConnection = [self peerConnectionForKey: valueTag];
     if (!peerConnection) {
         return;
     }
@@ -676,21 +681,21 @@ RCT_EXPORT_METHOD(rtpEncodingParametersSetMinBitrate:(nonnull NSNumber *)bitrate
           didAddStream:(RTCMediaStream *)stream
 {
     stream.valueTag = [self createNewValueTag];
-    [WebRTCValueManager addNewObject: stream];
-    self.streams[stream.valueTag] = stream;
+    [self addStream: stream forKey: stream.valueTag];
     
     for (RTCMediaStreamTrack *track in stream.allTracks) {
         track.valueTag = [self createNewValueTag];
-        [WebRTCValueManager addNewObject: track];
-        self.tracks[track.valueTag] = track;
+        [self addTrack: track forKey: track.valueTag];
     }
 }
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
        didRemoveStream:(RTCMediaStream *)stream
 {
-    [WebRTCValueManager removeValueTagForObject: stream];
-    self.streams[stream.valueTag] = nil;
+    if (stream.valueTag) {
+        [WebRTCValueManager removeValueTagForObject: stream];
+        [self removeStreamForKey: stream.valueTag];
+    }
 }
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
@@ -698,8 +703,7 @@ RCT_EXPORT_METHOD(rtpEncodingParametersSetMinBitrate:(nonnull NSNumber *)bitrate
                streams:(NSArray<RTCMediaStream *> *)mediaStreams
 {
     rtpReceiver.valueTag = [self createNewValueTag];
-    [WebRTCValueManager addNewObject: rtpReceiver];
-    self.receivers[rtpReceiver.valueTag] = rtpReceiver;
+    [self addReceiver: rtpReceiver forKey: rtpReceiver.valueTag];
     NSMutableArray *streamIds = [[NSMutableArray alloc] init];
     for (RTCMediaStream *stream in mediaStreams) {
         [streamIds addObject: stream.streamId];
@@ -715,8 +719,10 @@ RCT_EXPORT_METHOD(rtpEncodingParametersSetMinBitrate:(nonnull NSNumber *)bitrate
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
      didRemoveReceiver:(RTCRtpReceiver *)rtpReceiver
 {
-    self.receivers[rtpReceiver.valueTag] = nil;
-    [WebRTCValueManager removeValueTagForObject: rtpReceiver];
+    if (rtpReceiver.valueTag != nil) {
+        [self removeReceiverForKey: rtpReceiver.valueTag];
+        [WebRTCValueManager removeValueTagForString: rtpReceiver.receiverId];
+    }
 
     [self.bridge.eventDispatcher
      sendDeviceEventWithName: @"peerConnectionRemoveReceiver"
@@ -728,7 +734,7 @@ RCT_EXPORT_METHOD(rtpEncodingParametersSetMinBitrate:(nonnull NSNumber *)bitrate
 didStartReceivingOnTransceiver:(RTCRtpTransceiver *)transceiver
 {
     transceiver.valueTag = [self createNewValueTag];
-    self.transceivers[transceiver.valueTag] = nil;
+    [self removeTransceiverForKey: transceiver.valueTag];
     [WebRTCValueManager removeValueTagForObject: transceiver];
     
     [self.bridge.eventDispatcher
