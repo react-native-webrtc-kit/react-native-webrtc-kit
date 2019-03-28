@@ -7,7 +7,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath "com.android.tools.build:gradle:3.2.1"
     }
 }
 
@@ -15,7 +15,6 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.3"
 
     defaultConfig {
         minSdkVersion 16
@@ -41,7 +40,7 @@ repositories {
 }
 
 dependencies {
-    api 'com.facebook.react:react-native:+'
+    api "com.facebook.react:react-native:+"
     api "com.github.shiguredo:sora-webrtc-android:66.8.1.1"
 }
   
