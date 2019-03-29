@@ -12,13 +12,19 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 
+import org.webrtc.Metrics;
+
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WebRTCModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
 
-    public WebRTCModule(ReactApplicationContext reactContext) {
+    public WebRTCModule(final ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
     }
@@ -34,23 +40,59 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
 
     //region ReactMethod
 
+    /**
+     * JS レイヤーがロードまたはリロードされたときに呼ばれます。
+     * ネイティブ実装の内部状態をクリーンアップするために使用されます。
+     */
     @ReactMethod
     public void finishLoading() {
+        /* JS レイヤーがロードまたはリロードされたときに呼ばれる。
+         * ここでリロード前の古い RTCPeerConnection の終了処理を行わないと、
+         * RTCPeerConnection の接続が残ったままになってしまう。
+         */
         Log.v(getName(), "finishLoading()");
+        /*
+        TODO: implement the following code
+        [WebRTCCamera reloadApplication];
+
+        // すべての peer connection を終了する
+        for (RTCPeerConnection *conn in self.peerConnections) {
+            [conn closeAndFinish];
+        }
+
+        [self.peerConnectionDict removeAllObjects];
+        [self.trackDict removeAllObjects];
+        [self.senderDict removeAllObjects];
+        [self.receiverDict removeAllObjects];
+        [self.transceiverDict removeAllObjects];
+         */
     }
 
     @ReactMethod
     public void enableMetrics() {
         Log.v(getName(), "enableMetrics()");
+        Metrics.enable();
     }
 
     /**
      * getAndResetMetrics(): Promise<Array<RTCMetricsSampleInfo>>
      */
     @ReactMethod
-    public void getAndResetMetrics(@NonNull Promise promise) {
+    public void getAndResetMetrics(@NonNull final Promise promise) {
         Log.v(getName(), "getAndResetMetrics()");
-        promise.resolve(Collections.emptyList()); // Maybe ReadableArray? Idk...
+        final Metrics metrics = Metrics.getAndReset();
+        final List<Map<String, Object>>results = new ArrayList<>();
+        for (final String infoName : metrics.map.keySet()) {
+            final Metrics.HistogramInfo info = metrics.map.get(infoName);
+            final Map<String, Object> infoMap = new HashMap<>();
+            infoMap.put("name", infoName);
+            infoMap.put("min", info.min);
+            infoMap.put("max", info.max);
+            infoMap.put("bucketCount", info.bucketCount);
+            infoMap.put("samples", info.samples);
+            results.add(infoMap);
+        }
+        promise.resolve(results);
     }
 
     /**
@@ -72,11 +114,11 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     * TODO: convert JSON -> RTCMediaStreamConstraints
+     * TODO: convert JSON -> RTCMediaStreamConstraints, there are no RCTConvert mechanics in Android so we need to map ReadableMap into objects by hand
      * getUserMedia(constraints: RTCMediaStreamConstraints): Promise<Object>
      */
     @ReactMethod
-    public void getUserMedia(@Nullable Object json, @NonNull Promise promise) {
+    public void getUserMedia(@Nullable ReadableMap constraintsJson, @NonNull Promise promise) {
         Log.v(getName(), "getUserMedia()");
         promise.resolve(null);
     }
@@ -146,7 +188,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      * peerConnectionInit(valueTag: ValueTag, configuration: RTCConfiguration, constraints: RTCMediaConstraints)
      */
     @ReactMethod
-    public void peerConnectionInit(@NonNull Object configuration, @Nullable ReadableMap constraints, @NonNull String valueTag) {
+    public void peerConnectionInit(@NonNull ReadableMap configuration, @Nullable ReadableMap constraints, @NonNull String valueTag) {
         Log.v(getName(), "peerConnectionInit()");
     }
 
@@ -155,7 +197,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      * peerConnectionSetConfiguration(valueTag: ValueTag, configuration: RTCConfiguration)
      */
     @ReactMethod
-    public void peerConnectionSetConfiguration(@NonNull Object configuration, @NonNull String valueTag) {
+    public void peerConnectionSetConfiguration(@NonNull ReadableMap configuration, @NonNull String valueTag) {
         Log.v(getName(), "peerConnectionSetConfiguration()");
     }
 
@@ -206,7 +248,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      * peerConnectionSetLocalDescription(valueTag: ValueTag, sdp: RTCSessionDescription): Promise<void>
      */
     @ReactMethod
-    public void peerConnectionSetLocalDescription(@NonNull Object json, @NonNull String valueTag, @NonNull Promise promise) {
+    public void peerConnectionSetLocalDescription(@NonNull ReadableMap json, @NonNull String valueTag, @NonNull Promise promise) {
         Log.v(getName(), "peerConnectionSetLocalDescription()");
         promise.resolve(null);
     }
@@ -216,7 +258,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      * peerConnectionSetRemoteDescription(valueTag: ValueTag, sdp: RTCSessionDescription): Promise<void>
      */
     @ReactMethod
-    public void peerConnectionSetRemoteDescription(@NonNull Object json, @NonNull String valueTag, @NonNull Promise promise) {
+    public void peerConnectionSetRemoteDescription(@NonNull ReadableMap json, @NonNull String valueTag, @NonNull Promise promise) {
         Log.v(getName(), "peerConnectionSetRemoteDescription()");
         promise.resolve(null);
     }
@@ -226,7 +268,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      * peerConnectionAddICECandidate(valueTag: ValueTag, candidate: RTCIceCandidate): Promise<void>
      */
     @ReactMethod
-    public void peerConnectionAddICECandidate(@NonNull Object json, @NonNull String valueTag, @NonNull Promise promise) {
+    public void peerConnectionAddICECandidate(@NonNull ReadableMap json, @NonNull String valueTag, @NonNull Promise promise) {
         Log.v(getName(), "peerConnectionAddICECandidate()");
         promise.resolve(null);
     }
