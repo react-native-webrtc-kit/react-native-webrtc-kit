@@ -12,10 +12,10 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 
+import org.webrtc.Camera1Enumerator;
 import org.webrtc.Metrics;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,10 +23,13 @@ import java.util.Map;
 public class WebRTCModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
+    private final Camera1Enumerator cameraEnumerator;
+
 
     public WebRTCModule(final ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
+        this.cameraEnumerator = new Camera1Enumerator(true);
     }
 
     //region ReactContextBaseJavaModule
@@ -81,7 +84,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     public void getAndResetMetrics(@NonNull final Promise promise) {
         Log.v(getName(), "getAndResetMetrics()");
         final Metrics metrics = Metrics.getAndReset();
-        final List<Map<String, Object>>results = new ArrayList<>();
+        final List<Map<String, Object>> results = new ArrayList<>();
         for (final String infoName : metrics.map.keySet()) {
             final Metrics.HistogramInfo info = metrics.map.get(infoName);
             final Map<String, Object> infoMap = new HashMap<>();
@@ -96,36 +99,69 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     }
 
     /**
+     * This feature is not supported by the Android SDK.
      * getAudioPort(): Promise<RTCAudioPort>
      */
     @ReactMethod
-    public void getAudioPort(@NonNull Promise promise) {
+    public void getAudioPort(@NonNull final Promise promise) {
         Log.v(getName(), "getAudioPort()");
-        promise.resolve(null);
+        promise.resolve("none");
     }
 
     /**
+     * This feature is not supported by the Android SDK.
      * setAudioPort(port: RTCAudioPort): Promise<void>
      */
     @ReactMethod
-    public void setAudioPort(@Nullable String port, @NonNull Promise promise) {
+    public void setAudioPort(@Nullable final String port, @NonNull final Promise promise) {
         Log.v(getName(), "setAudioPort()");
         promise.resolve(null);
     }
 
     /**
-     * TODO: convert JSON -> RTCMediaStreamConstraints, there are no RCTConvert mechanics in Android so we need to map ReadableMap into objects by hand
      * getUserMedia(constraints: RTCMediaStreamConstraints): Promise<Object>
      */
     @ReactMethod
-    public void getUserMedia(@Nullable ReadableMap constraintsJson, @NonNull Promise promise) {
+    public void getUserMedia(@Nullable final ReadableMap constraintsJson, @NonNull final Promise promise) {
         Log.v(getName(), "getUserMedia()");
-        promise.resolve(null);
+        final WebRTCMediaStreamConstraints constraints = new WebRTCMediaStreamConstraints(constraintsJson);
+
+        // TODO: Create a support class that wraps org.webrtc.Camera1Xxxx classes. In iOS the class is named WebRTCCamera.
+
+        if (constraints.video != null) {
+            // カメラとマイクを起動する
+            // libwebrtc でカメラを起動すると自動的にマイクも起動される
+            // そのため、音声のみ必要な場合でもカメラを起動する必要がある
+        } else {
+            // 映像が不要の場合でも、マイクを起動するためにカメラを起動しておく
+            // その場合は後々ストリームから映像トラックを外す
+            //[WebRTCCamera startCaptureWithAllDevices];
+        }
+
+        // カメラ用のトラックを持つストリームを生成する
+        // このストリームを管理する必要はなく、
+        // ストリーム ID のみ getUserMedia に渡せればよい
+
+        // 映像と音声のトラックをストリームに追加する
+
+        // constraints の指定に従ってトラックの可否を決める
+
+        // アスペクト比の設定
+
+        // JS に処理を戻す
+        final Map<String, Object> result = new HashMap<>();
+        result.put("streamId", ""); // TODO mediaStream.streamId -> String
+        final List<Object> tracks = new ArrayList<>();
+        tracks.add(new HashMap<>()); // TODO [videoTrack json] -> Map
+        tracks.add(new HashMap<>()); // TODO [audioTrack json] -> Map
+        result.put("tracks", tracks);
+        promise.resolve(result);
     }
 
     @ReactMethod
     public void stopUserMedia() {
         Log.v(getName(), "stopUserMedia()");
+        // [WebRTCCamera stopCapture];
     }
 
     /**
