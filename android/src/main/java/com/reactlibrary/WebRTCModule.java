@@ -12,24 +12,38 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 
-import org.webrtc.Camera1Enumerator;
+import org.webrtc.AudioSource;
+import org.webrtc.AudioTrack;
+import org.webrtc.DefaultVideoDecoderFactory;
+import org.webrtc.DefaultVideoEncoderFactory;
+import org.webrtc.MediaStream;
+import org.webrtc.MediaStreamTrack;
 import org.webrtc.Metrics;
+import org.webrtc.PeerConnectionFactory;
+import org.webrtc.VideoSource;
+import org.webrtc.VideoTrack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class WebRTCModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
-    private final Camera1Enumerator cameraEnumerator;
-
+    private final PeerConnectionFactory peerConnectionFactory;
+    private final WebRTCCamera cameraCapturer;
+    private final WebRTCMediaStreamRepository repository = new WebRTCMediaStreamRepository();
 
     public WebRTCModule(final ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
-        this.cameraEnumerator = new Camera1Enumerator(true);
+        this.peerConnectionFactory = PeerConnectionFactory.builder()
+                .setVideoEncoderFactory(new DefaultVideoEncoderFactory(eglContext, enableIntelVp8Encoder, enableH264HighProfile))
+                .setVideoDecoderFactory(new DefaultVideoDecoderFactory(eglContext))
+                .createPeerConnectionFactory();
+        this.cameraCapturer = new WebRTCCamera();
     }
 
     //region ReactContextBaseJavaModule
@@ -125,35 +139,58 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     public void getUserMedia(@Nullable final ReadableMap constraintsJson, @NonNull final Promise promise) {
         Log.v(getName(), "getUserMedia()");
         final WebRTCMediaStreamConstraints constraints = new WebRTCMediaStreamConstraints(constraintsJson);
+        final boolean isVideoEnabled = (constraints.video != null);
+        final boolean isAudioEnabled = (constraints.audio != null);
 
-        // TODO: Create a support class that wraps org.webrtc.Camera1Xxxx classes. In iOS the class is named WebRTCCamera.
-
-        if (constraints.video != null) {
+        if (isVideoEnabled) {
             // カメラとマイクを起動する
             // libwebrtc でカメラを起動すると自動的にマイクも起動される
             // そのため、音声のみ必要な場合でもカメラを起動する必要がある
+            final String deviceName = cameraCapturer.getSuitableDeviceNameForFacingMode(constraints.video.facingMode);
+            if (deviceName == null) {
+                promise.reject("NotFoundError", "No suitable camera device is found for the given facing mode.");
+                return;
+            }
+            cameraCapturer.startCapture(deviceName, constraints.video.width, constraints.video.height, constraints.video.frameRate);
+            // TODO: Tie the given started device with the video source, using the videoCapturer reference maybe, look for examples for better implementation
         } else {
             // 映像が不要の場合でも、マイクを起動するためにカメラを起動しておく
             // その場合は後々ストリームから映像トラックを外す
-            //[WebRTCCamera startCaptureWithAllDevices];
+            cameraCapturer.startCaptureWithAllDevices();
         }
 
         // カメラ用のトラックを持つストリームを生成する
         // このストリームを管理する必要はなく、
         // ストリーム ID のみ getUserMedia に渡せればよい
+        final MediaStream mediaStream = peerConnectionFactory.createLocalMediaStream(createNewValueTag());
 
         // 映像と音声のトラックをストリームに追加する
+        final VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer);
+        final VideoTrack videoTrack = peerConnectionFactory.createVideoTrack(createNewValueTag(), videoSource);
+        final AudioSource audioSource = peerConnectionFactory.createAudioSource(null);
+        final AudioTrack audioTrack = peerConnectionFactory.createAudioTrack(createNewValueTag(), audioSource);
+
+        repository.addTrack(videoTrack, createNewValueTag());
+        repository.addTrack(audioTrack, createNewValueTag());
+        mediaStream.addTrack(videoTrack);
+        mediaStream.addTrack(audioTrack);
+        //[[WebRTCCameraVideoCapturer shared] addTrackValueTag: videoTrack.valueTag]; // TODO: is this needed?
 
         // constraints の指定に従ってトラックの可否を決める
+        videoTrack.setEnabled(isVideoEnabled);
+        audioTrack.setEnabled(isAudioEnabled);
 
         // アスペクト比の設定
+        if (isVideoEnabled) {
+            repository.setVideoTrackAspectRatio(videoTrack, constraints.video.aspectRatio);
+        }
 
         // JS に処理を戻す
         final Map<String, Object> result = new HashMap<>();
-        result.put("streamId", ""); // TODO mediaStream.streamId -> String
+        result.put("streamId", mediaStream.label());
         final List<Object> tracks = new ArrayList<>();
-        tracks.add(new HashMap<>()); // TODO [videoTrack json] -> Map
-        tracks.add(new HashMap<>()); // TODO [audioTrack json] -> Map
+        tracks.add(createJsonMap(videoTrack));
+        tracks.add(createJsonMap(audioTrack));
         result.put("tracks", tracks);
         promise.resolve(result);
     }
@@ -161,7 +198,8 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void stopUserMedia() {
         Log.v(getName(), "stopUserMedia()");
-        // [WebRTCCamera stopCapture];
+        cameraCapturer.stopCapture();
+        // TODO: remove the stopped stream/track from the repository, maybe.
     }
 
     /**
@@ -169,7 +207,12 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void trackSetEnabled(boolean isEnabled, @NonNull String valueTag) {
-        Log.v(getName(), "getUserMedia()");
+        Log.v(getName(), "trackSetEnabled()");
+        final MediaStreamTrack track = repository.getTrackByValueTag(valueTag);
+        if (track == null) {
+            return;
+        }
+        track.setEnabled(isEnabled);
     }
 
     /**
@@ -178,6 +221,11 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void trackSetAspectRatio(double aspectRatio, @NonNull String valueTag) {
         Log.v(getName(), "trackSetAspectRatio()");
+        final VideoTrack videoTrack = repository.getVideoTrackByValueTag(valueTag);
+        if (videoTrack == null) {
+            return;
+        }
+        repository.setVideoTrackAspectRatio(videoTrack, aspectRatio);
     }
 
     /**
@@ -348,5 +396,32 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     }
 
     //endregion
+
+    @NonNull
+    private String createNewValueTag() {
+        return UUID.randomUUID().toString();
+    }
+
+    @NonNull
+    private Map<String, Object> createJsonMap(@NonNull MediaStreamTrack track) {
+        final String readyState;
+        switch (track.state()) {
+            case LIVE:
+                readyState = "live";
+                break;
+            case ENDED:
+                readyState = "ended";
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        final Map<String, Object> jsonMap = new HashMap<>();
+        jsonMap.put("valueTag", ""); // TODO: get a value tag!
+        jsonMap.put("enabled", track.enabled());
+        jsonMap.put("id", track.id());
+        jsonMap.put("kind", track.kind());
+        jsonMap.put("readyState", readyState);
+        return jsonMap;
+    }
 
 }
