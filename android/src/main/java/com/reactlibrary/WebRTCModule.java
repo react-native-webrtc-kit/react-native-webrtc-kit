@@ -16,10 +16,12 @@ import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.DefaultVideoDecoderFactory;
 import org.webrtc.DefaultVideoEncoderFactory;
+import org.webrtc.EglBase;
 import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.Metrics;
 import org.webrtc.PeerConnectionFactory;
+import org.webrtc.VideoCapturer;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
@@ -38,9 +40,15 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
 
     public WebRTCModule(final ReactApplicationContext reactContext) {
         super(reactContext);
+        final EglBase eglBase = EglBase.create();
+        final EglBase.Context eglContext = eglBase.getEglBaseContext();
+
+        // XXX: DefaultVideoEncoderFactory - VP8 encoder / H264 の利用可否を適切に判断する
+        //      現在のところは決め打ちで両方有効にしているが、ハードウェアによっては利用できない場合がある
+        //      RN経由でユーザーから調整可能にしてもよいが、可能であればここで利用可否を判断できるのが望ましい
         this.reactContext = reactContext;
         this.peerConnectionFactory = PeerConnectionFactory.builder()
-                .setVideoEncoderFactory(new DefaultVideoEncoderFactory(eglContext, enableIntelVp8Encoder, enableH264HighProfile))
+                .setVideoEncoderFactory(new DefaultVideoEncoderFactory(eglContext, true, true))
                 .setVideoDecoderFactory(new DefaultVideoDecoderFactory(eglContext))
                 .createPeerConnectionFactory();
         this.cameraCapturer = new WebRTCCamera();
@@ -68,6 +76,9 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
          * RTCPeerConnection の接続が残ったままになってしまう。
          */
         Log.v(getName(), "finishLoading()");
+        cameraCapturer.stopCapture();
+        repository.clear();
+        // TODO: EGLのrelease()とかlocal/remote rendererのrelease()が必要になるかも
         /*
         TODO: implement the following code
         [WebRTCCamera reloadApplication];
@@ -142,21 +153,23 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         final boolean isVideoEnabled = (constraints.video != null);
         final boolean isAudioEnabled = (constraints.audio != null);
 
+        final WebRTCCameraDeviceCandidate deviceCandidate;
+        final VideoCapturer videoCapturer;
         if (isVideoEnabled) {
             // カメラとマイクを起動する
             // libwebrtc でカメラを起動すると自動的にマイクも起動される
             // そのため、音声のみ必要な場合でもカメラを起動する必要がある
-            final String deviceName = cameraCapturer.getSuitableDeviceNameForFacingMode(constraints.video.facingMode);
-            if (deviceName == null) {
+            deviceCandidate = cameraCapturer.getSuitableDeviceCandidate(constraints.video);
+            if (deviceCandidate == null) {
                 promise.reject("NotFoundError", "No suitable camera device is found for the given facing mode.");
                 return;
             }
-            cameraCapturer.startCapture(deviceName, constraints.video.width, constraints.video.height, constraints.video.frameRate);
-            // TODO: Tie the given started device with the video source, using the videoCapturer reference maybe, look for examples for better implementation
+            videoCapturer = cameraCapturer.createCapturer(deviceCandidate);
         } else {
             // 映像が不要の場合でも、マイクを起動するためにカメラを起動しておく
             // その場合は後々ストリームから映像トラックを外す
-            cameraCapturer.startCaptureWithAllDevices();
+            deviceCandidate = null;
+            videoCapturer = cameraCapturer.createCapturerFromAllDevices();
         }
 
         // カメラ用のトラックを持つストリームを生成する
@@ -165,6 +178,8 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         final MediaStream mediaStream = peerConnectionFactory.createLocalMediaStream(createNewValueTag());
 
         // 映像と音声のトラックをストリームに追加する
+        // XXX: PeerConnectionFactory::createVideoSource(VideoCapturer videoCapturer) の実装により、videoCapturerが適切にinitializeされる
+        //      したがってcreateVideoSource()の後videoCapturerをstartすればOK
         final VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer);
         final VideoTrack videoTrack = peerConnectionFactory.createVideoTrack(createNewValueTag(), videoSource);
         final AudioSource audioSource = peerConnectionFactory.createAudioSource(null);
@@ -174,15 +189,16 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         repository.addTrack(audioTrack, createNewValueTag());
         mediaStream.addTrack(videoTrack);
         mediaStream.addTrack(audioTrack);
-        //[[WebRTCCameraVideoCapturer shared] addTrackValueTag: videoTrack.valueTag]; // TODO: is this needed?
 
         // constraints の指定に従ってトラックの可否を決める
         videoTrack.setEnabled(isVideoEnabled);
         audioTrack.setEnabled(isAudioEnabled);
 
-        // アスペクト比の設定
+        // アスペクト比の設定と、カメラデバイスのキャプチャ開始
+        // XXX: キャプチャ開始はlocal stream追加まで待ったほうがいいかもしれないけど、ここではiOS版に揃えて即開始します。ダメそうなら待つように実装を修正する。
         if (isVideoEnabled) {
             repository.setVideoTrackAspectRatio(videoTrack, constraints.video.aspectRatio);
+            cameraCapturer.startCapture(videoCapturer, deviceCandidate, constraints.video);
         }
 
         // JS に処理を戻す
@@ -199,7 +215,6 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     public void stopUserMedia() {
         Log.v(getName(), "stopUserMedia()");
         cameraCapturer.stopCapture();
-        // TODO: remove the stopped stream/track from the repository, maybe.
     }
 
     /**

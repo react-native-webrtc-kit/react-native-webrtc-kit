@@ -79,4 +79,10 @@ final class WebRTCMediaStreamRepository {
         trackAspectRatioMap.put(videoTrack.id(), aspectRatio);
     }
 
+    void clear() {
+        trackMap.clear();
+        trackValueTagMap.clear();
+        trackAspectRatioMap.clear();
+    }
+
 }
