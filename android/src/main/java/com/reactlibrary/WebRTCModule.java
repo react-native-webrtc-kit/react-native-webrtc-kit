@@ -36,7 +36,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext reactContext;
     private final PeerConnectionFactory peerConnectionFactory;
     private final WebRTCCamera cameraCapturer;
-    private final WebRTCMediaStreamRepository repository = new WebRTCMediaStreamRepository();
+    final WebRTCMediaStreamRepository repository = new WebRTCMediaStreamRepository();
 
     public WebRTCModule(final ReactApplicationContext reactContext) {
         super(reactContext);
