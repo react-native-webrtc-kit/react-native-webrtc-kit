@@ -4,15 +4,28 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.webrtc.MediaStreamTrack;
+import org.webrtc.RtpTransceiver;
 import org.webrtc.VideoTrack;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * WebRTCモジュールが使用するすべてのWebRTC関連のオブジェクト (PeerConnection, MediaStream, MediaStreamTrack等) を管理するリポジトリです。
  * TODO: Maybe I must make all the call synchronized and locked. I don't think that's required since RN doesn't run on mutiple threads... but WebRTC does, so it depends.
  */
-final class WebRTCMediaStreamRepository {
+final class WebRTCRepository {
+
+
+    //region PeerConnection
+    //endregion
+
+
+    //region Stream
+    //endregion
+
+
+    //region Track
 
     /**
      * Key is id, Value is track.
@@ -26,7 +39,6 @@ final class WebRTCMediaStreamRepository {
      * Key is id, Value is aspectRatio.
      */
     private final Map<String, Double> trackAspectRatioMap = new HashMap<>();
-
 
     void addTrack(@NonNull final MediaStreamTrack track, @NonNull final String valueTag) {
         trackMap.put(track.id(), track);
@@ -79,10 +91,56 @@ final class WebRTCMediaStreamRepository {
         trackAspectRatioMap.put(videoTrack.id(), aspectRatio);
     }
 
+    //endregion
+
+
+    //region RTP Sender
+    //endregion
+
+
+    //region RTP Receiver
+    //endregion
+
+
+    //region RTP Transceiver
+
+    /**
+     * Key is valueTag, Value is transceiver.
+     */
+    private final Map<String, RtpTransceiver> transceiverMap = new HashMap<>();
+
+    void addTransceiver(@NonNull final RtpTransceiver transceiver, @NonNull final String valueTag) {
+        transceiverMap.put(valueTag, transceiver);
+    }
+
+    void removeTransceiverByValueTag(@Nullable final String valueTag) {
+        if (valueTag == null) {
+            return;
+        }
+        transceiverMap.remove(valueTag);
+    }
+
+    @Nullable
+    RtpTransceiver getTransceiverByValueTag(@Nullable final String valueTag) {
+        if (valueTag == null) {
+            return null;
+        }
+        return transceiverMap.get(valueTag);
+    }
+
+    //endregion
+
+
+    /**
+     * このリポジトリの中身を完全に空にします。
+     * その際、格納されていたWebRTC関連のオブジェクトは、現在のところ、明示的に初期化されません。
+     * ※将来的にこの挙動は変更される可能性があります。
+     */
     void clear() {
         trackMap.clear();
         trackValueTagMap.clear();
         trackAspectRatioMap.clear();
+        transceiverMap.clear();
     }
 
 }

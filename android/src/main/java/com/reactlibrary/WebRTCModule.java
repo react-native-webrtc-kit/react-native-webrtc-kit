@@ -21,6 +21,7 @@ import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.Metrics;
 import org.webrtc.PeerConnectionFactory;
+import org.webrtc.RtpTransceiver;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 import org.webrtc.VideoSource;
@@ -31,6 +32,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static com.reactlibrary.WebRTCValueConverter.fromString;
+import static com.reactlibrary.WebRTCValueConverter.stringValue;
 
 public class WebRTCModule extends ReactContextBaseJavaModule {
 
@@ -48,7 +52,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @NonNull
     private final SurfaceTextureHelper surfaceTextureHelper;
     @NonNull
-    final WebRTCMediaStreamRepository repository = new WebRTCMediaStreamRepository();
+    final WebRTCRepository repository = new WebRTCRepository();
 
 
     public WebRTCModule(@NonNull final ReactApplicationContext reactContext) {
@@ -271,14 +275,17 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     * TODO: RTCRtpTransceiverDirection = String
      * transceiverDirection(valueTag: ValueTag): Promise<RTCRtpTransceiverDirection>
      */
     @ReactMethod
     public void transceiverDirection(@NonNull String valueTag, @NonNull Promise promise) {
         Log.v(getName(), "transceiverDirection()");
-        promise.resolve(null);
-
+        final RtpTransceiver transceiver = repository.getTransceiverByValueTag(valueTag);
+        if (transceiver == null) {
+            promise.reject("NotFoundError", "transceiver is not found", null);
+            return;
+        }
+        promise.resolve(stringValue(transceiver.getDirection()));
     }
 
     /**
@@ -287,17 +294,32 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void transceiverSetDirection(@NonNull String valueTag, @NonNull String value, @NonNull Promise promise) {
         Log.v(getName(), "transceiverSetDirection()");
+        final RtpTransceiver transceiver = repository.getTransceiverByValueTag(valueTag);
+        if (transceiver == null) {
+            promise.reject("NotFoundError", "transceiver is not found", null);
+            return;
+        }
+        transceiver.setDirection(fromString(value));
         promise.resolve(null);
     }
 
     /**
-     * TODO: RTCRtpTransceiverDirection = String
      * transceiverCurrentDirection(valueTag: ValueTag): Promise<RTCRtpTransceiverDirection>
      */
     @ReactMethod
     public void transceiverCurrentDirection(@NonNull String valueTag, @NonNull Promise promise) {
         Log.v(getName(), "transceiverCurrentDirection()");
-        promise.resolve(null);
+        final RtpTransceiver transceiver = repository.getTransceiverByValueTag(valueTag);
+        if (transceiver == null) {
+            promise.reject("NotFoundError", "transceiver is not found", null);
+            return;
+        }
+        final RtpTransceiver.RtpTransceiverDirection currentDirection = transceiver.getCurrentDirection();
+        if (currentDirection == null) {
+            promise.resolve(null);
+            return;
+        }
+        promise.resolve(stringValue(currentDirection));
     }
 
     /**
@@ -306,6 +328,12 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void transceiverStop(@NonNull String valueTag, @NonNull Promise promise) {
         Log.v(getName(), "transceiverStop()");
+        final RtpTransceiver transceiver = repository.getTransceiverByValueTag(valueTag);
+        if (transceiver == null) {
+            promise.reject("NotFoundError", "transceiver is not found", null);
+            return;
+        }
+        transceiver.stop();
         promise.resolve(null);
     }
 
