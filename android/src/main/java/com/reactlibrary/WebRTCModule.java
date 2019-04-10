@@ -21,6 +21,7 @@ import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.Metrics;
 import org.webrtc.PeerConnectionFactory;
+import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
@@ -33,26 +34,48 @@ import java.util.UUID;
 
 public class WebRTCModule extends ReactContextBaseJavaModule {
 
+    @NonNull
     private final ReactApplicationContext reactContext;
+    @NonNull
+    private final EglBase eglBase;
+    @NonNull
     private final PeerConnectionFactory peerConnectionFactory;
+    @NonNull
     private final WebRTCCamera cameraCapturer;
+    /**
+     * XXX: Maybe we should move the surfaceTextureHelper to the WebRTCCamera so that the camera module handles all capturing tasks instead of this module
+     */
+    @NonNull
+    private final SurfaceTextureHelper surfaceTextureHelper;
+    @NonNull
     final WebRTCMediaStreamRepository repository = new WebRTCMediaStreamRepository();
 
-    public WebRTCModule(final ReactApplicationContext reactContext) {
-        super(reactContext);
-        final EglBase eglBase = EglBase.create();
-        final EglBase.Context eglContext = eglBase.getEglBaseContext();
 
+    public WebRTCModule(@NonNull final ReactApplicationContext reactContext) {
+        super(reactContext);
+
+        // PeerConnectionFactory自体を最初に初期化する必要がある
+        final PeerConnectionFactory.InitializationOptions pcfInitializationOptions =
+                PeerConnectionFactory.InitializationOptions.builder(reactContext)
+                        .setEnableInternalTracer(false)
+                        .setFieldTrials("")
+                        .createInitializationOptions();
+        PeerConnectionFactory.initialize(pcfInitializationOptions);
+
+        // 各フィールドを初期化
         // XXX: DefaultVideoEncoderFactory - VP8 encoder / H264 の利用可否を適切に判断する
         //      現在のところは決め打ちで両方有効にしているが、ハードウェアによっては利用できない場合がある
         //      RN経由でユーザーから調整可能にしてもよいが、可能であればここで利用可否を判断できるのが望ましい
         this.reactContext = reactContext;
+        this.eglBase = EglBase.create();
         this.peerConnectionFactory = PeerConnectionFactory.builder()
-                .setVideoEncoderFactory(new DefaultVideoEncoderFactory(eglContext, true, true))
-                .setVideoDecoderFactory(new DefaultVideoDecoderFactory(eglContext))
+                .setVideoEncoderFactory(new DefaultVideoEncoderFactory(getEglContext(), true, true))
+                .setVideoDecoderFactory(new DefaultVideoDecoderFactory(getEglContext()))
                 .createPeerConnectionFactory();
         this.cameraCapturer = new WebRTCCamera();
+        this.surfaceTextureHelper = SurfaceTextureHelper.create("WebRTCCameraCaptureThread", getEglContext());
     }
+
 
     //region ReactContextBaseJavaModule
 
@@ -62,6 +85,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     }
 
     //endregion
+
 
     //region ReactMethod
 
@@ -78,7 +102,9 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         Log.v(getName(), "finishLoading()");
         cameraCapturer.stopCapture();
         repository.clear();
-        // TODO: EGLのrelease()とかlocal/remote rendererのrelease()が必要になるかも
+        // EGLのrelease()やlocalRenderer/remoteRendererのrelease()は行わない
+        // finishLoading後もアプリの動作は継続するため、一度捨てたら再利用できないフィールドは破棄しない
+        // これでリロードがうまく動作しない場合は、コンストラクタではなくfinishLoading()内でフィールドを初期化するように変更する必要がある
         /*
         TODO: implement the following code
         [WebRTCCamera reloadApplication];
@@ -180,7 +206,8 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         // 映像と音声のトラックをストリームに追加する
         // XXX: PeerConnectionFactory::createVideoSource(VideoCapturer videoCapturer) の実装により、videoCapturerが適切にinitializeされる
         //      したがってcreateVideoSource()の後videoCapturerをstartすればOK
-        final VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer);
+        final VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
+        videoCapturer.initialize(surfaceTextureHelper, reactContext, videoSource.getCapturerObserver());
         final VideoTrack videoTrack = peerConnectionFactory.createVideoTrack(createNewValueTag(), videoSource);
         final AudioSource audioSource = peerConnectionFactory.createAudioSource(null);
         final AudioTrack audioTrack = peerConnectionFactory.createAudioTrack(createNewValueTag(), audioSource);
@@ -203,7 +230,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
 
         // JS に処理を戻す
         final Map<String, Object> result = new HashMap<>();
-        result.put("streamId", mediaStream.label());
+        result.put("streamId", mediaStream.getId());
         final List<Object> tracks = new ArrayList<>();
         tracks.add(createJsonMap(videoTrack));
         tracks.add(createJsonMap(audioTrack));
@@ -411,6 +438,11 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     }
 
     //endregion
+
+    @NonNull
+    public EglBase.Context getEglContext() {
+        return eglBase.getEglBaseContext();
+    }
 
     @NonNull
     private String createNewValueTag() {

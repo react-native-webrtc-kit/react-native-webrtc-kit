@@ -84,24 +84,23 @@ public class WebRTCVideoViewManager extends SimpleViewManager<WebRTCVideoView> {
     @ReactProp(name = "track")
     public void setTrack(@NonNull final WebRTCVideoView view, @Nullable final ReadableMap json) {
         if (json == null) {
-            // XXX: iOSのようにセッターを用意してそちらにやらせたほうがよさそう
-            //      iOSでも track に view を追加するのがWebRTC的な実装なのだが、
-            //      iOS側実装はviewにセッターを用意しておいて view 経由で track に追加させるようになっていて、
-            //      これにより多重にtrackがセットされるのを防いでいる用に見える。これは見習ったほうが良さそう
+            view.setVideoTrack(null);
             return;
         }
         final String valueTag = json.getString("_valueTag");
         if (valueTag == null) {
+            // XXX: このケースはUnexpected (videoTrackの指定がない), Exception吐いたほうがいいかも
             return;
         }
 
-        final ThemedReactContext reactContext = (ThemedReactContext) view.getContext();
+        final ThemedReactContext reactContext = view.getReactContext();
         final WebRTCModule module = reactContext.getNativeModule(WebRTCModule.class);
         final VideoTrack videoTrack = module.repository.getVideoTrackByValueTag(valueTag);
         if (videoTrack == null) {
+            // XXX: このケースはUnexpected (指定されたvideoTrackが見つからない), Exception吐いたほうがいいかも
             return;
         }
-        videoTrack.addSink(view.surfaceViewRenderer);
+        view.setVideoTrack(videoTrack);
     }
 
     //endregion
