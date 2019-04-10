@@ -14,13 +14,17 @@ import com.facebook.react.bridge.ReadableMap;
 
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
+import org.webrtc.DataChannel;
 import org.webrtc.DefaultVideoDecoderFactory;
 import org.webrtc.DefaultVideoEncoderFactory;
 import org.webrtc.EglBase;
+import org.webrtc.IceCandidate;
 import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.Metrics;
+import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
+import org.webrtc.RtpReceiver;
 import org.webrtc.RtpTransceiver;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
@@ -33,8 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.reactlibrary.WebRTCValueConverter.fromString;
-import static com.reactlibrary.WebRTCValueConverter.stringValue;
+import static com.reactlibrary.WebRTCConverter.rtcConfiguration;
+import static com.reactlibrary.WebRTCConverter.rtpTransceiverDirection;
+import static com.reactlibrary.WebRTCConverter.rtpTransceiverDirectionStringValue;
 
 public class WebRTCModule extends ReactContextBaseJavaModule {
 
@@ -285,7 +290,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
             promise.reject("NotFoundError", "transceiver is not found", null);
             return;
         }
-        promise.resolve(stringValue(transceiver.getDirection()));
+        promise.resolve(rtpTransceiverDirectionStringValue(transceiver.getDirection()));
     }
 
     /**
@@ -299,7 +304,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
             promise.reject("NotFoundError", "transceiver is not found", null);
             return;
         }
-        transceiver.setDirection(fromString(value));
+        transceiver.setDirection(rtpTransceiverDirection(value));
         promise.resolve(null);
     }
 
@@ -319,7 +324,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
             promise.resolve(null);
             return;
         }
-        promise.resolve(stringValue(currentDirection));
+        promise.resolve(rtpTransceiverDirectionStringValue(currentDirection));
     }
 
     /**
@@ -338,12 +343,18 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     * TODO: JSON conversion RTCConfiguration
      * peerConnectionInit(valueTag: ValueTag, configuration: RTCConfiguration, constraints: RTCMediaConstraints)
+     * TODO: MediaConstraintsがdeprecated扱いになっているがどうするべきか？とりあえず現状はconstraints引数を無視するようにしているが・・・
      */
     @ReactMethod
-    public void peerConnectionInit(@NonNull ReadableMap configuration, @Nullable ReadableMap constraints, @NonNull String valueTag) {
+    public void peerConnectionInit(@NonNull ReadableMap configurationJson, @Nullable ReadableMap constraintsJson, @NonNull String valueTag) {
         Log.v(getName(), "peerConnectionInit()");
+        final PeerConnection.RTCConfiguration configuration = rtcConfiguration(configurationJson);
+        final PeerConnection peerConnection = peerConnectionFactory.createPeerConnection(configuration, peerConnectionObserver);
+        if (peerConnection == null) {
+            throw new IllegalStateException("createPeerConnection failed");
+        }
+        repository.addPeerConnection(peerConnection, createNewValueTag());
     }
 
     /**
@@ -467,8 +478,154 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
 
     //endregion
 
+    //region PeerConnection.Observer
+
+    private final PeerConnection.Observer peerConnectionObserver = new PeerConnection.Observer() {
+        @Override
+        public void onSignalingChange(PeerConnection.SignalingState signalingState) {
+                /*
+                [peerConnection detectConnectionStateAndFinishWithModule: self];
+                [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionSignalingStateChanged"
+                                                                body:@{@"valueTag": peerConnection.valueTag,
+                                                                       @"signalingState": [WebRTCUtils stringForSignalingState:newState]}];
+                 */
+        }
+
+        @Override
+        public void onIceConnectionChange(PeerConnection.IceConnectionState iceConnectionState) {
+                /*
+                [peerConnection detectConnectionStateAndFinishWithModule: self];
+[self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionIceConnectionChanged"
+                                                body:@{@"valueTag": peerConnection.valueTag,
+                                                       @"iceConnectionState": [WebRTCUtils stringForICEConnectionState:newState]}];
+                 */
+        }
+
+        @Override
+        public void onIceConnectionReceivingChange(boolean b) {
+            // Do nothing
+        }
+
+        @Override
+        public void onIceGatheringChange(PeerConnection.IceGatheringState iceGatheringState) {
+                /*
+                [peerConnection detectConnectionStateAndFinishWithModule: self];
+[self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionIceGatheringChanged"
+                                                body:@{@"valueTag": peerConnection.valueTag,
+                                                       @"iceGatheringState": [WebRTCUtils stringForICEGatheringState:newState]}];
+                 */
+        }
+
+        @Override
+        public void onIceCandidate(IceCandidate iceCandidate) {
+                /*
+                [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionGotICECandidate"
+                                                body:@{@"valueTag": peerConnection.valueTag,
+                                                       @"candidate": @{
+                                                               @"candidate": candidate.sdp,
+                                                               @"sdpMLineIndex": @(candidate.sdpMLineIndex),
+                                                               @"sdpMid": candidate.sdpMid}}];
+                 */
+        }
+
+        @Override
+        public void onIceCandidatesRemoved(IceCandidate[] iceCandidates) {
+                /*
+                [peerConnection removeIceCandidates: candidates];
+                */
+        }
+
+        @Override
+        public void onAddStream(MediaStream mediaStream) {
+                /*
+                stream.valueTag = [self createNewValueTag];
+                [self addStream: stream forKey: stream.valueTag];
+
+                for (RTCMediaStreamTrack *track in stream.allTracks) {
+                    track.valueTag = [self createNewValueTag];
+                    [self addTrack: track forKey: track.valueTag];
+                }
+                 */
+        }
+
+        @Override
+        public void onRemoveStream(MediaStream mediaStream) {
+                /*
+                if (stream.valueTag) {
+                    [WebRTCValueManager removeValueTagForObject: stream];
+                    [self removeStreamForKey: stream.valueTag];
+                }
+                 */
+        }
+
+        @Override
+        public void onAddTrack(RtpReceiver rtpReceiver, MediaStream[] mediaStreams) {
+                /*
+                rtpReceiver.valueTag = [self createNewValueTag];
+                [self addReceiver: rtpReceiver forKey: rtpReceiver.valueTag];
+                NSMutableArray *streamIds = [[NSMutableArray alloc] init];
+                for (RTCMediaStream *stream in mediaStreams) {
+                    [streamIds addObject: stream.streamId];
+                }
+                rtpReceiver.streamIds = streamIds;
+
+                [self.bridge.eventDispatcher
+                 sendDeviceEventWithName: @"peerConnectionAddedReceiver"
+                 body:@{@"valueTag": peerConnection.valueTag,
+                        @"receiver": [rtpReceiver json]}];
+                 */
+        }
+
+        // TODO: rtpReceiverがremoveされたタイミングで呼び出されるobserverが現状存在しない。
+        //       別口で調べてみたところ以下のコメントを見つけた
+        //       > (shino): Unified plan に onRemoveTrack が来たらこっち = void onTrack(RtpTransceiver transceiver) で対応する。
+        //       > 今は SDP semantics に関わらず onAddStream/onRemoveStream でシグナリングに通知している
+        //       とのこと、やはり何か実装が足りていない様子。一旦フローと各callbackの呼び出しタイミングを整理する。
+        //       ちなみにiOS側のonRemoveTrackに相当する実装は以下の通り
+            /*
+            if (rtpReceiver.valueTag != nil) {
+                [self removeReceiverForKey: rtpReceiver.valueTag];
+                [WebRTCValueManager removeValueTagForString: rtpReceiver.receiverId];
+            }
+
+            [self.bridge.eventDispatcher
+             sendDeviceEventWithName: @"peerConnectionRemoveReceiver"
+             body:@{@"valueTag": peerConnection.valueTag,
+                    @"receiver": [rtpReceiver json]}];
+             */
+
+        @Override
+        public void onTrack(RtpTransceiver transceiver) {
+                /*
+                transceiver.valueTag = [self createNewValueTag];
+                [self removeTransceiverForKey: transceiver.valueTag];
+                [WebRTCValueManager removeValueTagForObject: transceiver];
+
+                [self.bridge.eventDispatcher
+                 sendDeviceEventWithName: @"peerConnectionStartTransceiver"
+                 body:@{@"valueTag": peerConnection.valueTag,
+                        @"transceiver": [transceiver json]}];
+                 */
+        }
+
+        @Override
+        public void onDataChannel(DataChannel dataChannel) {
+            // DataChannel は現在対応しない
+        }
+
+        @Override
+        public void onRenegotiationNeeded() {
+                /*
+                [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionShouldNegotiate"
+                                                body:@{@"valueTag": peerConnection.valueTag}];
+                 */
+        }
+    };
+
+    //endregion
+
     @NonNull
-    public EglBase.Context getEglContext() {
+    EglBase.Context getEglContext() {
         return eglBase.getEglBaseContext();
     }
 
@@ -477,6 +634,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         return UUID.randomUUID().toString();
     }
 
+    // TODO: Move this to WebRTCConverter, maybe that should be better
     @NonNull
     private Map<String, Object> createJsonMap(@NonNull MediaStreamTrack track) {
         final String readyState;

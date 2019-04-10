@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.webrtc.MediaStreamTrack;
+import org.webrtc.PeerConnection;
 import org.webrtc.RtpTransceiver;
 import org.webrtc.VideoTrack;
 
@@ -18,6 +19,31 @@ final class WebRTCRepository {
 
 
     //region PeerConnection
+
+    /**
+     * Key is valueTag, Value is PeerConnection.
+     */
+    private final Map<String, PeerConnection> peerConnectionMap = new HashMap<>();
+
+    void addPeerConnection(@NonNull final PeerConnection peerConnection, @NonNull final String valueTag) {
+        peerConnectionMap.put(valueTag, peerConnection);
+    }
+
+    void removePeerConnectionByValueTag(@Nullable final String valueTag) {
+        if (valueTag == null) {
+            return;
+        }
+        peerConnectionMap.remove(valueTag);
+    }
+
+    @Nullable
+    PeerConnection getPeerConnectionByValueTag(@Nullable final String valueTag) {
+        if (valueTag == null) {
+            return null;
+        }
+        return peerConnectionMap.get(valueTag);
+    }
+
     //endregion
 
 
