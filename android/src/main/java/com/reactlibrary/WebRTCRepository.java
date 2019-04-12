@@ -2,7 +2,9 @@ package com.reactlibrary;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Pair;
 
+import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.PeerConnection;
 import org.webrtc.RtpTransceiver;
@@ -25,8 +27,8 @@ final class WebRTCRepository {
      */
     private final Map<String, PeerConnection> peerConnectionMap = new HashMap<>();
 
-    void addPeerConnection(@NonNull final PeerConnection peerConnection, @NonNull final String valueTag) {
-        peerConnectionMap.put(valueTag, peerConnection);
+    void addPeerConnection(@NonNull final Pair<String, PeerConnection> peerConnectionPair) {
+        peerConnectionMap.put(peerConnectionPair.first, peerConnectionPair.second);
     }
 
     void removePeerConnectionByValueTag(@Nullable final String valueTag) {
@@ -48,6 +50,49 @@ final class WebRTCRepository {
 
 
     //region Stream
+
+    /**
+     * Key is id, Value is stream.
+     */
+    private final Map<String, MediaStream> streamMap = new HashMap<>();
+    /**
+     * Key is id, Value is valueTag. Should better be a BiMap, but not available without Google Guava.
+     */
+    private final Map<String, String> streamValueTagMap = new HashMap<>();
+
+    void addStream(@NonNull final Pair<String, MediaStream> streamPair) {
+        streamMap.put(streamPair.second.getId(), streamPair.second);
+        streamValueTagMap.put(streamPair.second.getId(), streamPair.first);
+    }
+
+    void removeStreamById(@Nullable final String id) {
+        if (id == null) {
+            return;
+        }
+        streamMap.remove(id);
+        streamValueTagMap.remove(id);
+    }
+
+    void removeStreamByValueTag(@Nullable final String valueTag) {
+        final MediaStream stream = getStreamByValueTag(valueTag);
+        if (stream != null) {
+            removeStreamById(stream.getId());
+        }
+    }
+
+    @Nullable
+    MediaStream getStreamByValueTag(@Nullable final String valueTag) {
+        if (valueTag == null) {
+            return null;
+        }
+        for (Map.Entry<String, String> kv : streamValueTagMap.entrySet()) {
+            if (kv.getValue().equals(valueTag)) {
+                return streamMap.get(kv.getKey());
+            }
+        }
+        return null;
+    }
+
     //endregion
 
 
@@ -66,9 +111,9 @@ final class WebRTCRepository {
      */
     private final Map<String, Double> trackAspectRatioMap = new HashMap<>();
 
-    void addTrack(@NonNull final MediaStreamTrack track, @NonNull final String valueTag) {
-        trackMap.put(track.id(), track);
-        trackValueTagMap.put(track.id(), valueTag);
+    void addTrack(@NonNull final Pair<String, MediaStreamTrack> trackPair) {
+        trackMap.put(trackPair.second.id(), trackPair.second);
+        trackValueTagMap.put(trackPair.second.id(), trackPair.first);
     }
 
     private void removeTrackById(@Nullable final String id) {

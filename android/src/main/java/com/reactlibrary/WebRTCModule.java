@@ -4,6 +4,7 @@ package com.reactlibrary;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.Pair;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -217,11 +218,13 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         final VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
         videoCapturer.initialize(surfaceTextureHelper, reactContext, videoSource.getCapturerObserver());
         final VideoTrack videoTrack = peerConnectionFactory.createVideoTrack(createNewValueTag(), videoSource);
+        final Pair<String, MediaStreamTrack> videoTrackPair = new Pair<>(createNewValueTag(), videoTrack);
         final AudioSource audioSource = peerConnectionFactory.createAudioSource(null);
         final AudioTrack audioTrack = peerConnectionFactory.createAudioTrack(createNewValueTag(), audioSource);
+        final Pair<String, MediaStreamTrack> audioTrackPair = new Pair<>(createNewValueTag(), audioTrack);
 
-        repository.addTrack(videoTrack, createNewValueTag());
-        repository.addTrack(audioTrack, createNewValueTag());
+        repository.addTrack(videoTrackPair);
+        repository.addTrack(audioTrackPair);
         mediaStream.addTrack(videoTrack);
         mediaStream.addTrack(audioTrack);
 
@@ -354,8 +357,9 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         if (peerConnection == null) {
             throw new IllegalStateException("createPeerConnection failed");
         }
-        observer.peerConnection = peerConnection;
-        repository.addPeerConnection(peerConnection, createNewValueTag());
+        final Pair<String, PeerConnection> peerConnectionPair = new Pair<>(createNewValueTag(), peerConnection);
+        observer.peerConnectionPair = peerConnectionPair;
+        repository.addPeerConnection(peerConnectionPair);
     }
 
     /**
@@ -486,7 +490,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     }
 
     @NonNull
-    private String createNewValueTag() {
+    String createNewValueTag() {
         return UUID.randomUUID().toString();
     }
 

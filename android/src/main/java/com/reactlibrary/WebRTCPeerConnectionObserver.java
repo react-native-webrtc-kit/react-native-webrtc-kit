@@ -2,6 +2,7 @@ package com.reactlibrary;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Pair;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
@@ -11,19 +12,32 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaStream;
+import org.webrtc.MediaStreamTrack;
 import org.webrtc.PeerConnection;
 import org.webrtc.RtpReceiver;
 import org.webrtc.RtpTransceiver;
+
+import static com.reactlibrary.WebRTCConverter.iceConnectionStateStringValue;
+import static com.reactlibrary.WebRTCConverter.iceGatheringStateStringValue;
+import static com.reactlibrary.WebRTCConverter.signalingStateStringValue;
 
 final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
 
     @NonNull
     private final ReactContext reactContext;
+    /**
+     * First is valueTag, Seconds is PeerConnection.
+     */
     @Nullable
-    PeerConnection peerConnection = null;
+    Pair<String, PeerConnection> peerConnectionPair = null;
 
     WebRTCPeerConnectionObserver(@NonNull final ReactContext reactContext) {
         this.reactContext = reactContext;
+    }
+
+    @NonNull
+    private WebRTCModule getModule() {
+        return reactContext.getNativeModule(WebRTCModule.class);
     }
 
     /**
@@ -39,28 +53,30 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
      * Closes the PeerConnection managed by this observer, completely disposing it from everywhere.
      */
     private void closeAndFinish() {
-        if (peerConnection != null) {
-            // TODO: remove the peer connection from the module repository before disposing it
-            peerConnection.dispose();
-            peerConnection = null;
+        if (peerConnectionPair != null) {
+            getModule().repository.removePeerConnectionByValueTag(peerConnectionPair.first);
+            peerConnectionPair.second.dispose();
+            peerConnectionPair = null;
         }
     }
 
     //region PeerConnection.Observer
 
     @Override
-    public void onSignalingChange(PeerConnection.SignalingState newSignalingState) {
+    public void onSignalingChange(@NonNull final PeerConnection.SignalingState newSignalingState) {
+        if (peerConnectionPair == null) return;
         final WritableMap params = Arguments.createMap();
-        params.putString("valueTag", null); // TODO: peerConnection.valueTag somehow
-        params.putString("signalingState", null); // TODO:  [WebRTCUtils stringForSignalingState:newSignalingState]
+        params.putString("valueTag", peerConnectionPair.first);
+        params.putString("signalingState", signalingStateStringValue(newSignalingState));
         sendDeviceEvent("peerConnectionSignalingStateChanged", params);
     }
 
     @Override
-    public void onIceConnectionChange(PeerConnection.IceConnectionState newIceConnectionState) {
+    public void onIceConnectionChange(@NonNull final PeerConnection.IceConnectionState newIceConnectionState) {
+        if (peerConnectionPair == null) return;
         final WritableMap params = Arguments.createMap();
-        params.putString("valueTag", null); // TODO: peerConnection.valueTag somehow
-        params.putString("iceConnectionState", null); // TODO:  [WebRTCUtils stringForICEConnectionState:newIceConnectionState]
+        params.putString("valueTag", peerConnectionPair.first);
+        params.putString("iceConnectionState", iceConnectionStateStringValue(newIceConnectionState));
         sendDeviceEvent("peerConnectionIceConnectionChanged", params);
         switch (newIceConnectionState) {
             case NEW:
@@ -88,54 +104,55 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
 
     @Override
     public void onIceGatheringChange(PeerConnection.IceGatheringState iceGatheringState) {
-                /*
-                [peerConnection detectConnectionStateAndFinishWithModule: self];
-[self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionIceGatheringChanged"
-                                                body:@{@"valueTag": peerConnection.valueTag,
-                                                       @"iceGatheringState": [WebRTCUtils stringForICEGatheringState:newState]}];
-                 */
+        if (peerConnectionPair == null) return;
+        final WritableMap params = Arguments.createMap();
+        params.putString("valueTag", peerConnectionPair.first);
+        params.putString("iceGatheringState", iceGatheringStateStringValue(iceGatheringState));
+        sendDeviceEvent("peerConnectionIceGatheringChanged", params);
     }
 
     @Override
     public void onIceCandidate(IceCandidate iceCandidate) {
-                /*
-                [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionGotICECandidate"
-                                                body:@{@"valueTag": peerConnection.valueTag,
-                                                       @"candidate": @{
-                                                               @"candidate": candidate.sdp,
-                                                               @"sdpMLineIndex": @(candidate.sdpMLineIndex),
-                                                               @"sdpMid": candidate.sdpMid}}];
-                 */
+        if (peerConnectionPair == null) return;
+        final WritableMap candidate = Arguments.createMap();
+        candidate.putString("candidate", iceCandidate.sdp);
+        candidate.putInt("sdpMLineIndex", iceCandidate.sdpMLineIndex);
+        candidate.putString("sdpMid", iceCandidate.sdpMid);
+        final WritableMap params = Arguments.createMap();
+        params.putString("valueTag", peerConnectionPair.first);
+        params.putMap("candidate", candidate);
+        sendDeviceEvent("peerConnectionGotICECandidate", params);
     }
 
     @Override
     public void onIceCandidatesRemoved(IceCandidate[] iceCandidates) {
-                /*
-                [peerConnection removeIceCandidates: candidates];
-                */
+        if (peerConnectionPair == null) return;
+        peerConnectionPair.second.removeIceCandidates(iceCandidates);
     }
 
     @Override
     public void onAddStream(MediaStream mediaStream) {
-                /*
-                stream.valueTag = [self createNewValueTag];
-                [self addStream: stream forKey: stream.valueTag];
+        if (peerConnectionPair == null) return;
+        final WebRTCModule module = getModule();
+        final Pair<String, MediaStream> streamPair = new Pair<>(module.createNewValueTag(), mediaStream);
+        module.repository.addStream(streamPair);
 
-                for (RTCMediaStreamTrack *track in stream.allTracks) {
-                    track.valueTag = [self createNewValueTag];
-                    [self addTrack: track forKey: track.valueTag];
-                }
-                 */
+        // XXX: Preserved Video Trackについては現在無視しているがこれも管理したほうが良いのか？
+        for (final MediaStreamTrack track : mediaStream.videoTracks) {
+            final Pair<String, MediaStreamTrack> trackPair = new Pair<>(module.createNewValueTag(), track);
+            module.repository.addTrack(trackPair);
+        }
+        for (final MediaStreamTrack track : mediaStream.audioTracks) {
+            final Pair<String, MediaStreamTrack> trackPair = new Pair<>(module.createNewValueTag(), track);
+            module.repository.addTrack(trackPair);
+        }
     }
 
     @Override
     public void onRemoveStream(MediaStream mediaStream) {
-                /*
-                if (stream.valueTag) {
-                    [WebRTCValueManager removeValueTagForObject: stream];
-                    [self removeStreamForKey: stream.valueTag];
-                }
-                 */
+        if (peerConnectionPair == null) return;
+        getModule().repository.removeStreamById(mediaStream.getId());
+        // XXX: このstream管理下のtrackはrepositoryから削除しなくてもよいのか？追加する方は追加しているのに削除する方はしなくて大丈夫？
     }
 
     @Override
@@ -195,10 +212,10 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
 
     @Override
     public void onRenegotiationNeeded() {
-                /*
-                [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionShouldNegotiate"
-                                                body:@{@"valueTag": peerConnection.valueTag}];
-                 */
+        if (peerConnectionPair == null) return;
+        final WritableMap params = Arguments.createMap();
+        params.putString("valueTag", peerConnectionPair.first);
+        sendDeviceEvent("peerConnectionShouldNegotiate", params);
     }
 
     //endregion

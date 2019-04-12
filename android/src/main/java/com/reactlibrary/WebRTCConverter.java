@@ -142,6 +142,7 @@ final class WebRTCConverter {
 
     //endregion
 
+
     //region PeerConnection.SdpSemantics
 
     @NonNull
@@ -153,6 +154,83 @@ final class WebRTCConverter {
                 return PeerConnection.SdpSemantics.UNIFIED_PLAN;
             default:
                 throw new IllegalArgumentException("invalid semantics string " + string);
+        }
+    }
+
+    //endregion
+
+
+    //region PeerConnection.SignalingState
+
+    @NonNull
+    static String signalingStateStringValue(@NonNull final PeerConnection.SignalingState signalingState) {
+        switch (signalingState) {
+            case STABLE:
+                return "stable";
+            case HAVE_LOCAL_OFFER:
+                return "have-local-offer";
+            case HAVE_LOCAL_PRANSWER:
+                return "have-local-pranswer";
+            case HAVE_REMOTE_OFFER:
+                return "have-remote-offer";
+            case HAVE_REMOTE_PRANSWER:
+                return "have-remote-pranswer";
+            case CLOSED:
+                return "closed";
+            default:
+                throw new IllegalArgumentException("invalid signalingState");
+        }
+    }
+
+    //endregion
+
+
+    //region PeerConnection.PeerConnectionState
+    //endregion
+
+
+    //region PeerConnection.IceConnectionState
+
+    @NonNull
+    static String iceConnectionStateStringValue(@NonNull final PeerConnection.IceConnectionState iceConnectionState) {
+        switch (iceConnectionState) {
+            case NEW:
+                return "new";
+            case CHECKING:
+                return "checking";
+            case CONNECTED:
+                return "connected";
+            case COMPLETED:
+                return "completed";
+            case FAILED:
+                return "failed";
+            case DISCONNECTED:
+                return "disconnected";
+            case CLOSED:
+                return "closed";
+            // TODO: IceConnectionState.COUNT が存在しないのでCOUNTが飛んできたら多分死ぬ、どうすればいい？
+            default:
+                throw new IllegalArgumentException("invalid iceConnectionState");
+        }
+    }
+
+    //endregion
+
+
+    //region PeerConnection.IceGatheringState
+
+
+    @NonNull
+    static String iceGatheringStateStringValue(@NonNull final PeerConnection.IceGatheringState iceGatheringState) {
+        switch (iceGatheringState) {
+            case NEW:
+                return "new";
+            case GATHERING:
+                return "gathering";
+            case COMPLETE:
+                return "complete";
+            default:
+                throw new IllegalArgumentException("invalid iceGatheringState");
         }
     }
 
