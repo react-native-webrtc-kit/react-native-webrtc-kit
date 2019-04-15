@@ -7,10 +7,13 @@ import android.util.Pair;
 import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.PeerConnection;
+import org.webrtc.RtpReceiver;
 import org.webrtc.RtpTransceiver;
 import org.webrtc.VideoTrack;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -170,6 +173,70 @@ final class WebRTCRepository {
 
 
     //region RTP Receiver
+
+    /**
+     * Key is id, Value is receiver.
+     */
+    private final Map<String, RtpReceiver> receiverMap = new HashMap<>();
+    /**
+     * Key is id, Value is valueTag. Should better be a BiMap, but not available without Google Guava.
+     */
+    private final Map<String, String> receiverValueTagMap = new HashMap<>();
+    /**
+     * Key is id, Value is associated stream ids.
+     */
+    private final Map<String, List<String>> receiverStreamIdsMap = new HashMap<>();
+
+    void addReceiver(@NonNull final Pair<String, RtpReceiver> receiverPair) {
+        receiverMap.put(receiverPair.second.id(), receiverPair.second);
+        receiverValueTagMap.put(receiverPair.second.id(), receiverPair.first);
+    }
+
+//    private void removeTrackById(@Nullable final String id) {
+//        if (id == null) {
+//            return;
+//        }
+//        trackMap.remove(id);
+//        trackValueTagMap.remove(id);
+//        trackAspectRatioMap.remove(id);
+//    }
+//
+//    void removeTrackByValueTag(@Nullable final String valueTag) {
+//        final MediaStreamTrack track = getTrackByValueTag(valueTag);
+//        if (track != null) {
+//            removeTrackById(track.id());
+//        }
+//    }
+//
+//    @Nullable
+//    MediaStreamTrack getTrackByValueTag(@Nullable final String valueTag) {
+//        if (valueTag == null) {
+//            return null;
+//        }
+//        for (Map.Entry<String, String> kv : trackValueTagMap.entrySet()) {
+//            if (kv.getValue().equals(valueTag)) {
+//                return trackMap.get(kv.getKey());
+//            }
+//        }
+//        return null;
+//    }
+
+    void setStreamIdsForReceiver(@NonNull final String receiverId, @Nullable final MediaStream[] mediaStreams) {
+        if (mediaStreams == null) {
+            receiverStreamIdsMap.remove(receiverId);
+            return;
+        }
+        final List<String> streamIds = new ArrayList<>();
+        for (final MediaStream stream : mediaStreams) {
+            streamIds.add(stream.getId());
+        }
+        if (streamIds.size() == 0) {
+            receiverStreamIdsMap.remove(receiverId);
+            return;
+        }
+        receiverStreamIdsMap.put(receiverId, streamIds);
+    }
+
     //endregion
 
 
@@ -208,9 +275,19 @@ final class WebRTCRepository {
      * ※将来的にこの挙動は変更される可能性があります。
      */
     void clear() {
+        peerConnectionMap.clear();
+
+        streamMap.clear();
+        streamValueTagMap.clear();
+
         trackMap.clear();
         trackValueTagMap.clear();
         trackAspectRatioMap.clear();
+
+        receiverMap.clear();
+        receiverValueTagMap.clear();
+        receiverStreamIdsMap.clear();
+
         transceiverMap.clear();
     }
 

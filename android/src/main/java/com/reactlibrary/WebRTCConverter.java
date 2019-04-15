@@ -6,12 +6,23 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 
 import org.webrtc.PeerConnection;
+import org.webrtc.RtpReceiver;
 import org.webrtc.RtpTransceiver;
 
 import java.util.ArrayList;
 import java.util.List;
 
 final class WebRTCConverter {
+
+    //region RtpReceiver
+
+    @NonNull
+    static String rtpReceiverStringValue(@NonNull final RtpReceiver receiver) {
+        // TODO: return the JSON representation of the RtpReceiver here!
+        return "";
+    }
+
+    //endregion
 
     //region RtpTransceiver.RtpTransceiverDirection
 

@@ -19,6 +19,7 @@ import org.webrtc.RtpTransceiver;
 
 import static com.reactlibrary.WebRTCConverter.iceConnectionStateStringValue;
 import static com.reactlibrary.WebRTCConverter.iceGatheringStateStringValue;
+import static com.reactlibrary.WebRTCConverter.rtpReceiverStringValue;
 import static com.reactlibrary.WebRTCConverter.signalingStateStringValue;
 
 final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
@@ -100,6 +101,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     @Override
     public void onIceConnectionReceivingChange(boolean b) {
         // Do nothing
+        // JS側へのイベント通知は無し
     }
 
     @Override
@@ -128,6 +130,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     public void onIceCandidatesRemoved(IceCandidate[] iceCandidates) {
         if (peerConnectionPair == null) return;
         peerConnectionPair.second.removeIceCandidates(iceCandidates);
+        // JS側へのイベント通知は無し
     }
 
     @Override
@@ -137,7 +140,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
         final Pair<String, MediaStream> streamPair = new Pair<>(module.createNewValueTag(), mediaStream);
         module.repository.addStream(streamPair);
 
-        // XXX: Preserved Video Trackについては現在無視しているがこれも管理したほうが良いのか？
+        // XXX: Preserved Video Trackについては現在無視しているがこれも管理したほうが良いか？
         for (final MediaStreamTrack track : mediaStream.videoTracks) {
             final Pair<String, MediaStreamTrack> trackPair = new Pair<>(module.createNewValueTag(), track);
             module.repository.addTrack(trackPair);
@@ -146,31 +149,32 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
             final Pair<String, MediaStreamTrack> trackPair = new Pair<>(module.createNewValueTag(), track);
             module.repository.addTrack(trackPair);
         }
+        // JS側へのイベント通知は無し (Unified Plan移行につき、旧Plan BのStreamベースのdeprecatedイベント通知は使用しない)
+        // XXX: libwebrtc AndroidにonRemoveTrack()が存在しないため、現状JS側がstream/trackをremoveするのに適したイベントが一切存在しない状態になってしまっている
+        //      iOS側はonRemoveTrack()の実装があるので `peerConnectionRemoveReceiver` イベントをJS側に供給できているが、Android側はその実装が不可能。
+        //      一旦はその状態でおいておくが後々必ず修正が必要。
     }
 
     @Override
     public void onRemoveStream(MediaStream mediaStream) {
         if (peerConnectionPair == null) return;
         getModule().repository.removeStreamById(mediaStream.getId());
-        // XXX: このstream管理下のtrackはrepositoryから削除しなくてもよいのか？追加する方は追加しているのに削除する方はしなくて大丈夫？
+        // このstream管理下のtrackはrepositoryから削除しなくてもよい
+        // trackも削除したい場合は利用者側で明示的にremoveTrack()する仕様となっている
     }
 
     @Override
     public void onAddTrack(RtpReceiver rtpReceiver, MediaStream[] mediaStreams) {
-                /*
-                rtpReceiver.valueTag = [self createNewValueTag];
-                [self addReceiver: rtpReceiver forKey: rtpReceiver.valueTag];
-                NSMutableArray *streamIds = [[NSMutableArray alloc] init];
-                for (RTCMediaStream *stream in mediaStreams) {
-                    [streamIds addObject: stream.streamId];
-                }
-                rtpReceiver.streamIds = streamIds;
+        if (peerConnectionPair == null) return;
+        final WebRTCModule module = getModule();
+        final Pair<String, RtpReceiver> receiverPair = new Pair<>(module.createNewValueTag(), rtpReceiver);
+        module.repository.addReceiver(receiverPair);
+        module.repository.setStreamIdsForReceiver(receiverPair.second.id(), mediaStreams);
 
-                [self.bridge.eventDispatcher
-                 sendDeviceEventWithName: @"peerConnectionAddedReceiver"
-                 body:@{@"valueTag": peerConnection.valueTag,
-                        @"receiver": [rtpReceiver json]}];
-                 */
+        final WritableMap params = Arguments.createMap();
+        params.putString("valueTag", peerConnectionPair.first);
+        params.putString("receiver", rtpReceiverStringValue(rtpReceiver));
+        sendDeviceEvent("peerConnectionAddedReceiver", params);
     }
 
     // TODO: rtpReceiverがremoveされたタイミングで呼び出されるobserverが現状存在しない。
