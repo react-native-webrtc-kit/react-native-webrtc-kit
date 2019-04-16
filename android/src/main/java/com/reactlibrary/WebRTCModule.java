@@ -218,13 +218,11 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         final VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
         videoCapturer.initialize(surfaceTextureHelper, reactContext, videoSource.getCapturerObserver());
         final VideoTrack videoTrack = peerConnectionFactory.createVideoTrack(createNewValueTag(), videoSource);
-        final Pair<String, MediaStreamTrack> videoTrackPair = new Pair<>(createNewValueTag(), videoTrack);
         final AudioSource audioSource = peerConnectionFactory.createAudioSource(null);
         final AudioTrack audioTrack = peerConnectionFactory.createAudioTrack(createNewValueTag(), audioSource);
-        final Pair<String, MediaStreamTrack> audioTrackPair = new Pair<>(createNewValueTag(), audioTrack);
 
-        repository.addTrack(videoTrackPair);
-        repository.addTrack(audioTrackPair);
+        repository.tracks.add(videoTrack.id(), createNewValueTag(), videoTrack);
+        repository.tracks.add(audioTrack.id(), createNewValueTag(), audioTrack);
         mediaStream.addTrack(videoTrack);
         mediaStream.addTrack(audioTrack);
 
@@ -261,7 +259,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void trackSetEnabled(boolean isEnabled, @NonNull String valueTag) {
         Log.v(getName(), "trackSetEnabled()");
-        final MediaStreamTrack track = repository.getTrackByValueTag(valueTag);
+        final MediaStreamTrack track = repository.tracks.getByValueTag(valueTag);
         if (track == null) {
             return;
         }
@@ -274,10 +272,11 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void trackSetAspectRatio(double aspectRatio, @NonNull String valueTag) {
         Log.v(getName(), "trackSetAspectRatio()");
-        final VideoTrack videoTrack = repository.getVideoTrackByValueTag(valueTag);
-        if (videoTrack == null) {
+        final MediaStreamTrack track = repository.tracks.getByValueTag(valueTag);
+        if (!(track instanceof VideoTrack)) {
             return;
         }
+        final VideoTrack videoTrack = (VideoTrack) track;
         repository.setVideoTrackAspectRatio(videoTrack, aspectRatio);
     }
 
@@ -287,7 +286,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void transceiverDirection(@NonNull String valueTag, @NonNull Promise promise) {
         Log.v(getName(), "transceiverDirection()");
-        final RtpTransceiver transceiver = repository.getTransceiverByValueTag(valueTag);
+        final RtpTransceiver transceiver = repository.transceivers.getByValueTag(valueTag);
         if (transceiver == null) {
             promise.reject("NotFoundError", "transceiver is not found", null);
             return;
@@ -301,7 +300,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void transceiverSetDirection(@NonNull String valueTag, @NonNull String value, @NonNull Promise promise) {
         Log.v(getName(), "transceiverSetDirection()");
-        final RtpTransceiver transceiver = repository.getTransceiverByValueTag(valueTag);
+        final RtpTransceiver transceiver = repository.transceivers.getByValueTag(valueTag);
         if (transceiver == null) {
             promise.reject("NotFoundError", "transceiver is not found", null);
             return;
@@ -316,7 +315,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void transceiverCurrentDirection(@NonNull String valueTag, @NonNull Promise promise) {
         Log.v(getName(), "transceiverCurrentDirection()");
-        final RtpTransceiver transceiver = repository.getTransceiverByValueTag(valueTag);
+        final RtpTransceiver transceiver = repository.transceivers.getByValueTag(valueTag);
         if (transceiver == null) {
             promise.reject("NotFoundError", "transceiver is not found", null);
             return;
@@ -335,7 +334,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void transceiverStop(@NonNull String valueTag, @NonNull Promise promise) {
         Log.v(getName(), "transceiverStop()");
-        final RtpTransceiver transceiver = repository.getTransceiverByValueTag(valueTag);
+        final RtpTransceiver transceiver = repository.transceivers.getByValueTag(valueTag);
         if (transceiver == null) {
             promise.reject("NotFoundError", "transceiver is not found", null);
             return;

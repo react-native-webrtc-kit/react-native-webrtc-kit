@@ -8,6 +8,7 @@ import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.PeerConnection;
 import org.webrtc.RtpReceiver;
+import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
 import org.webrtc.VideoTrack;
 
@@ -101,65 +102,14 @@ final class WebRTCRepository {
 
     //region Track
 
-    /**
-     * Key is id, Value is track.
-     */
-    private final Map<String, MediaStreamTrack> trackMap = new HashMap<>();
-    /**
-     * Key is id, Value is valueTag. Should better be a BiMap, but not available without Google Guava.
-     */
-    private final Map<String, String> trackValueTagMap = new HashMap<>();
+    final DualKeyMap<MediaStreamTrack> tracks = new DualKeyMap<>();
     /**
      * Key is id, Value is aspectRatio.
      */
     private final Map<String, Double> trackAspectRatioMap = new HashMap<>();
 
-    void addTrack(@NonNull final Pair<String, MediaStreamTrack> trackPair) {
-        trackMap.put(trackPair.second.id(), trackPair.second);
-        trackValueTagMap.put(trackPair.second.id(), trackPair.first);
-    }
-
-    private void removeTrackById(@Nullable final String id) {
-        if (id == null) {
-            return;
-        }
-        trackMap.remove(id);
-        trackValueTagMap.remove(id);
-        trackAspectRatioMap.remove(id);
-    }
-
-    void removeTrackByValueTag(@Nullable final String valueTag) {
-        final MediaStreamTrack track = getTrackByValueTag(valueTag);
-        if (track != null) {
-            removeTrackById(track.id());
-        }
-    }
-
-    @Nullable
-    MediaStreamTrack getTrackByValueTag(@Nullable final String valueTag) {
-        if (valueTag == null) {
-            return null;
-        }
-        for (Map.Entry<String, String> kv : trackValueTagMap.entrySet()) {
-            if (kv.getValue().equals(valueTag)) {
-                return trackMap.get(kv.getKey());
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    VideoTrack getVideoTrackByValueTag(@Nullable final String valueTag) {
-        final MediaStreamTrack track = getTrackByValueTag(valueTag);
-        if (track instanceof VideoTrack) {
-            return (VideoTrack) track;
-        } else {
-            return null;
-        }
-    }
-
     void setVideoTrackAspectRatio(@NonNull final VideoTrack videoTrack, double aspectRatio) {
-        if (!trackMap.containsKey(videoTrack.id()) || !trackValueTagMap.containsKey(videoTrack.id())) {
+        if (!tracks.containsId(videoTrack.id())) {
             return;
         }
         trackAspectRatioMap.put(videoTrack.id(), aspectRatio);
@@ -169,61 +119,21 @@ final class WebRTCRepository {
 
 
     //region RTP Sender
-    //endregion
 
-
-    //region RTP Receiver
-
-    /**
-     * Key is id, Value is receiver.
-     */
-    private final Map<String, RtpReceiver> receiverMap = new HashMap<>();
-    /**
-     * Key is id, Value is valueTag. Should better be a BiMap, but not available without Google Guava.
-     */
-    private final Map<String, String> receiverValueTagMap = new HashMap<>();
+    final DualKeyMap<RtpSender> senders = new DualKeyMap<>();
     /**
      * Key is id, Value is associated stream ids.
      */
-    private final Map<String, List<String>> receiverStreamIdsMap = new HashMap<>();
+    private final Map<String, List<String>> senderStreamIdsMap = new HashMap<>();
 
-    void addReceiver(@NonNull final Pair<String, RtpReceiver> receiverPair) {
-        receiverMap.put(receiverPair.second.id(), receiverPair.second);
-        receiverValueTagMap.put(receiverPair.second.id(), receiverPair.first);
+    @Nullable
+    List<String> getStreamIdsForSender(@NonNull final RtpSender sender) {
+        return receiverStreamIdsMap.get(sender.id());
     }
 
-//    private void removeTrackById(@Nullable final String id) {
-//        if (id == null) {
-//            return;
-//        }
-//        trackMap.remove(id);
-//        trackValueTagMap.remove(id);
-//        trackAspectRatioMap.remove(id);
-//    }
-//
-//    void removeTrackByValueTag(@Nullable final String valueTag) {
-//        final MediaStreamTrack track = getTrackByValueTag(valueTag);
-//        if (track != null) {
-//            removeTrackById(track.id());
-//        }
-//    }
-//
-//    @Nullable
-//    MediaStreamTrack getTrackByValueTag(@Nullable final String valueTag) {
-//        if (valueTag == null) {
-//            return null;
-//        }
-//        for (Map.Entry<String, String> kv : trackValueTagMap.entrySet()) {
-//            if (kv.getValue().equals(valueTag)) {
-//                return trackMap.get(kv.getKey());
-//            }
-//        }
-//        return null;
-//    }
-
-    void setStreamIdsForReceiver(@NonNull final String receiverId, @Nullable final MediaStream[] mediaStreams) {
+    void setStreamIdsForSender(@NonNull final RtpSender sender, @Nullable final MediaStream[] mediaStreams) {
         if (mediaStreams == null) {
-            receiverStreamIdsMap.remove(receiverId);
+            receiverStreamIdsMap.remove(sender.id());
             return;
         }
         final List<String> streamIds = new ArrayList<>();
@@ -231,10 +141,42 @@ final class WebRTCRepository {
             streamIds.add(stream.getId());
         }
         if (streamIds.size() == 0) {
-            receiverStreamIdsMap.remove(receiverId);
+            receiverStreamIdsMap.remove(sender.id());
             return;
         }
-        receiverStreamIdsMap.put(receiverId, streamIds);
+        receiverStreamIdsMap.put(sender.id(), streamIds);
+    }
+
+    //endregion
+
+
+    //region RTP Receiver
+
+    final DualKeyMap<RtpReceiver> receivers = new DualKeyMap<>();
+    /**
+     * Key is id, Value is associated stream ids.
+     */
+    private final Map<String, List<String>> receiverStreamIdsMap = new HashMap<>();
+
+    @Nullable
+    List<String> getStreamIdsForReceiver(@NonNull final RtpReceiver receiver) {
+        return receiverStreamIdsMap.get(receiver.id());
+    }
+
+    void setStreamIdsForReceiver(@NonNull final RtpReceiver receiver, @Nullable final MediaStream[] mediaStreams) {
+        if (mediaStreams == null) {
+            receiverStreamIdsMap.remove(receiver.id());
+            return;
+        }
+        final List<String> streamIds = new ArrayList<>();
+        for (final MediaStream stream : mediaStreams) {
+            streamIds.add(stream.getId());
+        }
+        if (streamIds.size() == 0) {
+            receiverStreamIdsMap.remove(receiver.id());
+            return;
+        }
+        receiverStreamIdsMap.put(receiver.id(), streamIds);
     }
 
     //endregion
@@ -242,29 +184,7 @@ final class WebRTCRepository {
 
     //region RTP Transceiver
 
-    /**
-     * Key is valueTag, Value is transceiver.
-     */
-    private final Map<String, RtpTransceiver> transceiverMap = new HashMap<>();
-
-    void addTransceiver(@NonNull final RtpTransceiver transceiver, @NonNull final String valueTag) {
-        transceiverMap.put(valueTag, transceiver);
-    }
-
-    void removeTransceiverByValueTag(@Nullable final String valueTag) {
-        if (valueTag == null) {
-            return;
-        }
-        transceiverMap.remove(valueTag);
-    }
-
-    @Nullable
-    RtpTransceiver getTransceiverByValueTag(@Nullable final String valueTag) {
-        if (valueTag == null) {
-            return null;
-        }
-        return transceiverMap.get(valueTag);
-    }
+    final DualKeyMap<RtpTransceiver> transceivers = new DualKeyMap<>();
 
     //endregion
 
@@ -280,15 +200,91 @@ final class WebRTCRepository {
         streamMap.clear();
         streamValueTagMap.clear();
 
-        trackMap.clear();
-        trackValueTagMap.clear();
+        tracks.clear();
         trackAspectRatioMap.clear();
 
-        receiverMap.clear();
-        receiverValueTagMap.clear();
+        senders.clear();
+
+        receivers.clear();
         receiverStreamIdsMap.clear();
 
-        transceiverMap.clear();
+        transceivers.clear();
+    }
+
+    static final class DualKeyMap<V> {
+        @NonNull
+        private final Map<String, V> idMap = new HashMap<>();
+        @NonNull
+        private final Map<String, String> idToValueTag = new HashMap<>();
+        @NonNull
+        private final Map<String, String> valueTagToId = new HashMap<>();
+
+        void add(@NonNull final String id, @NonNull final String valueTag, @NonNull final V value) {
+            idMap.put(id, value);
+            idToValueTag.put(id, valueTag);
+            valueTagToId.put(valueTag, id);
+        }
+
+        @Nullable
+        String getId(@Nullable final String valueTag) {
+            if (valueTag == null) return null;
+            return valueTagToId.get(valueTag);
+        }
+
+        @Nullable
+        String getValueTag(@Nullable final String id) {
+            if (id == null) return null;
+            return idToValueTag.get(id);
+        }
+
+        boolean containsId(@Nullable final String id) {
+            if (id == null) return false;
+            return idToValueTag.containsKey(id);
+        }
+
+        boolean containsValueTag(@Nullable final String valueTag) {
+            if (valueTag == null) return false;
+            return valueTagToId.containsKey(valueTag);
+        }
+
+        @Nullable
+        V getById(@Nullable final String id) {
+            if (id == null) return null;
+            return idMap.get(id);
+        }
+
+        @Nullable
+        V getByValueTag(@Nullable final String valueTag) {
+            if (valueTag == null) return null;
+            final String id = valueTagToId.get(valueTag);
+            if (id == null) return null;
+            return idMap.get(id);
+        }
+
+        void removeById(@Nullable final String id) {
+            if (id == null) return;
+            final String valueTag = idToValueTag.get(id);
+            if (valueTag == null) return;
+            idMap.remove(id);
+            idToValueTag.remove(id);
+            valueTagToId.remove(valueTag);
+        }
+
+        void removeByValueTag(@Nullable final String valueTag) {
+            if (valueTag == null) return;
+            final String id = valueTagToId.get(valueTag);
+            if (id == null) return;
+            idMap.remove(id);
+            idToValueTag.remove(id);
+            valueTagToId.remove(valueTag);
+        }
+
+        void clear() {
+            idMap.clear();
+            idToValueTag.clear();
+            valueTagToId.clear();
+        }
+
     }
 
 }

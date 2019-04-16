@@ -19,7 +19,8 @@ import org.webrtc.RtpTransceiver;
 
 import static com.reactlibrary.WebRTCConverter.iceConnectionStateStringValue;
 import static com.reactlibrary.WebRTCConverter.iceGatheringStateStringValue;
-import static com.reactlibrary.WebRTCConverter.rtpReceiverStringValue;
+import static com.reactlibrary.WebRTCConverter.rtpReceiverJsonValue;
+import static com.reactlibrary.WebRTCConverter.rtpTransceiverJsonValue;
 import static com.reactlibrary.WebRTCConverter.signalingStateStringValue;
 
 final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
@@ -142,12 +143,10 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
 
         // XXX: Preserved Video Trackについては現在無視しているがこれも管理したほうが良いか？
         for (final MediaStreamTrack track : mediaStream.videoTracks) {
-            final Pair<String, MediaStreamTrack> trackPair = new Pair<>(module.createNewValueTag(), track);
-            module.repository.addTrack(trackPair);
+            module.repository.tracks.add(track.id(), module.createNewValueTag(), track);
         }
         for (final MediaStreamTrack track : mediaStream.audioTracks) {
-            final Pair<String, MediaStreamTrack> trackPair = new Pair<>(module.createNewValueTag(), track);
-            module.repository.addTrack(trackPair);
+            module.repository.tracks.add(track.id(), module.createNewValueTag(), track);
         }
         // JS側へのイベント通知は無し (Unified Plan移行につき、旧Plan BのStreamベースのdeprecatedイベント通知は使用しない)
         // XXX: libwebrtc AndroidにonRemoveTrack()が存在しないため、現状JS側がstream/trackをremoveするのに適したイベントが一切存在しない状態になってしまっている
@@ -161,19 +160,23 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
         getModule().repository.removeStreamById(mediaStream.getId());
         // このstream管理下のtrackはrepositoryから削除しなくてもよい
         // trackも削除したい場合は利用者側で明示的にremoveTrack()する仕様となっている
+
+        // TODO: onRemoveTrack()に相当するコールバックがAndroid実装にないので、代わりと言っては何だがここでonRemoveTrackに相当するイベントをJS側に投げてみたらどうか？
+        //       > なので、1track が 多くとも1stream という制限であれば native/Java の onRemoveStream から JS の onRemoveTrack よべばいいのかなぁと。
+        //       確かに合理的な気がする
     }
 
     @Override
-    public void onAddTrack(RtpReceiver rtpReceiver, MediaStream[] mediaStreams) {
+    public void onAddTrack(RtpReceiver receiver, MediaStream[] mediaStreams) {
         if (peerConnectionPair == null) return;
         final WebRTCModule module = getModule();
-        final Pair<String, RtpReceiver> receiverPair = new Pair<>(module.createNewValueTag(), rtpReceiver);
-        module.repository.addReceiver(receiverPair);
-        module.repository.setStreamIdsForReceiver(receiverPair.second.id(), mediaStreams);
+        final Pair<String, RtpReceiver> receiverPair = new Pair<>(module.createNewValueTag(), receiver);
+        module.repository.receivers.add(receiver.id(), module.createNewValueTag(), receiver);
+        module.repository.setStreamIdsForReceiver(receiver, mediaStreams);
 
         final WritableMap params = Arguments.createMap();
         params.putString("valueTag", peerConnectionPair.first);
-        params.putString("receiver", rtpReceiverStringValue(rtpReceiver));
+        params.putMap("receiver", rtpReceiverJsonValue(receiver, module.repository));
         sendDeviceEvent("peerConnectionAddedReceiver", params);
     }
 
@@ -183,30 +186,35 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     //       > 今は SDP semantics に関わらず onAddStream/onRemoveStream でシグナリングに通知している
     //       とのこと、やはり何か実装が足りていない様子。一旦フローと各callbackの呼び出しタイミングを整理する。
     //       ちなみにiOS側のonRemoveTrackに相当する実装は以下の通り
-            /*
-            if (rtpReceiver.valueTag != nil) {
-                [self removeReceiverForKey: rtpReceiver.valueTag];
-                [WebRTCValueManager removeValueTagForString: rtpReceiver.receiverId];
-            }
+    /*
+    if (rtpReceiver.valueTag != nil) {
+        [self removeReceiverForKey: rtpReceiver.valueTag];
+        [WebRTCValueManager removeValueTagForString: rtpReceiver.receiverId];
+    }
 
-            [self.bridge.eventDispatcher
-             sendDeviceEventWithName: @"peerConnectionRemoveReceiver"
-             body:@{@"valueTag": peerConnection.valueTag,
-                    @"receiver": [rtpReceiver json]}];
-             */
+    [self.bridge.eventDispatcher
+     sendDeviceEventWithName: @"peerConnectionRemoveReceiver"
+     body:@{@"valueTag": peerConnection.valueTag,
+            @"receiver": [rtpReceiver json]}];
+     */
 
     @Override
     public void onTrack(RtpTransceiver transceiver) {
-                /*
-                transceiver.valueTag = [self createNewValueTag];
-                [self removeTransceiverForKey: transceiver.valueTag];
-                [WebRTCValueManager removeValueTagForObject: transceiver];
+        // XXX: iOS側のSDKだと何故かここで以下のようにtransceiverを削除しているが、絶対におかしい、ここは追加するタイミングのはず
+        //      恐らくiOS側が間違っていると判断する
+        /*
+        transceiver.valueTag = [self createNewValueTag];
+        [self removeTransceiverForKey: transceiver.valueTag];
+        [WebRTCValueManager removeValueTagForObject: transceiver];
+         */
+        if (peerConnectionPair == null) return;
+        final WebRTCModule module = getModule();
+        module.repository.transceivers.add(transceiver.getMid(), module.createNewValueTag(), transceiver);
 
-                [self.bridge.eventDispatcher
-                 sendDeviceEventWithName: @"peerConnectionStartTransceiver"
-                 body:@{@"valueTag": peerConnection.valueTag,
-                        @"transceiver": [transceiver json]}];
-                 */
+        final WritableMap params = Arguments.createMap();
+        params.putString("valueTag", peerConnectionPair.first);
+        params.putMap("transceiver", rtpTransceiverJsonValue(transceiver, module.repository));
+        sendDeviceEvent("peerConnectionStartTransceiver", params);
     }
 
     @Override
