@@ -25,6 +25,7 @@ import org.webrtc.MediaStreamTrack;
 import org.webrtc.Metrics;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
+import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
@@ -38,8 +39,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.reactlibrary.WebRTCConverter.rtcConfiguration;
+import static com.reactlibrary.WebRTCConverter.rtpSenderJsonValue;
 import static com.reactlibrary.WebRTCConverter.rtpTransceiverDirection;
 import static com.reactlibrary.WebRTCConverter.rtpTransceiverDirectionStringValue;
+import static com.reactlibrary.WebRTCConverter.toStringList;
 
 public class WebRTCModule extends ReactContextBaseJavaModule {
 
@@ -110,25 +113,17 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
          */
         Log.v(getName(), "finishLoading()");
         cameraCapturer.stopCapture();
+
+        // XXX: 現状確実に終了しないと問題が発生するPeerConnectionのみをここで終了しているが、
+        //      必要に応じてその他のオブジェクトもここで終了するようにすること
+        for (final PeerConnection peerConnection : repository.allPeerConnections()) {
+            peerConnection.dispose();
+        }
         repository.clear();
+
         // EGLのrelease()やlocalRenderer/remoteRendererのrelease()は行わない
         // finishLoading後もアプリの動作は継続するため、一度捨てたら再利用できないフィールドは破棄しない
         // これでリロードがうまく動作しない場合は、コンストラクタではなくfinishLoading()内でフィールドを初期化するように変更する必要がある
-        /*
-        TODO: implement the following code
-        [WebRTCCamera reloadApplication];
-
-        // すべての peer connection を終了する
-        for (RTCPeerConnection *conn in self.peerConnections) {
-            [conn closeAndFinish];
-        }
-
-        [self.peerConnectionDict removeAllObjects];
-        [self.trackDict removeAllObjects];
-        [self.senderDict removeAllObjects];
-        [self.receiverDict removeAllObjects];
-        [self.transceiverDict removeAllObjects];
-         */
     }
 
     @ReactMethod
@@ -260,9 +255,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     public void trackSetEnabled(boolean isEnabled, @NonNull String valueTag) {
         Log.v(getName(), "trackSetEnabled()");
         final MediaStreamTrack track = repository.tracks.getByValueTag(valueTag);
-        if (track == null) {
-            return;
-        }
+        if (track == null) return;
         track.setEnabled(isEnabled);
     }
 
@@ -273,9 +266,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     public void trackSetAspectRatio(double aspectRatio, @NonNull String valueTag) {
         Log.v(getName(), "trackSetAspectRatio()");
         final MediaStreamTrack track = repository.tracks.getByValueTag(valueTag);
-        if (!(track instanceof VideoTrack)) {
-            return;
-        }
+        if (!(track instanceof VideoTrack)) return;
         final VideoTrack videoTrack = (VideoTrack) track;
         repository.setVideoTrackAspectRatio(videoTrack, aspectRatio);
     }
@@ -362,12 +353,15 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     * TODO: JSON conversion RTCConfiguration
      * peerConnectionSetConfiguration(valueTag: ValueTag, configuration: RTCConfiguration)
      */
     @ReactMethod
-    public void peerConnectionSetConfiguration(@NonNull ReadableMap configuration, @NonNull String valueTag) {
+    public void peerConnectionSetConfiguration(@NonNull ReadableMap configurationJson, @NonNull String valueTag) {
         Log.v(getName(), "peerConnectionSetConfiguration()");
+        final PeerConnection.RTCConfiguration configuration = rtcConfiguration(configurationJson);
+        final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
+        if (peerConnection == null) return;
+        peerConnection.setConfiguration(configuration);
     }
 
     /**
@@ -379,7 +373,26 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
                                        @NonNull String valueTag,
                                        @NonNull Promise promise) {
         Log.v(getName(), "peerConnectionAddTrack()");
-        promise.resolve(null);
+        final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
+        if (peerConnection == null) {
+            promise.reject("NotFoundError", "peer connection is not found");
+            return;
+        }
+        final MediaStreamTrack track = repository.tracks.getByValueTag(trackValueTag);
+        if (track == null) {
+            promise.reject("NotFoundError", "track is not found");
+            return;
+        }
+        final List<String> streamIdsList = toStringList(streamIds);
+        final RtpSender sender = peerConnection.addTrack(track, streamIdsList);
+        if (sender == null) {
+            promise.reject("PeerConnectionError", "cannot add the track");
+            return;
+        }
+        repository.senders.add(sender.id(), createNewValueTag(), sender);
+        repository.setStreamIdsForSender(sender, streamIdsList);
+
+        promise.resolve(rtpSenderJsonValue(sender, repository));
     }
 
     /**
@@ -387,11 +400,27 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
 
-    public void peerConnectionRemoveTrack(@NonNull String trackValueTag,
+    public void peerConnectionRemoveTrack(@NonNull String senderValueTag,
                                           @NonNull String valueTag,
                                           @NonNull Promise promise) {
         Log.v(getName(), "peerConnectionRemoveTrack()");
-        promise.resolve(null);
+        final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
+        if (peerConnection == null) {
+            promise.reject("NotFoundError", "peer connection is not found");
+            return;
+        }
+        final RtpSender sender = repository.senders.getByValueTag(senderValueTag);
+        if (sender == null) {
+            promise.reject("NotFoundError", "sender is not found");
+            return;
+        }
+
+        repository.senders.removeById(sender.id());
+        if (peerConnection.removeTrack(sender)) {
+            promise.resolve(null);
+        } else {
+            promise.reject("RemoveTrackFailed", "cannot remove track");
+        }
     }
 
     /**

@@ -13,7 +13,9 @@ import org.webrtc.RtpTransceiver;
 import org.webrtc.VideoTrack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -50,52 +52,23 @@ final class WebRTCRepository {
         return peerConnectionMap.get(valueTag);
     }
 
+    @NonNull
+    Iterable<PeerConnection> allPeerConnections() {
+        return new Iterable<PeerConnection>() {
+            @NonNull
+            @Override
+            public Iterator<PeerConnection> iterator() {
+                return peerConnectionMap.values().iterator();
+            }
+        };
+    }
+
     //endregion
 
 
     //region Stream
 
-    /**
-     * Key is id, Value is stream.
-     */
-    private final Map<String, MediaStream> streamMap = new HashMap<>();
-    /**
-     * Key is id, Value is valueTag. Should better be a BiMap, but not available without Google Guava.
-     */
-    private final Map<String, String> streamValueTagMap = new HashMap<>();
-
-    void addStream(@NonNull final Pair<String, MediaStream> streamPair) {
-        streamMap.put(streamPair.second.getId(), streamPair.second);
-        streamValueTagMap.put(streamPair.second.getId(), streamPair.first);
-    }
-
-    void removeStreamById(@Nullable final String id) {
-        if (id == null) {
-            return;
-        }
-        streamMap.remove(id);
-        streamValueTagMap.remove(id);
-    }
-
-    void removeStreamByValueTag(@Nullable final String valueTag) {
-        final MediaStream stream = getStreamByValueTag(valueTag);
-        if (stream != null) {
-            removeStreamById(stream.getId());
-        }
-    }
-
-    @Nullable
-    MediaStream getStreamByValueTag(@Nullable final String valueTag) {
-        if (valueTag == null) {
-            return null;
-        }
-        for (Map.Entry<String, String> kv : streamValueTagMap.entrySet()) {
-            if (kv.getValue().equals(valueTag)) {
-                return streamMap.get(kv.getKey());
-            }
-        }
-        return null;
-    }
+    final DualKeyMap<MediaStream> streams = new DualKeyMap<>();
 
     //endregion
 
@@ -131,20 +104,24 @@ final class WebRTCRepository {
         return receiverStreamIdsMap.get(sender.id());
     }
 
+    void setStreamIdsForSender(@NonNull final RtpSender sender, @Nullable final List<String> streamIds) {
+        if (streamIds == null || streamIds.size() == 0) {
+            receiverStreamIdsMap.remove(sender.id());
+            return;
+        }
+        receiverStreamIdsMap.put(sender.id(), streamIds);
+    }
+
     void setStreamIdsForSender(@NonNull final RtpSender sender, @Nullable final MediaStream[] mediaStreams) {
         if (mediaStreams == null) {
-            receiverStreamIdsMap.remove(sender.id());
+            setStreamIdsForSender(sender, Collections.emptyList());
             return;
         }
         final List<String> streamIds = new ArrayList<>();
         for (final MediaStream stream : mediaStreams) {
             streamIds.add(stream.getId());
         }
-        if (streamIds.size() == 0) {
-            receiverStreamIdsMap.remove(sender.id());
-            return;
-        }
-        receiverStreamIdsMap.put(sender.id(), streamIds);
+        setStreamIdsForSender(sender, streamIds);
     }
 
     //endregion
@@ -197,8 +174,7 @@ final class WebRTCRepository {
     void clear() {
         peerConnectionMap.clear();
 
-        streamMap.clear();
-        streamValueTagMap.clear();
+        streams.clear();
 
         tracks.clear();
         trackAspectRatioMap.clear();
@@ -220,6 +196,16 @@ final class WebRTCRepository {
         private final Map<String, String> valueTagToId = new HashMap<>();
 
         void add(@NonNull final String id, @NonNull final String valueTag, @NonNull final V value) {
+            // すでに同一のIDで同一のインスタンスが登録されている場合は上書きしないで無視します
+            // 同一のIDがすでに登録されていても、インスタンスが別であれば上書きします
+            // XXX: ひょっとしたらIDだけ同一なら上書きしないほうがいいかも、というのはAndroidの場合実態はnative側にあって、
+            //      Java側のインスタンスはただのラッパーなので、毎回毎回同一のnativeオブジェクトに対して必要に応じてJava側のラッパーが生成される、
+            //      すなわちインスタンスは同じIDでも毎回別になる内部実装になっている恐れがあるため。
+            //      実際に試してみてダメそうなら調整する。
+            final V oldValue = idMap.get(id);
+            if (oldValue == value) {
+                return;
+            }
             idMap.put(id, value);
             idToValueTag.put(id, valueTag);
             valueTagToId.put(valueTag, id);
@@ -259,6 +245,17 @@ final class WebRTCRepository {
             final String id = valueTagToId.get(valueTag);
             if (id == null) return null;
             return idMap.get(id);
+        }
+
+        @NonNull
+        Iterable<V> all() {
+            return new Iterable<V>() {
+                @NonNull
+                @Override
+                public Iterator<V> iterator() {
+                    return idMap.values().iterator();
+                }
+            };
         }
 
         void removeById(@Nullable final String id) {

@@ -129,20 +129,6 @@ final class WebRTCConverter {
         return json;
     }
 
-    // TODO: 呼び出し側で以下の準備を行う、iOSの実装と異なりここでは行わない
-    /*
-    - (id)json
-    {
-    // RTCRtpSender/Receiver の track プロパティは
-    // RTCMediaStreamTrcak を動的に生成するので、
-    // 新しい value tag を割り当てる
-    RTCMediaStreamTrack *track = self.track;
-    if (track) {
-        track.valueTag = [[WebRTCModule shared] createNewValueTag];
-        [[WebRTCModule shared] addTrack: track forKey: track.valueTag];
-    }
-     */
-
     //endregion
 
     //region RtpReceiver
@@ -174,20 +160,6 @@ final class WebRTCConverter {
         }
         return json;
     }
-
-    // TODO: 呼び出し側で以下の準備を行う、iOSの実装と異なりここでは行わない
-    /*
-    - (id)json
-    {
-    // RTCRtpSender/Receiver の track プロパティは
-    // RTCMediaStreamTrcak を動的に生成するので、
-    // 新しい value tag を割り当てる
-    RTCMediaStreamTrack *track = self.track;
-    if (track) {
-        track.valueTag = [[WebRTCModule shared] createNewValueTag];
-        [[WebRTCModule shared] addTrack: track forKey: track.valueTag];
-    }
-     */
 
     //endregion
 
@@ -257,15 +229,7 @@ final class WebRTCConverter {
         } else if (urlsJson.size() == 0) {
             throw new IllegalArgumentException("RTCIceServer.urls is empty");
         }
-        final List<String> urls = new ArrayList<>();
-        for (int i = 0; i < urlsJson.size(); i++) {
-            final String url = urlsJson.getString(i);
-            if (url == null) {
-                throw new NullPointerException("each RTCIceServer.urls");
-            }
-            urls.add(url);
-        }
-
+        final List<String> urls = toStringList(urlsJson);
         final PeerConnection.IceServer.Builder builder = PeerConnection.IceServer.builder(urls);
         final String usernameString = json.getString("username");
         if (usernameString != null) {
@@ -405,7 +369,7 @@ final class WebRTCConverter {
                 return "disconnected";
             case CLOSED:
                 return "closed";
-            // TODO: IceConnectionState.COUNT が存在しないのでCOUNTが飛んできたら多分死ぬ、どうすればいい？
+            // XXX: IceConnectionState.COUNT がAndroid SDKに存在しないので、COUNTが飛んできたら多分死ぬ。SDK側が対応しない限りどうしようもない。
             default:
                 throw new IllegalArgumentException("invalid iceConnectionState");
         }
@@ -468,5 +432,19 @@ final class WebRTCConverter {
     }
 
     //endregion
+
+
+    @NonNull
+    static List<String> toStringList(@NonNull final ReadableArray arrayJson) {
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < arrayJson.size(); i++) {
+            final String value = arrayJson.getString(i);
+            if (value == null) {
+                throw new IllegalStateException(String.format("Index %d is not a string: %s", i, arrayJson));
+            }
+            result.add(value);
+        }
+        return result;
+    }
 
 }

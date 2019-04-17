@@ -8,6 +8,7 @@ import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
+import org.webrtc.MediaStreamTrack;
 import org.webrtc.VideoTrack;
 
 import java.util.NoSuchElementException;
@@ -95,11 +96,12 @@ public class WebRTCVideoViewManager extends SimpleViewManager<WebRTCVideoView> {
 
         final ThemedReactContext reactContext = view.getReactContext();
         final WebRTCModule module = reactContext.getNativeModule(WebRTCModule.class);
-        final VideoTrack videoTrack = module.repository.getVideoTrackByValueTag(valueTag);
-        if (videoTrack == null) {
-            // XXX: このケースはUnexpected (指定されたvideoTrackが見つからない), Exception吐いたほうがいいかも
+        final MediaStreamTrack track = module.repository.tracks.getByValueTag(valueTag);
+        if (!(track instanceof VideoTrack)) {
+            // XXX: このケースはUnexpected (指定されたvideoTrackが見つからない or VideoTrackではない), Exception吐いたほうがいいかも
             return;
         }
+        final VideoTrack videoTrack = (VideoTrack) track;
         view.setVideoTrack(videoTrack);
     }
 

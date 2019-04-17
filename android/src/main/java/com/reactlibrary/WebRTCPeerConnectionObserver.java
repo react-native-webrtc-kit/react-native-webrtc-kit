@@ -15,6 +15,7 @@ import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.PeerConnection;
 import org.webrtc.RtpReceiver;
+import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
 
 import static com.reactlibrary.WebRTCConverter.iceConnectionStateStringValue;
@@ -138,8 +139,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     public void onAddStream(MediaStream mediaStream) {
         if (peerConnectionPair == null) return;
         final WebRTCModule module = getModule();
-        final Pair<String, MediaStream> streamPair = new Pair<>(module.createNewValueTag(), mediaStream);
-        module.repository.addStream(streamPair);
+        module.repository.streams.add(mediaStream.getId(), module.createNewValueTag(), mediaStream);
 
         // XXX: Preserved Video Trackについては現在無視しているがこれも管理したほうが良いか？
         for (final MediaStreamTrack track : mediaStream.videoTracks) {
@@ -157,7 +157,8 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     @Override
     public void onRemoveStream(MediaStream mediaStream) {
         if (peerConnectionPair == null) return;
-        getModule().repository.removeStreamById(mediaStream.getId());
+        final WebRTCModule module = getModule();
+        module.repository.streams.removeById(mediaStream.getId());
         // このstream管理下のtrackはrepositoryから削除しなくてもよい
         // trackも削除したい場合は利用者側で明示的にremoveTrack()する仕様となっている
 
@@ -172,6 +173,10 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
         final WebRTCModule module = getModule();
         final Pair<String, RtpReceiver> receiverPair = new Pair<>(module.createNewValueTag(), receiver);
         module.repository.receivers.add(receiver.id(), module.createNewValueTag(), receiver);
+        final MediaStreamTrack track = receiver.track();
+        if (track != null) {
+            module.repository.tracks.add(track.id(), module.createNewValueTag(), track);
+        }
         module.repository.setStreamIdsForReceiver(receiver, mediaStreams);
 
         final WritableMap params = Arguments.createMap();
@@ -210,6 +215,18 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
         if (peerConnectionPair == null) return;
         final WebRTCModule module = getModule();
         module.repository.transceivers.add(transceiver.getMid(), module.createNewValueTag(), transceiver);
+        final RtpSender sender = transceiver.getSender();
+        final MediaStreamTrack senderTrack = sender.track();
+        final RtpReceiver receiver = transceiver.getReceiver();
+        final MediaStreamTrack receiverTrack = receiver.track();
+        module.repository.senders.add(sender.id(), module.createNewValueTag(), sender);
+        module.repository.receivers.add(receiver.id(), module.createNewValueTag(), receiver);
+        if (senderTrack != null) {
+            module.repository.tracks.add(senderTrack.id(), module.createNewValueTag(), senderTrack);
+        }
+        if (receiverTrack != null) {
+            module.repository.tracks.add(receiverTrack.id(), module.createNewValueTag(), receiverTrack);
+        }
 
         final WritableMap params = Arguments.createMap();
         params.putString("valueTag", peerConnectionPair.first);
