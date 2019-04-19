@@ -5,15 +5,20 @@ import android.support.annotation.NonNull;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
+import org.webrtc.IceCandidate;
+import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.PeerConnection;
 import org.webrtc.RtpParameters;
 import org.webrtc.RtpReceiver;
 import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
+import org.webrtc.SessionDescription;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -397,6 +402,31 @@ final class WebRTCConverter {
     //endregion
 
 
+    //region SessionDescription
+
+    @NonNull
+    static SessionDescription sessionDescription(@NonNull final ReadableMap json) {
+        final String sdp = json.getString("sdp");
+        final SessionDescription.Type type = SessionDescription.Type.fromCanonicalForm(json.getString("type"));
+        return new SessionDescription(type, sdp);
+    }
+
+    //endregion
+
+
+    //region IceCandidate
+
+    @NonNull
+    static IceCandidate iceCandidate(@NonNull final ReadableMap json) {
+        final String sdp = json.getString("sdp");
+        final int sdpMLineIndex = json.getInt("sdpMLineIndex");
+        final String sdpMid = json.getString("sdpMid");
+        return new IceCandidate(sdpMid, sdpMLineIndex, sdp);
+    }
+
+    //endregion
+
+
     //region MediaStreamTrack
 
     @NonNull
@@ -429,6 +459,63 @@ final class WebRTCConverter {
             default:
                 throw new IllegalArgumentException("invalid mediaStreamTrackState");
         }
+    }
+
+    //endregion
+
+
+    //region MediaConstraints
+
+    @NonNull
+    static MediaConstraints mediaConstraints(@NonNull final ReadableMap json) {
+        final MediaConstraints mediaConstraints = new MediaConstraints();
+        final ReadableMap mandatoryJson = json.getMap("mandatory");
+        final ReadableArray optionalArrayJson = json.getArray("optional");
+
+        if (mandatoryJson != null) {
+            mediaConstraints.mandatory.addAll(toMediaConstraintsKeyValueList(mandatoryJson));
+        }
+
+        if (optionalArrayJson != null) {
+            for (int i = 0; i < optionalArrayJson.size(); i++) {
+                final ReadableMap optionalJson = optionalArrayJson.getMap(i);
+                if (optionalJson == null) continue;
+                mediaConstraints.optional.addAll(toMediaConstraintsKeyValueList(optionalJson));
+            }
+        }
+
+        return mediaConstraints;
+    }
+
+    @NonNull
+    private static List<MediaConstraints.KeyValuePair> toMediaConstraintsKeyValueList(@NonNull final ReadableMap json) {
+        final List<MediaConstraints.KeyValuePair> result = new ArrayList<>();
+        final ReadableMapKeySetIterator iterator = json.keySetIterator();
+        String key;
+        while ((key = iterator.nextKey()) != null) {
+            final ReadableType type = json.getType(key);
+            switch (type) {
+                case String:
+                    result.add(new MediaConstraints.KeyValuePair(key, json.getString(key)));
+                    break;
+                case Number:
+                    result.add(new MediaConstraints.KeyValuePair(key, String.valueOf(json.getDouble(key))));
+                    break;
+                case Boolean:
+                    result.add(new MediaConstraints.KeyValuePair(key, String.valueOf(json.getBoolean(key))));
+                    break;
+                case Map:
+                    result.add(new MediaConstraints.KeyValuePair(key, String.valueOf(json.getMap(key))));
+                    break;
+                case Array:
+                    result.add(new MediaConstraints.KeyValuePair(key, String.valueOf(json.getArray(key))));
+                    break;
+                case Null:
+                    result.add(new MediaConstraints.KeyValuePair(key, "null"));
+                    break;
+            }
+        }
+        return result;
     }
 
     //endregion

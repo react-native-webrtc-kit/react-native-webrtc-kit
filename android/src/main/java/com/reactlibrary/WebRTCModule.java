@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Pair;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -27,6 +28,8 @@ import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
+import org.webrtc.SdpObserver;
+import org.webrtc.SessionDescription;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 import org.webrtc.VideoSource;
@@ -38,10 +41,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.reactlibrary.WebRTCConverter.iceCandidate;
+import static com.reactlibrary.WebRTCConverter.mediaConstraints;
 import static com.reactlibrary.WebRTCConverter.rtcConfiguration;
 import static com.reactlibrary.WebRTCConverter.rtpSenderJsonValue;
 import static com.reactlibrary.WebRTCConverter.rtpTransceiverDirection;
 import static com.reactlibrary.WebRTCConverter.rtpTransceiverDirectionStringValue;
+import static com.reactlibrary.WebRTCConverter.sessionDescription;
 import static com.reactlibrary.WebRTCConverter.toStringList;
 
 public class WebRTCModule extends ReactContextBaseJavaModule {
@@ -427,47 +433,168 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      * peerConnectionCreateOffer(valueTag: ValueTag, constraints: RTCMediaConstraints): Promise<RTCSessionDescription>
      */
     @ReactMethod
-    public void peerConnectionCreateOffer(@NonNull String valueTag, @Nullable ReadableMap constraints, @NonNull Promise promise) {
+    public void peerConnectionCreateOffer(@NonNull String valueTag, @Nullable ReadableMap constraintsJson, @NonNull Promise promise) {
         Log.v(getName(), "peerConnectionCreateOffer()");
-        promise.resolve(null);
+        final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
+        if (peerConnection == null) {
+            promise.reject("NotFoundError", "peer connection is not found");
+            return;
+        }
+        if (constraintsJson == null) {
+            promise.reject("NotFoundError", "constraints is null");
+            return;
+        }
+        final SdpObserver observer = new SdpObserver() {
+            @Override
+            public void onCreateSuccess(SessionDescription sessionDescription) {
+                final WritableMap result = Arguments.createMap();
+                result.putString("sdp", sessionDescription.description);
+                result.putString("type", sessionDescription.type.canonicalForm());
+                promise.resolve(result);
+            }
+
+            @Override
+            public void onSetSuccess() {
+                promise.reject("FatalError", "this must not be called");
+            }
+
+            @Override
+            public void onCreateFailure(String s) {
+                promise.reject("CreateOfferFailed", s);
+            }
+
+            @Override
+            public void onSetFailure(String s) {
+                promise.reject("FatalError", "this must not be called");
+            }
+        };
+        peerConnection.createOffer(observer, mediaConstraints(constraintsJson));
     }
 
     /**
      * peerConnectionCreateAnswer(valueTag: ValueTag, constraints: RTCMediaConstraints): Promise<RTCSessionDescription>
      */
     @ReactMethod
-    public void peerConnectionCreateAnswer(@NonNull String valueTag, @Nullable ReadableMap constraints, @NonNull Promise promise) {
+    public void peerConnectionCreateAnswer(@NonNull String valueTag, @Nullable ReadableMap constraintsJson, @NonNull Promise promise) {
         Log.v(getName(), "peerConnectionCreateAnswer()");
-        promise.resolve(null);
+        final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
+        if (peerConnection == null) {
+            promise.reject("NotFoundError", "peer connection is not found");
+            return;
+        }
+        if (constraintsJson == null) {
+            promise.reject("NotFoundError", "constraints is null");
+            return;
+        }
+        final SdpObserver observer = new SdpObserver() {
+            @Override
+            public void onCreateSuccess(SessionDescription sessionDescription) {
+                final WritableMap result = Arguments.createMap();
+                result.putString("sdp", sessionDescription.description);
+                result.putString("type", sessionDescription.type.canonicalForm());
+                promise.resolve(result);
+            }
+
+            @Override
+            public void onSetSuccess() {
+                promise.reject("FatalError", "this must not be called");
+            }
+
+            @Override
+            public void onCreateFailure(String s) {
+                promise.reject("CreateOfferFailed", s);
+            }
+
+            @Override
+            public void onSetFailure(String s) {
+                promise.reject("FatalError", "this must not be called");
+            }
+        };
+        peerConnection.createAnswer(observer, mediaConstraints(constraintsJson));
     }
 
     /**
-     * TODO: convert JSON -> RTCSessionDescription
      * peerConnectionSetLocalDescription(valueTag: ValueTag, sdp: RTCSessionDescription): Promise<void>
      */
     @ReactMethod
-    public void peerConnectionSetLocalDescription(@NonNull ReadableMap json, @NonNull String valueTag, @NonNull Promise promise) {
+    public void peerConnectionSetLocalDescription(@NonNull ReadableMap sdpJson, @NonNull String valueTag, @NonNull Promise promise) {
         Log.v(getName(), "peerConnectionSetLocalDescription()");
-        promise.resolve(null);
+        final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
+        if (peerConnection == null) {
+            promise.reject("NotFoundError", "peer connection is not found");
+            return;
+        }
+        final SdpObserver observer = new SdpObserver() {
+            @Override
+            public void onCreateSuccess(SessionDescription sessionDescription) {
+                promise.reject("FatalError", "this must not be called");
+            }
+
+            @Override
+            public void onSetSuccess() {
+                promise.resolve(null);
+            }
+
+            @Override
+            public void onCreateFailure(String s) {
+                promise.reject("FatalError", "this must not be called");
+            }
+
+            @Override
+            public void onSetFailure(String s) {
+                promise.reject("SetLocalDescriptionFailed", s);
+            }
+        };
+        peerConnection.setLocalDescription(observer, sessionDescription(sdpJson));
     }
 
     /**
-     * TODO: convert JSON -> RTCSessionDescription
      * peerConnectionSetRemoteDescription(valueTag: ValueTag, sdp: RTCSessionDescription): Promise<void>
      */
     @ReactMethod
-    public void peerConnectionSetRemoteDescription(@NonNull ReadableMap json, @NonNull String valueTag, @NonNull Promise promise) {
+    public void peerConnectionSetRemoteDescription(@NonNull ReadableMap sdpJson, @NonNull String valueTag, @NonNull Promise promise) {
         Log.v(getName(), "peerConnectionSetRemoteDescription()");
-        promise.resolve(null);
+        final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
+        if (peerConnection == null) {
+            promise.reject("NotFoundError", "peer connection is not found");
+            return;
+        }
+        final SdpObserver observer = new SdpObserver() {
+            @Override
+            public void onCreateSuccess(SessionDescription sessionDescription) {
+                promise.reject("FatalError", "this must not be called");
+            }
+
+            @Override
+            public void onSetSuccess() {
+                promise.resolve(null);
+            }
+
+            @Override
+            public void onCreateFailure(String s) {
+                promise.reject("FatalError", "this must not be called");
+            }
+
+            @Override
+            public void onSetFailure(String s) {
+                promise.reject("SetRemoteDescriptionFailed", s);
+            }
+        };
+        peerConnection.setRemoteDescription(observer, sessionDescription(sdpJson));
     }
 
     /**
-     * TODO: convert JSON -> RTCIceCandidate
      * peerConnectionAddICECandidate(valueTag: ValueTag, candidate: RTCIceCandidate): Promise<void>
      */
     @ReactMethod
-    public void peerConnectionAddICECandidate(@NonNull ReadableMap json, @NonNull String valueTag, @NonNull Promise promise) {
+    public void peerConnectionAddICECandidate(@NonNull ReadableMap iceCandidateJson, @NonNull String valueTag, @NonNull Promise promise) {
         Log.v(getName(), "peerConnectionAddICECandidate()");
+        final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
+        if (peerConnection == null) {
+            promise.reject("NotFoundError", "peer connection is not found");
+            return;
+        }
+        peerConnection.addIceCandidate(iceCandidate(iceCandidateJson));
         promise.resolve(null);
     }
 
@@ -477,6 +604,12 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void peerConnectionClose(@NonNull String valueTag) {
         Log.v(getName(), "peerConnectionClose()");
+        final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
+        if (peerConnection == null) {
+            return;
+        }
+        repository.removePeerConnectionByValueTag(valueTag);
+        peerConnection.dispose();
     }
 
     /**
@@ -487,6 +620,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
                                                long ssrc,
                                                @NonNull String ownerValueTag) {
         Log.v(getName(), "rtpEncodingParametersSetActive()");
+        // TODO:
     }
 
     /**
@@ -497,6 +631,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
                                                    long ssrc,
                                                    @NonNull String ownerValueTag) {
         Log.v(getName(), "rtpEncodingParametersSetMaxBitrate()");
+        // TODO:
     }
 
     /**
@@ -507,6 +642,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
                                                    long ssrc,
                                                    @NonNull String ownerValueTag) {
         Log.v(getName(), "rtpEncodingParametersSetMinBitrate()");
+        // TODO:
     }
 
     //endregion
