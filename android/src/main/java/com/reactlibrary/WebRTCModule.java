@@ -26,6 +26,7 @@ import org.webrtc.MediaStreamTrack;
 import org.webrtc.Metrics;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
+import org.webrtc.RtpParameters;
 import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
 import org.webrtc.SdpObserver;
@@ -43,6 +44,7 @@ import java.util.UUID;
 
 import static com.reactlibrary.WebRTCConverter.iceCandidate;
 import static com.reactlibrary.WebRTCConverter.mediaConstraints;
+import static com.reactlibrary.WebRTCConverter.mediaStreamTrackJsonValue;
 import static com.reactlibrary.WebRTCConverter.rtcConfiguration;
 import static com.reactlibrary.WebRTCConverter.rtpSenderJsonValue;
 import static com.reactlibrary.WebRTCConverter.rtpTransceiverDirection;
@@ -242,8 +244,8 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         final Map<String, Object> result = new HashMap<>();
         result.put("streamId", mediaStream.getId());
         final List<Object> tracks = new ArrayList<>();
-        tracks.add(createJsonMap(videoTrack));
-        tracks.add(createJsonMap(audioTrack));
+        tracks.add(mediaStreamTrackJsonValue(videoTrack, repository));
+        tracks.add(mediaStreamTrackJsonValue(audioTrack, repository));
         result.put("tracks", tracks);
         promise.resolve(result);
     }
@@ -620,29 +622,35 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
                                                long ssrc,
                                                @NonNull String ownerValueTag) {
         Log.v(getName(), "rtpEncodingParametersSetActive()");
-        // TODO:
+        final RtpParameters.Encoding encodingParams = repository.getRtpEncodingParametersByValueTag(ownerValueTag, ssrc);
+        if (encodingParams == null) return;
+        encodingParams.active = flag;
     }
 
     /**
      * rtpEncodingParametersSetMaxBitrate(owner: ValueTag, ssrc: number | null, value: number | null)
      */
     @ReactMethod
-    public void rtpEncodingParametersSetMaxBitrate(double bitrate,
+    public void rtpEncodingParametersSetMaxBitrate(int bitrate,
                                                    long ssrc,
                                                    @NonNull String ownerValueTag) {
         Log.v(getName(), "rtpEncodingParametersSetMaxBitrate()");
-        // TODO:
+        final RtpParameters.Encoding encodingParams = repository.getRtpEncodingParametersByValueTag(ownerValueTag, ssrc);
+        if (encodingParams == null) return;
+        encodingParams.maxBitrateBps = bitrate;
     }
 
     /**
      * rtpEncodingParametersSetMinBitrate(owner: ValueTag, ssrc: number | null, value: number | null)
      */
     @ReactMethod
-    public void rtpEncodingParametersSetMinBitrate(double bitrate,
+    public void rtpEncodingParametersSetMinBitrate(int bitrate,
                                                    long ssrc,
                                                    @NonNull String ownerValueTag) {
         Log.v(getName(), "rtpEncodingParametersSetMinBitrate()");
-        // TODO:
+        final RtpParameters.Encoding encodingParams = repository.getRtpEncodingParametersByValueTag(ownerValueTag, ssrc);
+        if (encodingParams == null) return;
+        encodingParams.minBitrateBps = bitrate;
     }
 
     //endregion
@@ -665,29 +673,6 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     private void sendDeviceEvent(@NonNull final String eventName,
                                  @Nullable final WritableMap params) {
         reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
-    }
-
-    // TODO: Move this to WebRTCConverter, maybe that should be better
-    @NonNull
-    private Map<String, Object> createJsonMap(@NonNull MediaStreamTrack track) {
-        final String readyState;
-        switch (track.state()) {
-            case LIVE:
-                readyState = "live";
-                break;
-            case ENDED:
-                readyState = "ended";
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-        final Map<String, Object> jsonMap = new HashMap<>();
-        jsonMap.put("valueTag", ""); // TODO: get a value tag!
-        jsonMap.put("enabled", track.enabled());
-        jsonMap.put("id", track.id());
-        jsonMap.put("kind", track.kind());
-        jsonMap.put("readyState", readyState);
-        return jsonMap;
     }
 
 }

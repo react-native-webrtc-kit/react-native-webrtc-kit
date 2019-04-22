@@ -7,6 +7,7 @@ import android.util.Pair;
 import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.PeerConnection;
+import org.webrtc.RtpParameters;
 import org.webrtc.RtpReceiver;
 import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 /**
  * WebRTCモジュールが使用するすべてのWebRTC関連のオブジェクト (PeerConnection, MediaStream, MediaStreamTrack等) を管理するリポジトリです。
- * TODO: Maybe I must make all the call synchronized and locked. I don't think that's required since RN doesn't run on mutiple threads... but WebRTC does, so it depends.
+ * TODO: 現状一切同期処理を行っていないので、複数スレッドから同時に触られると壊れる可能性が高い。同期ロックが必要かどうかを調べて必要であれば追加する。
  */
 final class WebRTCRepository {
 
@@ -162,6 +163,38 @@ final class WebRTCRepository {
     //region RTP Transceiver
 
     final DualKeyMap<RtpTransceiver> transceivers = new DualKeyMap<>();
+
+    //endregion
+
+
+    //region RTP Parameters
+
+    @Nullable
+    RtpParameters getRtpParametersByValueTag(@NonNull final String valueTag) {
+        for (final RtpSender sender : senders.all()) {
+            if (valueTag.equals(senders.getValueTag(sender.id()))) {
+                return sender.getParameters();
+            }
+        }
+        for (final RtpReceiver receiver : receivers.all()) {
+            if (valueTag.equals(receivers.getValueTag(receiver.id()))) {
+                return receiver.getParameters();
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    RtpParameters.Encoding getRtpEncodingParametersByValueTag(@NonNull final String valueTag, long ssrc) {
+        final RtpParameters rtpParameters = getRtpParametersByValueTag(valueTag);
+        if (rtpParameters == null) return null;
+        for (final RtpParameters.Encoding encoding : rtpParameters.encodings) {
+            if (encoding.ssrc != null && encoding.ssrc == ssrc) {
+                return encoding;
+            }
+        }
+        return null;
+    }
 
     //endregion
 
