@@ -4,7 +4,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.ReadableType;
+
+import static com.reactlibrary.Readables.isTruthy;
+import static com.reactlibrary.Readables.jdouble;
+import static com.reactlibrary.Readables.jint;
+import static com.reactlibrary.Readables.map;
+import static com.reactlibrary.Readables.string;
 
 final class WebRTCMediaStreamConstraints {
 
@@ -40,7 +45,7 @@ final class WebRTCMediaStreamConstraints {
 
         @Nullable
         static Video fromJson(@NonNull final ReadableMap json) {
-            final ReadableMap videoJson = json.getMap("video");
+            final ReadableMap videoJson = map(json, "video");
             if (videoJson == null) {
                 return null;
             } else {
@@ -49,7 +54,7 @@ final class WebRTCMediaStreamConstraints {
         }
 
         private Video(@NonNull final ReadableMap videoJson) {
-            final String facingModeValue = videoJson.getString("facingMode");
+            final String facingModeValue = string(videoJson, "facingMode");
             if (facingModeValue != null) {
                 switch (facingModeValue) {
                     case "user":
@@ -65,17 +70,17 @@ final class WebRTCMediaStreamConstraints {
             } else {
                 this.facingMode = null;
             }
-            width = (videoJson.hasKey("width") && !videoJson.isNull("width")) ? videoJson.getInt("width") : -1;
-            height = (videoJson.hasKey("height") && !videoJson.isNull("height")) ? videoJson.getInt("height") : -1;
-            frameRate = (videoJson.hasKey("frameRate") && !videoJson.isNull("frameRate")) ? videoJson.getInt("frameRate") : -1;
-            aspectRatio = (videoJson.hasKey("aspectRatio") && !videoJson.isNull("aspectRatio")) ? videoJson.getDouble("aspectRatio") : -1;
+            width = jint(videoJson, "width", -1);
+            height = jint(videoJson, "width", -1);
+            frameRate = jint(videoJson, "frameRate", -1);
+            aspectRatio = jdouble(videoJson, "aspectRatio", -1);
         }
     }
 
     static class Audio {
         @Nullable
         static Audio fromJson(@NonNull final ReadableMap json) {
-            if (json.getType("audio") != ReadableType.Null) {
+            if (isTruthy(json, "audio")) {
                 return new Audio();
             } else {
                 return null;

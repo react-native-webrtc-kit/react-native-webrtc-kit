@@ -22,11 +22,21 @@ import org.webrtc.SessionDescription;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.reactlibrary.Readables.array;
+import static com.reactlibrary.Readables.booleans;
+import static com.reactlibrary.Readables.doubles;
+import static com.reactlibrary.Readables.jint;
+import static com.reactlibrary.Readables.map;
+import static com.reactlibrary.Readables.string;
+import static com.reactlibrary.Readables.type;
+
 final class WebRTCConverter {
+
+    private WebRTCConverter() {
+    }
 
     //region RtpParameters
 
@@ -229,7 +239,7 @@ final class WebRTCConverter {
 
     @NonNull
     static PeerConnection.IceServer iceServer(@NonNull final ReadableMap json) {
-        final ReadableArray urlsJson = json.getArray("urls");
+        final ReadableArray urlsJson = array(json, "urls");
         if (urlsJson == null) {
             throw new NullPointerException("RTCIceServer.urls");
         } else if (urlsJson.size() == 0) {
@@ -237,11 +247,11 @@ final class WebRTCConverter {
         }
         final List<String> urls = toStringList(urlsJson);
         final PeerConnection.IceServer.Builder builder = PeerConnection.IceServer.builder(urls);
-        final String usernameString = json.getString("username");
+        final String usernameString = string(json, "username");
         if (usernameString != null) {
             builder.setUsername(usernameString);
         }
-        final String credentialString = json.getString("credential");
+        final String credentialString = string(json, "credential");
         if (credentialString != null) {
             builder.setPassword(credentialString);
         }
@@ -256,7 +266,7 @@ final class WebRTCConverter {
 
     @NonNull
     static PeerConnection.RTCConfiguration rtcConfiguration(@NonNull final ReadableMap json) {
-        final ReadableArray iceServersJson = json.getArray("iceServers");
+        final ReadableArray iceServersJson = array(json, "iceServers");
         final List<PeerConnection.IceServer> iceServers = new ArrayList<>();
         if (iceServersJson != null) {
             for (int i = 0; i < iceServersJson.size(); i++) {
@@ -270,18 +280,15 @@ final class WebRTCConverter {
 
         final PeerConnection.RTCConfiguration configuration = new PeerConnection.RTCConfiguration(iceServers);
 
-        final String policyString = json.getString("iceTransportPolicy");
-        if (policyString == null) {
-            throw new NullPointerException("RTCConfiguration.iceTransportPolicy");
+        final String policyString = string(json, "iceTransportPolicy");
+        if (policyString != null) {
+            configuration.iceTransportsType = iceTransportsType(policyString);
         }
-        configuration.iceTransportsType = iceTransportsType(policyString);
 
-
-        final String semanticsString = json.getString("sdpSemantics");
-        if (semanticsString == null) {
-            throw new NullPointerException("RTCConfiguration.sdpSemantics");
+        final String semanticsString = string(json, "sdpSemantics");
+        if (semanticsString != null) {
+            configuration.sdpSemantics = sdpSemantics(semanticsString);
         }
-        configuration.sdpSemantics = sdpSemantics(semanticsString);
 
         return configuration;
     }
@@ -407,8 +414,8 @@ final class WebRTCConverter {
 
     @NonNull
     static SessionDescription sessionDescription(@NonNull final ReadableMap json) {
-        final String sdp = json.getString("sdp");
-        final SessionDescription.Type type = SessionDescription.Type.fromCanonicalForm(json.getString("type"));
+        final String sdp = string(json, "sdp");
+        final SessionDescription.Type type = SessionDescription.Type.fromCanonicalForm(string(json, "type"));
         return new SessionDescription(type, sdp);
     }
 
@@ -419,9 +426,9 @@ final class WebRTCConverter {
 
     @NonNull
     static IceCandidate iceCandidate(@NonNull final ReadableMap json) {
-        final String sdp = json.getString("sdp");
-        final int sdpMLineIndex = json.getInt("sdpMLineIndex");
-        final String sdpMid = json.getString("sdpMid");
+        final String sdp = string(json, "sdp");
+        final int sdpMLineIndex = jint(json, "sdpMLineIndex");
+        final String sdpMid = string(json, "sdpMid");
         return new IceCandidate(sdpMid, sdpMLineIndex, sdp);
     }
 
@@ -470,8 +477,8 @@ final class WebRTCConverter {
     @NonNull
     static MediaConstraints mediaConstraints(@NonNull final ReadableMap json) {
         final MediaConstraints mediaConstraints = new MediaConstraints();
-        final ReadableMap mandatoryJson = json.getMap("mandatory");
-        final ReadableArray optionalArrayJson = json.getArray("optional");
+        final ReadableMap mandatoryJson = map(json, "mandatory");
+        final ReadableArray optionalArrayJson = array(json, "optional");
 
         if (mandatoryJson != null) {
             mediaConstraints.mandatory.addAll(toMediaConstraintsKeyValueList(mandatoryJson));
@@ -494,22 +501,22 @@ final class WebRTCConverter {
         final ReadableMapKeySetIterator iterator = json.keySetIterator();
         String key;
         while ((key = iterator.nextKey()) != null) {
-            final ReadableType type = json.getType(key);
+            final ReadableType type = type(json, key);
             switch (type) {
                 case String:
-                    result.add(new MediaConstraints.KeyValuePair(key, json.getString(key)));
+                    result.add(new MediaConstraints.KeyValuePair(key, string(json, key)));
                     break;
                 case Number:
-                    result.add(new MediaConstraints.KeyValuePair(key, String.valueOf(json.getDouble(key))));
+                    result.add(new MediaConstraints.KeyValuePair(key, String.valueOf(doubles(json, key))));
                     break;
                 case Boolean:
-                    result.add(new MediaConstraints.KeyValuePair(key, String.valueOf(json.getBoolean(key))));
+                    result.add(new MediaConstraints.KeyValuePair(key, String.valueOf(booleans(json, key))));
                     break;
                 case Map:
-                    result.add(new MediaConstraints.KeyValuePair(key, String.valueOf(json.getMap(key))));
+                    result.add(new MediaConstraints.KeyValuePair(key, String.valueOf(map(json, key))));
                     break;
                 case Array:
-                    result.add(new MediaConstraints.KeyValuePair(key, String.valueOf(json.getArray(key))));
+                    result.add(new MediaConstraints.KeyValuePair(key, String.valueOf(array(json, key))));
                     break;
                 case Null:
                     result.add(new MediaConstraints.KeyValuePair(key, "null"));

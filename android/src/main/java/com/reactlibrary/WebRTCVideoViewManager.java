@@ -13,6 +13,7 @@ import org.webrtc.VideoTrack;
 
 import java.util.NoSuchElementException;
 
+import static com.reactlibrary.Readables.string;
 import static org.webrtc.RendererCommon.ScalingType.SCALE_ASPECT_FILL;
 import static org.webrtc.RendererCommon.ScalingType.SCALE_ASPECT_FIT;
 
@@ -88,7 +89,7 @@ public class WebRTCVideoViewManager extends SimpleViewManager<WebRTCVideoView> {
             view.setVideoTrack(null);
             return;
         }
-        final String valueTag = json.getString("_valueTag");
+        final String valueTag = string(json, "_valueTag");
         if (valueTag == null) {
             // XXX: このケースはUnexpected (videoTrackの指定がない), Exception吐いたほうがいいかも
             return;
