@@ -13,6 +13,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
@@ -21,6 +22,7 @@ import org.webrtc.AudioTrack;
 import org.webrtc.DefaultVideoDecoderFactory;
 import org.webrtc.DefaultVideoEncoderFactory;
 import org.webrtc.EglBase;
+import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.Metrics;
@@ -221,7 +223,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         final VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
         videoCapturer.initialize(surfaceTextureHelper, reactContext, videoSource.getCapturerObserver());
         final VideoTrack videoTrack = peerConnectionFactory.createVideoTrack(createNewValueTag(), videoSource);
-        final AudioSource audioSource = peerConnectionFactory.createAudioSource(null);
+        final AudioSource audioSource = peerConnectionFactory.createAudioSource(new MediaConstraints());
         final AudioTrack audioTrack = peerConnectionFactory.createAudioTrack(createNewValueTag(), audioSource);
 
         repository.tracks.add(videoTrack.id(), createNewValueTag(), videoTrack);
@@ -241,12 +243,12 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         }
 
         // JS に処理を戻す
-        final Map<String, Object> result = new HashMap<>();
-        result.put("streamId", mediaStream.getId());
-        final List<Object> tracks = new ArrayList<>();
-        tracks.add(mediaStreamTrackJsonValue(videoTrack, repository));
-        tracks.add(mediaStreamTrackJsonValue(audioTrack, repository));
-        result.put("tracks", tracks);
+        final WritableMap result = Arguments.createMap();
+        result.putString("streamId", mediaStream.getId());
+        final WritableArray tracks = Arguments.createArray();
+        tracks.pushMap(mediaStreamTrackJsonValue(videoTrack, repository));
+        tracks.pushMap(mediaStreamTrackJsonValue(audioTrack, repository));
+        result.putArray("tracks", tracks);
         promise.resolve(result);
     }
 
@@ -348,14 +350,14 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void peerConnectionInit(@NonNull ReadableMap configurationJson, @Nullable ReadableMap constraintsJson, @NonNull String valueTag) {
-        Log.v(getName(), "peerConnectionInit()");
+        Log.v(getName(), "peerConnectionInit() - valueTag=" + valueTag);
         final PeerConnection.RTCConfiguration configuration = rtcConfiguration(configurationJson);
         final WebRTCPeerConnectionObserver observer = new WebRTCPeerConnectionObserver(reactContext);
         final PeerConnection peerConnection = peerConnectionFactory.createPeerConnection(configuration, observer);
         if (peerConnection == null) {
             throw new IllegalStateException("createPeerConnection failed");
         }
-        final Pair<String, PeerConnection> peerConnectionPair = new Pair<>(createNewValueTag(), peerConnection);
+        final Pair<String, PeerConnection> peerConnectionPair = new Pair<>(valueTag, peerConnection);
         observer.peerConnectionPair = peerConnectionPair;
         repository.addPeerConnection(peerConnectionPair);
     }
@@ -436,7 +438,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void peerConnectionCreateOffer(@NonNull String valueTag, @Nullable ReadableMap constraintsJson, @NonNull Promise promise) {
-        Log.v(getName(), "peerConnectionCreateOffer()");
+        Log.v(getName(), "peerConnectionCreateOffer() - valueTag=" + valueTag);
         final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
         if (peerConnection == null) {
             promise.reject("NotFoundError", "peer connection is not found");
