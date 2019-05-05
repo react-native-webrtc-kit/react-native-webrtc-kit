@@ -124,8 +124,8 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         Log.v(getName(), "finishLoading()");
         cameraCapturer.stopCapture();
 
-        // XXX: 現状確実に終了しないと問題が発生するPeerConnectionのみをここで終了しているが、
-        //      必要に応じてその他のオブジェクトもここで終了するようにすること
+        // PeerConnection.dispose()を実施するとそのPeerConnectionが内部で持っているすべてのオブジェクトを破棄するので、
+        // 同時にSender, Receiver, Streamなども適切に破棄される。
         for (final PeerConnection peerConnection : repository.allPeerConnections()) {
             peerConnection.dispose();
         }
@@ -358,6 +358,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
             throw new IllegalStateException("createPeerConnection failed");
         }
         final Pair<String, PeerConnection> peerConnectionPair = new Pair<>(valueTag, peerConnection);
+        // TODO: observerもrepositoryに保存するようにして、close時に明示的にかつ確実に破棄するようにする。
         observer.peerConnectionPair = peerConnectionPair;
         repository.addPeerConnection(peerConnectionPair);
     }
@@ -607,7 +608,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void peerConnectionClose(@NonNull String valueTag) {
-        Log.v(getName(), "peerConnectionClose()");
+        Log.v(getName(), "peerConnectionClose() - valueTag=" + valueTag);
         final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
         if (peerConnection == null) {
             return;
