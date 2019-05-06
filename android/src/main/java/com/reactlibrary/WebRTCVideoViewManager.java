@@ -2,6 +2,7 @@ package com.reactlibrary;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.SimpleViewManager;
@@ -35,6 +36,7 @@ public class WebRTCVideoViewManager extends SimpleViewManager<WebRTCVideoView> {
 
     @ReactProp(name = "objectFit")
     public void setObjectFit(@NonNull final WebRTCVideoView view, @Nullable final String objectFit) {
+        Log.v(getName(), "setObjectFit() - objectFit=" + objectFit);
         if (objectFit == null) {
             // Default = "contain" なので "contain" の実装に合わせる
             view.surfaceViewRenderer.setScalingType(SCALE_ASPECT_FILL, SCALE_ASPECT_FILL);
@@ -85,6 +87,7 @@ public class WebRTCVideoViewManager extends SimpleViewManager<WebRTCVideoView> {
 
     @ReactProp(name = "track")
     public void setTrack(@NonNull final WebRTCVideoView view, @Nullable final ReadableMap json) {
+        Log.v(getName(), "setTrack() - track=" + json);
         if (json == null) {
             view.setVideoTrack(null);
             return;
@@ -92,15 +95,14 @@ public class WebRTCVideoViewManager extends SimpleViewManager<WebRTCVideoView> {
         final String valueTag = string(json, "_valueTag");
         if (valueTag == null) {
             // XXX: このケースはUnexpected (videoTrackの指定がない), Exception吐いたほうがいいかも
-            return;
+            throw new IllegalStateException("track._valueTag is not defined");
         }
 
         final ThemedReactContext reactContext = view.getReactContext();
         final WebRTCModule module = reactContext.getNativeModule(WebRTCModule.class);
         final MediaStreamTrack track = module.repository.tracks.getByValueTag(valueTag);
         if (!(track instanceof VideoTrack)) {
-            // XXX: このケースはUnexpected (指定されたvideoTrackが見つからない or VideoTrackではない), Exception吐いたほうがいいかも
-            return;
+            throw new IllegalStateException("VideoTrack with valueTag " + valueTag + " is not found");
         }
         final VideoTrack videoTrack = (VideoTrack) track;
         view.setVideoTrack(videoTrack);
