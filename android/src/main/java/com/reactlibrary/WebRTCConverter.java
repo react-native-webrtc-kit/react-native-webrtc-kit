@@ -280,10 +280,18 @@ final class WebRTCConverter {
 
         final PeerConnection.RTCConfiguration configuration = new PeerConnection.RTCConfiguration(iceServers);
 
+        configuration.bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE;
+        configuration.rtcpMuxPolicy = PeerConnection.RtcpMuxPolicy.REQUIRE;
+        configuration.continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY;
+        configuration.keyType = PeerConnection.KeyType.ECDSA;
+        configuration.enableDtlsSrtp = true;
+
         final String policyString = string(json, "iceTransportPolicy");
         if (policyString != null) {
             configuration.iceTransportsType = iceTransportsType(policyString);
         }
+
+        // XXX:  configuration.tcpCandidatePolicy
 
         final String semanticsString = string(json, "sdpSemantics");
         if (semanticsString != null) {
