@@ -188,7 +188,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void getUserMedia(@Nullable final ReadableMap constraintsJson, @NonNull final Promise promise) {
-        Log.v(getName(), "getUserMedia()");
+        Log.v(getName(), "getUserMedia() - constraints=" + constraintsJson);
         final WebRTCMediaStreamConstraints constraints = new WebRTCMediaStreamConstraints(constraintsJson);
         final boolean isVideoEnabled = (constraints.video != null);
         final boolean isAudioEnabled = (constraints.audio != null);
