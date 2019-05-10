@@ -47,7 +47,14 @@ public class WebRTCVideoView extends ViewGroup {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        detachVideoTrackWithRenderer();
+        // XXX: このタイミングでViewをクリーンアップします
+        //      本来このタイミングではdetachVideoTrackWithRenderer()だけ実施すればいいはずなのですが、
+        //      JSコンテキストリロード時に本来使用したいWebRTCVideoViewManager.onDropViewInstanceが呼び出されません。
+        //      なので仕方なくウィンドウからViewが外されたら二度と再利用されないという前提のもとにここでリセットを掛けます。
+        //      もし万が一Viewを別のWindowやViewGroupの間で移動したりしたときに正しく動作しなくなったらここが原因の可能性が高いです。
+        //      基本的に一度捨てたViewを再利用するケースはほぼ無いので安全だとは思いますし、
+        //      そもそも問題が有るのは適切なタイミングで適切なコールバックを呼び出さないReactNativeですが、他に手がないです。
+        release();
     }
 
     @Override
@@ -76,6 +83,16 @@ public class WebRTCVideoView extends ViewGroup {
         detachVideoTrackWithRenderer();
         this.videoTrack = videoTrack;
         attachVideoTrackWithRenderer();
+    }
+
+    /**
+     * 内部に保持しているSurfaceViewRendererをリリースして開放します。
+     * 本メソッドを呼び出すと、それ以降本インスタンスは使用不可能になります。新しいインスタンスを作り直してください。
+     * なお内部に抱えているvideoTrackはdispose()されません。そちらは必要に応じて別途開放してください。
+     */
+    void release() {
+        setVideoTrack(null);
+        surfaceViewRenderer.release();
     }
 
     private void attachVideoTrackWithRenderer() {

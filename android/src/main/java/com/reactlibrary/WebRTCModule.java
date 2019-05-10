@@ -110,6 +110,37 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         return "WebRTCModule";
     }
 
+    @Override
+    public void initialize() {
+        // Do nothing
+        // Android版のReact Nativeはリロード時などにNative Moduleインスタンスを使い回さず新たに作り直すため、
+        // 通常のコンストラクタで問題なく動作する。
+        Log.d(getName(), "initialize()");
+    }
+
+    @Override
+    public void onCatalystInstanceDestroy() {
+        /* Native Moduleが破棄される直前に呼び出される (要するにJSレイヤーがリロードされるタイミング)
+         * ここでリロード前の古い RTCPeerConnection の終了処理を行わないと、
+         * RTCPeerConnection の接続が残ったままになってしまう。
+         * Android版のReact Nativeはリロード時などにNative Moduleインスタンスを使い回さず新たに作り直すため、
+         * finishLoading()は古いインスタンスではなく新しいインスタンスで呼び出されてしまい、うまくいかない。
+         */
+        Log.d(getName(), "onCatalystInstanceDestroy()");
+        cameraCapturer.stopCapture();
+
+        // PeerConnection.dispose()を実施するとそのPeerConnectionが内部で持っているすべてのオブジェクトを破棄するので、
+        // 同時にSender, Receiver, Streamなども適切に破棄される。
+        for (final PeerConnection peerConnection : repository.allPeerConnections()) {
+            peerConnection.dispose();
+        }
+        repository.clear();
+
+        peerConnectionFactory.dispose();
+        surfaceTextureHelper.dispose();
+        eglBase.release();
+    }
+
     //endregion
 
 
@@ -121,23 +152,9 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void finishLoading() {
-        /* JS レイヤーがロードまたはリロードされたときに呼ばれる。
-         * ここでリロード前の古い RTCPeerConnection の終了処理を行わないと、
-         * RTCPeerConnection の接続が残ったままになってしまう。
-         */
+        // Do nothing
+        // Android版はこの仕組みではなくNative Moduleの仕組みを利用して初期化とクリーンアップを行う
         Log.d(getName(), "finishLoading()");
-        cameraCapturer.stopCapture();
-
-        // PeerConnection.dispose()を実施するとそのPeerConnectionが内部で持っているすべてのオブジェクトを破棄するので、
-        // 同時にSender, Receiver, Streamなども適切に破棄される。
-        for (final PeerConnection peerConnection : repository.allPeerConnections()) {
-            peerConnection.dispose();
-        }
-        repository.clear();
-
-        // EGLのrelease()やlocalRenderer/remoteRendererのrelease()は行わない
-        // finishLoading後もアプリの動作は継続するため、一度捨てたら再利用できないフィールドは破棄しない
-        // これでリロードがうまく動作しない場合は、コンストラクタではなくfinishLoading()内でフィールドを初期化するように変更する必要がある
     }
 
     @ReactMethod
