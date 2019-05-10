@@ -212,14 +212,6 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
         [self removeTransceiverForKey: transceiver.valueTag];
         [WebRTCValueManager removeValueTagForObject: transceiver];
          */
-        // TODO: 以下の例外を修正する。これは他に誰もいないchannelに対して最初の一人目のsubscriberとして接続したときに発生する。
-        //       他に誰もいないからRtpSenderのstreamIdが空ということらしい。この場合どのような挙動が望ましいか調べて修正すること。
-        /*
-       　W/System.err: java.lang.IllegalStateException
-       　W/System.err:     at com.reactlibrary.WebRTCConverter.rtpSenderJsonValue(WebRTCConverter.java:125)
-       　W/System.err:     at com.reactlibrary.WebRTCConverter.rtpTransceiverJsonValue(WebRTCConverter.java:190)
-       　W/System.err:     at com.reactlibrary.WebRTCPeerConnectionObserver.onTrack(WebRTCPeerConnectionObserver.java:233)
-        */
         if (peerConnectionPair == null) return;
         final WebRTCModule module = getModule();
         module.repository.transceivers.add(transceiver.getMid(), module.createNewValueTag(), transceiver);
