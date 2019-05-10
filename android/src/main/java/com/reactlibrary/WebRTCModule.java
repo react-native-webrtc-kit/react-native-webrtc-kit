@@ -15,7 +15,6 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
@@ -218,8 +217,6 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         final MediaStream mediaStream = peerConnectionFactory.createLocalMediaStream(createNewValueTag());
 
         // 映像と音声のトラックをストリームに追加する
-        // XXX: PeerConnectionFactory::createVideoSource(VideoCapturer videoCapturer) の実装により、videoCapturerが適切にinitializeされる
-        //      したがってcreateVideoSource()の後videoCapturerをstartすればOK
         final VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
         videoCapturer.initialize(surfaceTextureHelper, reactContext, videoSource.getCapturerObserver());
         final VideoTrack videoTrack = peerConnectionFactory.createVideoTrack(createNewValueTag(), videoSource);
@@ -239,7 +236,8 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         // XXX: キャプチャ開始はlocal stream追加まで待ったほうがいいかもしれないけど、ここではiOS版に揃えて即開始します。ダメそうなら待つように実装を修正する。
         if (isVideoEnabled) {
             repository.setVideoTrackAspectRatio(videoTrack, constraints.video.aspectRatio);
-            cameraCapturer.startCapture(videoCapturer, deviceCandidate, constraints.video);
+            cameraCapturer.stopCapture();
+            cameraCapturer.startCapture(videoSource, videoCapturer, deviceCandidate, constraints.video);
         }
 
         // JS に処理を戻す
@@ -667,15 +665,6 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @NonNull
     String createNewValueTag() {
         return UUID.randomUUID().toString();
-    }
-
-    /**
-     * Sends out an event to JavaScript.
-     * https://facebook.github.io/react-native/docs/native-modules-android#sending-events-to-javascript
-     */
-    private void sendDeviceEvent(@NonNull final String eventName,
-                                 @Nullable final WritableMap params) {
-        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
     }
 
 }

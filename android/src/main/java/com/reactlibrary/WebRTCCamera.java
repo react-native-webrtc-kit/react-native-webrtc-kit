@@ -3,10 +3,12 @@ package com.reactlibrary;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.Pair;
 
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.CameraEnumerationAndroid;
 import org.webrtc.VideoCapturer;
+import org.webrtc.VideoSource;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +19,7 @@ final class WebRTCCamera {
     @NonNull
     private final Camera1Enumerator cameraEnumerator;
     @Nullable
-    private VideoCapturer runningCapturer = null;
+    private Pair<VideoSource, VideoCapturer> runningCapturer = null;
 
     WebRTCCamera() {
         this.cameraEnumerator = new Camera1Enumerator(true);
@@ -106,7 +108,8 @@ final class WebRTCCamera {
      * すでにキャプチャが開始されている場合は何もしません。
      * 引数のVideoCapturerはすでにVideoSourceと紐付けられた後でなければなりません。
      */
-    void startCapture(@NonNull final VideoCapturer capturer,
+    void startCapture(@NonNull final VideoSource source,
+                      @NonNull final VideoCapturer capturer,
                       @NonNull final WebRTCCameraDeviceCandidate candidate,
                       @NonNull final WebRTCMediaStreamConstraints.Video video) {
         if (runningCapturer != null) {
@@ -114,7 +117,7 @@ final class WebRTCCamera {
         }
         final int framerate = Math.max(candidate.format.framerate.min, Math.min(video.frameRate, candidate.format.framerate.max));
         capturer.startCapture(candidate.format.width, candidate.format.height, framerate);
-        runningCapturer = capturer;
+        runningCapturer = new Pair<>(source, capturer);
     }
 
     /**
@@ -126,7 +129,9 @@ final class WebRTCCamera {
             return;
         }
         try {
-            runningCapturer.stopCapture();
+            runningCapturer.second.stopCapture();
+            runningCapturer.first.dispose();
+            runningCapturer.second.dispose();
         } catch (InterruptedException e) {
             // Squash the exception here
             Log.e("WebRTCCamera", "stopCapture()", e);
