@@ -36,7 +36,7 @@ public class WebRTCVideoViewManager extends SimpleViewManager<WebRTCVideoView> {
 
     @ReactProp(name = "objectFit")
     public void setObjectFit(@NonNull final WebRTCVideoView view, @Nullable final String objectFit) {
-        Log.v(getName(), "setObjectFit() - objectFit=" + objectFit);
+        Log.d(getName(), "setObjectFit() - objectFit=" + objectFit);
         if (objectFit == null) {
             // Default = "contain" なので "contain" の実装に合わせる
             view.surfaceViewRenderer.setScalingType(SCALE_ASPECT_FILL, SCALE_ASPECT_FILL);
@@ -87,7 +87,7 @@ public class WebRTCVideoViewManager extends SimpleViewManager<WebRTCVideoView> {
 
     @ReactProp(name = "track")
     public void setTrack(@NonNull final WebRTCVideoView view, @Nullable final ReadableMap json) {
-        Log.v(getName(), "setTrack() - track=" + json);
+        Log.d(getName(), "setTrack() - track=" + json);
         if (json == null) {
             view.setVideoTrack(null);
             return;

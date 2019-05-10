@@ -21,6 +21,7 @@ import org.webrtc.AudioTrack;
 import org.webrtc.DefaultVideoDecoderFactory;
 import org.webrtc.DefaultVideoEncoderFactory;
 import org.webrtc.EglBase;
+import org.webrtc.Logging;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
@@ -83,6 +84,10 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
                         .createInitializationOptions();
         PeerConnectionFactory.initialize(pcfInitializationOptions);
 
+        // WebRTCのロギングを有効化する
+        // XXX: 不要になったら削除するかも、またはデバッグビルドでのみ有効にする必要があるかも
+        Logging.enableLogToDebugOutput(Logging.Severity.LS_INFO);
+
         // 各フィールドを初期化
         // XXX: DefaultVideoEncoderFactory - VP8 encoder / H264 の利用可否を適切に判断する
         //      現在のところは決め打ちで両方有効にしているが、ハードウェアによっては利用できない場合がある
@@ -120,7 +125,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
          * ここでリロード前の古い RTCPeerConnection の終了処理を行わないと、
          * RTCPeerConnection の接続が残ったままになってしまう。
          */
-        Log.v(getName(), "finishLoading()");
+        Log.d(getName(), "finishLoading()");
         cameraCapturer.stopCapture();
 
         // PeerConnection.dispose()を実施するとそのPeerConnectionが内部で持っているすべてのオブジェクトを破棄するので、
@@ -137,7 +142,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void enableMetrics() {
-        Log.v(getName(), "enableMetrics()");
+        Log.d(getName(), "enableMetrics()");
         Metrics.enable();
     }
 
@@ -146,7 +151,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void getAndResetMetrics(@NonNull final Promise promise) {
-        Log.v(getName(), "getAndResetMetrics()");
+        Log.d(getName(), "getAndResetMetrics()");
         final Metrics metrics = Metrics.getAndReset();
         final List<Map<String, Object>> results = new ArrayList<>();
         for (final String infoName : metrics.map.keySet()) {
@@ -168,7 +173,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void getAudioPort(@NonNull final Promise promise) {
-        Log.v(getName(), "getAudioPort()");
+        Log.d(getName(), "getAudioPort()");
         promise.resolve("none");
     }
 
@@ -178,7 +183,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void setAudioPort(@Nullable final String port, @NonNull final Promise promise) {
-        Log.v(getName(), "setAudioPort()");
+        Log.d(getName(), "setAudioPort()");
         promise.resolve(null);
     }
 
@@ -187,7 +192,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void getUserMedia(@Nullable final ReadableMap constraintsJson, @NonNull final Promise promise) {
-        Log.v(getName(), "getUserMedia() - constraints=" + constraintsJson);
+        Log.d(getName(), "getUserMedia() - constraints=" + constraintsJson);
         final WebRTCMediaStreamConstraints constraints = new WebRTCMediaStreamConstraints(constraintsJson);
         final boolean isVideoEnabled = (constraints.video != null);
         final boolean isAudioEnabled = (constraints.audio != null);
@@ -252,7 +257,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void stopUserMedia() {
-        Log.v(getName(), "stopUserMedia()");
+        Log.d(getName(), "stopUserMedia()");
         cameraCapturer.stopCapture();
     }
 
@@ -261,7 +266,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void trackSetEnabled(boolean isEnabled, @NonNull String valueTag) {
-        Log.v(getName(), "trackSetEnabled()");
+        Log.d(getName(), "trackSetEnabled()");
         final MediaStreamTrack track = repository.tracks.getByValueTag(valueTag);
         if (track == null) return;
         track.setEnabled(isEnabled);
@@ -272,7 +277,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void trackSetAspectRatio(double aspectRatio, @NonNull String valueTag) {
-        Log.v(getName(), "trackSetAspectRatio()");
+        Log.d(getName(), "trackSetAspectRatio()");
         final MediaStreamTrack track = repository.tracks.getByValueTag(valueTag);
         if (!(track instanceof VideoTrack)) return;
         final VideoTrack videoTrack = (VideoTrack) track;
@@ -284,7 +289,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void transceiverDirection(@NonNull String valueTag, @NonNull Promise promise) {
-        Log.v(getName(), "transceiverDirection()");
+        Log.d(getName(), "transceiverDirection()");
         final RtpTransceiver transceiver = repository.transceivers.getByValueTag(valueTag);
         if (transceiver == null) {
             promise.reject("NotFoundError", "transceiver is not found", null);
@@ -298,7 +303,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void transceiverSetDirection(@NonNull String valueTag, @NonNull String value, @NonNull Promise promise) {
-        Log.v(getName(), "transceiverSetDirection()");
+        Log.d(getName(), "transceiverSetDirection()");
         final RtpTransceiver transceiver = repository.transceivers.getByValueTag(valueTag);
         if (transceiver == null) {
             promise.reject("NotFoundError", "transceiver is not found", null);
@@ -313,7 +318,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void transceiverCurrentDirection(@NonNull String valueTag, @NonNull Promise promise) {
-        Log.v(getName(), "transceiverCurrentDirection()");
+        Log.d(getName(), "transceiverCurrentDirection()");
         final RtpTransceiver transceiver = repository.transceivers.getByValueTag(valueTag);
         if (transceiver == null) {
             promise.reject("NotFoundError", "transceiver is not found", null);
@@ -332,7 +337,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void transceiverStop(@NonNull String valueTag, @NonNull Promise promise) {
-        Log.v(getName(), "transceiverStop()");
+        Log.d(getName(), "transceiverStop()");
         final RtpTransceiver transceiver = repository.transceivers.getByValueTag(valueTag);
         if (transceiver == null) {
             promise.reject("NotFoundError", "transceiver is not found", null);
@@ -348,7 +353,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void peerConnectionInit(@NonNull ReadableMap configurationJson, @Nullable ReadableMap constraintsJson, @NonNull String valueTag) {
-        Log.v(getName(), "peerConnectionInit() - valueTag=" + valueTag);
+        Log.d(getName(), "peerConnectionInit() - valueTag=" + valueTag);
         final PeerConnection.RTCConfiguration configuration = rtcConfiguration(configurationJson);
         final WebRTCPeerConnectionObserver observer = new WebRTCPeerConnectionObserver(reactContext);
         final PeerConnection peerConnection = peerConnectionFactory.createPeerConnection(configuration, observer);
@@ -366,7 +371,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void peerConnectionSetConfiguration(@NonNull ReadableMap configurationJson, @NonNull String valueTag) {
-        Log.v(getName(), "peerConnectionSetConfiguration()");
+        Log.d(getName(), "peerConnectionSetConfiguration()");
         final PeerConnection.RTCConfiguration configuration = rtcConfiguration(configurationJson);
         final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
         if (peerConnection == null) return;
@@ -381,7 +386,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
                                        @NonNull ReadableArray streamIds,
                                        @NonNull String valueTag,
                                        @NonNull Promise promise) {
-        Log.v(getName(), "peerConnectionAddTrack()");
+        Log.d(getName(), "peerConnectionAddTrack()");
         final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
         if (peerConnection == null) {
             promise.reject("NotFoundError", "peer connection is not found");
@@ -412,7 +417,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     public void peerConnectionRemoveTrack(@NonNull String senderValueTag,
                                           @NonNull String valueTag,
                                           @NonNull Promise promise) {
-        Log.v(getName(), "peerConnectionRemoveTrack()");
+        Log.d(getName(), "peerConnectionRemoveTrack()");
         final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
         if (peerConnection == null) {
             promise.reject("NotFoundError", "peer connection is not found");
@@ -437,7 +442,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void peerConnectionCreateOffer(@NonNull String valueTag, @Nullable ReadableMap constraintsJson, @NonNull Promise promise) {
-        Log.v(getName(), "peerConnectionCreateOffer() - valueTag=" + valueTag);
+        Log.d(getName(), "peerConnectionCreateOffer() - valueTag=" + valueTag);
         final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
         if (peerConnection == null) {
             promise.reject("NotFoundError", "peer connection is not found");
@@ -479,7 +484,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void peerConnectionCreateAnswer(@NonNull String valueTag, @Nullable ReadableMap constraintsJson, @NonNull Promise promise) {
-        Log.v(getName(), "peerConnectionCreateAnswer()");
+        Log.d(getName(), "peerConnectionCreateAnswer()");
         final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
         if (peerConnection == null) {
             promise.reject("NotFoundError", "peer connection is not found");
@@ -521,7 +526,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void peerConnectionSetLocalDescription(@NonNull ReadableMap sdpJson, @NonNull String valueTag, @NonNull Promise promise) {
-        Log.v(getName(), "peerConnectionSetLocalDescription()");
+        Log.d(getName(), "peerConnectionSetLocalDescription()");
         final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
         if (peerConnection == null) {
             promise.reject("NotFoundError", "peer connection is not found");
@@ -556,7 +561,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void peerConnectionSetRemoteDescription(@NonNull ReadableMap sdpJson, @NonNull String valueTag, @NonNull Promise promise) {
-        Log.v(getName(), "peerConnectionSetRemoteDescription()");
+        Log.d(getName(), "peerConnectionSetRemoteDescription()");
         final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
         if (peerConnection == null) {
             promise.reject("NotFoundError", "peer connection is not found");
@@ -591,7 +596,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void peerConnectionAddICECandidate(@NonNull ReadableMap iceCandidateJson, @NonNull String valueTag, @NonNull Promise promise) {
-        Log.v(getName(), "peerConnectionAddICECandidate()");
+        Log.d(getName(), "peerConnectionAddICECandidate()");
         final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
         if (peerConnection == null) {
             promise.reject("NotFoundError", "peer connection is not found");
@@ -606,7 +611,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void peerConnectionClose(@NonNull String valueTag) {
-        Log.v(getName(), "peerConnectionClose() - valueTag=" + valueTag);
+        Log.d(getName(), "peerConnectionClose() - valueTag=" + valueTag);
         final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
         if (peerConnection == null) {
             return;
@@ -622,7 +627,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     public void rtpEncodingParametersSetActive(boolean flag,
                                                long ssrc,
                                                @NonNull String ownerValueTag) {
-        Log.v(getName(), "rtpEncodingParametersSetActive()");
+        Log.d(getName(), "rtpEncodingParametersSetActive()");
         final RtpParameters.Encoding encodingParams = repository.getRtpEncodingParametersByValueTag(ownerValueTag, ssrc);
         if (encodingParams == null) return;
         encodingParams.active = flag;
@@ -635,7 +640,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     public void rtpEncodingParametersSetMaxBitrate(int bitrate,
                                                    long ssrc,
                                                    @NonNull String ownerValueTag) {
-        Log.v(getName(), "rtpEncodingParametersSetMaxBitrate()");
+        Log.d(getName(), "rtpEncodingParametersSetMaxBitrate()");
         final RtpParameters.Encoding encodingParams = repository.getRtpEncodingParametersByValueTag(ownerValueTag, ssrc);
         if (encodingParams == null) return;
         encodingParams.maxBitrateBps = bitrate;
@@ -648,7 +653,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     public void rtpEncodingParametersSetMinBitrate(int bitrate,
                                                    long ssrc,
                                                    @NonNull String ownerValueTag) {
-        Log.v(getName(), "rtpEncodingParametersSetMinBitrate()");
+        Log.d(getName(), "rtpEncodingParametersSetMinBitrate()");
         final RtpParameters.Encoding encodingParams = repository.getRtpEncodingParametersByValueTag(ownerValueTag, ssrc);
         if (encodingParams == null) return;
         encodingParams.minBitrateBps = bitrate;

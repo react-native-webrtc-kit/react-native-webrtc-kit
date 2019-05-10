@@ -122,11 +122,12 @@ final class WebRTCConverter {
                                           @NonNull final WebRTCRepository repository) {
         final String valueTag = repository.senders.getValueTag(sender.id());
         final List<String> streamIds = repository.getStreamIdsForSender(sender);
-        if (streamIds == null) throw new IllegalStateException();
 
         final WritableArray streamIdsArray = Arguments.createArray();
-        for (final String streamId : streamIds) {
-            streamIdsArray.pushString(streamId);
+        if (streamIds != null) {
+            for (final String streamId : streamIds) {
+                streamIdsArray.pushString(streamId);
+            }
         }
 
         final WritableMap json = Arguments.createMap();
@@ -154,11 +155,12 @@ final class WebRTCConverter {
                                             @NonNull final WebRTCRepository repository) {
         final String valueTag = repository.receivers.getValueTag(receiver.id());
         final List<String> streamIds = repository.getStreamIdsForReceiver(receiver);
-        if (streamIds == null) throw new IllegalStateException();
 
         final WritableArray streamIdsArray = Arguments.createArray();
-        for (final String streamId : streamIds) {
-            streamIdsArray.pushString(streamId);
+        if (streamIds != null) {
+            for (final String streamId : streamIds) {
+                streamIdsArray.pushString(streamId);
+            }
         }
 
         final WritableMap json = Arguments.createMap();
