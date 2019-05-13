@@ -7,6 +7,7 @@ import android.util.Pair;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.queue.ReactQueueConfiguration;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import org.webrtc.DataChannel;
@@ -53,13 +54,22 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     }
 
     /**
-     * Closes the PeerConnection managed by this observer, completely disposing it from everywhere.
+     * Closes the PeerConnection managed by this observer in response to the given callbacks.
+     *
+     * Important thing is PeerConenction.close() / PeerConenction.dispose() MUST NOT BE called
+     * in the same runloop of the PeerConnection.Observer callbacks, meaning we have to dispatch the close call asynchronously.
+     * https://bugs.chromium.org/p/webrtc/issues/detail?id=3721
+     * This behavior is even noted in the PeerConnection.close() documentation.
      */
     private void closeAndFinish() {
         if (peerConnectionPair != null) {
-            getModule().repository.removePeerConnectionByValueTag(peerConnectionPair.first);
-            peerConnectionPair.second.dispose();
+            final WebRTCModule module = getModule();
+            final ReactQueueConfiguration queueConfiguration = module.getReactContext().getCatalystInstance().getReactQueueConfiguration();
+            final String valueTag = peerConnectionPair.first;
             peerConnectionPair = null;
+            queueConfiguration.getNativeModulesQueueThread().runOnQueue(() -> {
+                module.peerConnectionClose(valueTag);
+            });
         }
     }
 

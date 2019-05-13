@@ -72,6 +72,9 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @NonNull
     final WebRTCRepository repository = new WebRTCRepository();
 
+    @NonNull public ReactApplicationContext getReactContext() {
+        return reactContext;
+    }
 
     public WebRTCModule(@NonNull final ReactApplicationContext reactContext) {
         super(reactContext);
