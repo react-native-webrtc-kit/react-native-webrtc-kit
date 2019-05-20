@@ -108,12 +108,12 @@ public class WebRTCVideoViewManager extends SimpleViewManager<WebRTCVideoView> {
         }
         final String valueTag = string(json, "_valueTag");
         if (valueTag == null) {
-            // XXX: このケースはUnexpected (videoTrackの指定がない), Exception吐いたほうがいいかも
             throw new IllegalStateException("track._valueTag is not defined");
         }
 
         final ThemedReactContext reactContext = view.getReactContext();
         final WebRTCModule module = reactContext.getNativeModule(WebRTCModule.class);
+        Log.d(getName(), module.repository.tracks.dump());
         final MediaStreamTrack track = module.repository.tracks.getByValueTag(valueTag);
         if (!(track instanceof VideoTrack)) {
             throw new IllegalStateException("VideoTrack with valueTag " + valueTag + " is not found");

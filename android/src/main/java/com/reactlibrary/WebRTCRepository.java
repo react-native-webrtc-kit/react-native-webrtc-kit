@@ -315,6 +315,21 @@ final class WebRTCRepository {
             valueTagToId.clear();
         }
 
+        /**
+         * このRepositoryが抱えているすべてのID - ValueTag - Valueペアをダンプして文字列にします。
+         */
+        String dump() {
+            final StringBuilder sb = new StringBuilder();
+            for (final String id : idMap.keySet()) {
+                final String valueTag = idToValueTag.get(id);
+                final V value = idMap.get(id);
+                final String valueString = value.toString();
+                sb.append(String.format(" * %s - %s - %s", id, valueTag, valueString));
+                sb.append('\n');
+            }
+            return sb.toString();
+        }
+
     }
 
 }
