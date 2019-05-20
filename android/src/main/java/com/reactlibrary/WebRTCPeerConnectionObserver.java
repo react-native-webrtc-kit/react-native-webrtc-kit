@@ -2,6 +2,7 @@ package com.reactlibrary;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.Pair;
 
 import com.facebook.react.bridge.Arguments;
@@ -55,7 +56,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
 
     /**
      * Closes the PeerConnection managed by this observer in response to the given callbacks.
-     *
+     * <p>
      * Important thing is PeerConenction.close() / PeerConenction.dispose() MUST NOT BE called
      * in the same runloop of the PeerConnection.Observer callbacks, meaning we have to dispatch the close call asynchronously.
      * https://bugs.chromium.org/p/webrtc/issues/detail?id=3721
@@ -63,6 +64,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
      */
     private void closeAndFinish() {
         if (peerConnectionPair != null) {
+            Log.d("WebRTCModule", "closeAndFinish()[" + peerConnectionPair.first + "]");
             final WebRTCModule module = getModule();
             final ReactQueueConfiguration queueConfiguration = module.getReactContext().getCatalystInstance().getReactQueueConfiguration();
             final String valueTag = peerConnectionPair.first;
@@ -78,6 +80,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     @Override
     public void onSignalingChange(@NonNull final PeerConnection.SignalingState newSignalingState) {
         if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onSignalingChange()[" + peerConnectionPair.first + "] - newSignalingState=" + newSignalingState);
         final WritableMap params = Arguments.createMap();
         params.putString("valueTag", peerConnectionPair.first);
         params.putString("signalingState", signalingStateStringValue(newSignalingState));
@@ -87,6 +90,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     @Override
     public void onIceConnectionChange(@NonNull final PeerConnection.IceConnectionState newIceConnectionState) {
         if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onIceConnectionChange()[" + peerConnectionPair.first + "] - newIceConnectionState=" + newIceConnectionState);
         final WritableMap params = Arguments.createMap();
         params.putString("valueTag", peerConnectionPair.first);
         params.putString("iceConnectionState", iceConnectionStateStringValue(newIceConnectionState));
@@ -119,6 +123,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     @Override
     public void onIceGatheringChange(PeerConnection.IceGatheringState iceGatheringState) {
         if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onIceGatheringChange()[" + peerConnectionPair.first + "] - iceGatheringState=" + iceGatheringState);
         final WritableMap params = Arguments.createMap();
         params.putString("valueTag", peerConnectionPair.first);
         params.putString("iceGatheringState", iceGatheringStateStringValue(iceGatheringState));
@@ -128,6 +133,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     @Override
     public void onIceCandidate(IceCandidate iceCandidate) {
         if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onIceCandidate()[" + peerConnectionPair.first + "] - iceCandidate=" + iceCandidate);
         final WritableMap candidate = Arguments.createMap();
         candidate.putString("candidate", iceCandidate.sdp);
         candidate.putInt("sdpMLineIndex", iceCandidate.sdpMLineIndex);
@@ -141,6 +147,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     @Override
     public void onIceCandidatesRemoved(IceCandidate[] iceCandidates) {
         if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onIceCandidatesRemoved()[" + peerConnectionPair.first + "]");
         peerConnectionPair.second.removeIceCandidates(iceCandidates);
         // JS側へのイベント通知は無し
     }
@@ -148,6 +155,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     @Override
     public void onAddStream(MediaStream mediaStream) {
         if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onAddStream()[" + peerConnectionPair.first + "] - mediaStream=" + mediaStream);
         final WebRTCModule module = getModule();
         module.repository.streams.add(mediaStream.getId(), module.createNewValueTag(), mediaStream);
 
@@ -167,6 +175,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     @Override
     public void onRemoveStream(MediaStream mediaStream) {
         if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onRemoveStream()[" + peerConnectionPair.first + "] - mediaStream=" + mediaStream);
         final WebRTCModule module = getModule();
         module.repository.streams.removeById(mediaStream.getId());
         // このstream管理下のtrackはrepositoryから削除しなくてもよい
@@ -180,6 +189,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     @Override
     public void onAddTrack(RtpReceiver receiver, MediaStream[] mediaStreams) {
         if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onAddTrack()[" + peerConnectionPair.first + "] - receiver=" + receiver);
         final WebRTCModule module = getModule();
         final Pair<String, RtpReceiver> receiverPair = new Pair<>(module.createNewValueTag(), receiver);
         module.repository.receivers.add(receiver.id(), module.createNewValueTag(), receiver);
@@ -223,6 +233,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
         [WebRTCValueManager removeValueTagForObject: transceiver];
          */
         if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onTrack()[" + peerConnectionPair.first + "] - transceiver=" + transceiver);
         final WebRTCModule module = getModule();
         module.repository.transceivers.add(transceiver.getMid(), module.createNewValueTag(), transceiver);
         final RtpSender sender = transceiver.getSender();
@@ -254,6 +265,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     @Override
     public void onRenegotiationNeeded() {
         if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onRenegotiationNeeded()[" + peerConnectionPair.first + "]");
         final WritableMap params = Arguments.createMap();
         params.putString("valueTag", peerConnectionPair.first);
         sendDeviceEvent("peerConnectionShouldNegotiate", params);
