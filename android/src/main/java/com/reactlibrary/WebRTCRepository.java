@@ -20,6 +20,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static com.reactlibrary.WebRTCConverter.mediaStreamTrackDump;
+import static com.reactlibrary.WebRTCConverter.rtpTransceiverDump;
+
 /**
  * WebRTCモジュールが使用するすべてのWebRTC関連のオブジェクト (PeerConnection, MediaStream, MediaStreamTrack等) を管理するリポジトリです。
  * TODO: 現状一切同期処理を行っていないので、複数スレッドから同時に触られると壊れる可能性が高い。同期ロックが必要かどうかを調べて必要であれば追加する。
@@ -319,11 +322,20 @@ final class WebRTCRepository {
          * このRepositoryが抱えているすべてのID - ValueTag - Valueペアをダンプして文字列にします。
          */
         String dump() {
-            final StringBuilder sb = new StringBuilder();
+            final StringBuilder sb = new StringBuilder(" * ID - ValueTag - Value\n");
             for (final String id : idMap.keySet()) {
                 final String valueTag = idToValueTag.get(id);
                 final V value = idMap.get(id);
-                final String valueString = value.toString();
+                final String valueString;
+                if (value instanceof MediaStreamTrack) {
+                    final MediaStreamTrack track = (MediaStreamTrack) value;
+                    valueString = mediaStreamTrackDump(track);
+                } else if (value instanceof RtpTransceiver) {
+                    final RtpTransceiver transceiver = (RtpTransceiver) value;
+                    valueString = rtpTransceiverDump(transceiver);
+                } else {
+                    valueString = value.toString();
+                }
                 sb.append(String.format(" * %s - %s - %s", id, valueTag, valueString));
                 sb.append('\n');
             }

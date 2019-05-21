@@ -113,7 +113,8 @@ public class WebRTCVideoViewManager extends SimpleViewManager<WebRTCVideoView> {
 
         final ThemedReactContext reactContext = view.getReactContext();
         final WebRTCModule module = reactContext.getNativeModule(WebRTCModule.class);
-        Log.d(getName(), module.repository.tracks.dump());
+        Log.d(getName(), "repository.tracks.dump()=\n" + module.repository.tracks.dump());
+        Log.d(getName(), "repository.transceiver.dump()=\n" + module.repository.transceivers.dump());
         final MediaStreamTrack track = module.repository.tracks.getByValueTag(valueTag);
         if (!(track instanceof VideoTrack)) {
             throw new IllegalStateException("VideoTrack with valueTag " + valueTag + " is not found");

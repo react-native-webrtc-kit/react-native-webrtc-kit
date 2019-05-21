@@ -146,6 +146,17 @@ final class WebRTCConverter {
         return json;
     }
 
+    @NonNull
+    static String rtpSenderDump(@NonNull final RtpSender sender) {
+        final MediaStreamTrack track = sender.track();
+        if (track == null) {
+            return "sender -> no track";
+        } else {
+            return String.format("sender -> %s",
+                    mediaStreamTrackDump(track));
+        }
+    }
+
     //endregion
 
     //region RtpReceiver
@@ -179,6 +190,17 @@ final class WebRTCConverter {
         return json;
     }
 
+    @NonNull
+    static String rtpReceiverDump(@NonNull final RtpReceiver receiver) {
+        final MediaStreamTrack track = receiver.track();
+        if (track == null) {
+            return "receiver -> no track";
+        } else {
+            return String.format("receiver -> %s",
+                    mediaStreamTrackDump(track));
+        }
+    }
+
     //endregion
 
     //region RtpTransceiver
@@ -196,6 +218,16 @@ final class WebRTCConverter {
             json.putString("valueTag", valueTag);
         }
         return json;
+    }
+
+    @NonNull
+    static String rtpTransceiverDump(@NonNull final RtpTransceiver transceiver) {
+        return String.format("%s, %s %b [%s] [%s]",
+                transceiver.getMediaType(),
+                rtpTransceiverDirectionStringValue(transceiver.getDirection()),
+                transceiver.isStopped(),
+                rtpReceiverDump(transceiver.getReceiver()),
+                rtpSenderDump(transceiver.getSender()));
     }
 
     //endregion
@@ -460,6 +492,14 @@ final class WebRTCConverter {
             json.putString("valueTag", valueTag);
         }
         return json;
+    }
+
+    @NonNull
+    static String mediaStreamTrackDump(@NonNull final MediaStreamTrack track) {
+        return String.format("%s (%s) %b",
+                track.kind(),
+                mediaStreamTrackStateStringValue(track.state()),
+                track.enabled());
     }
 
     //endregion
