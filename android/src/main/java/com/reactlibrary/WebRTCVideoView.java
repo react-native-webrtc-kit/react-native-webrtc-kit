@@ -63,9 +63,11 @@ public class WebRTCVideoView extends ViewGroup {
                             final int t,
                             final int r,
                             final int b) {
-        // Do nothing, currently the video content mode (fit/fill) is managed by `surfaceViewRenderer.setScalingType()`.
+        // Do nothing special, just MATCH_PARENT layouting
+        // currently the video content mode (fit/fill) is managed by `surfaceViewRenderer.setScalingType()`.
         // We don't have to manually calculate the size of the surfaceViewRenderer here. Just let it MATCH_PARENT/MATCH_PARENT.
         // XXX: そのうち修正しないとダメな可能性が高い、詳細はWebRTCVideoViewManager.objectFitのコメントを参照
+        surfaceViewRenderer.layout(l, t, r, b);
     }
 
 
