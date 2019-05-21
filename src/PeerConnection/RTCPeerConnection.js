@@ -220,9 +220,14 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
     logger.log("# signaling state => ", this.signalingState);
     logger.log("# ice connection state => ", this.iceConnectionState);
     logger.log("# ice gathering state => ", this.iceGatheringState);
+    // if (this.signalingState == 'stable' &&
+    //   this.iceConnectionState == 'connected' &&
+    //   this.iceGatheringState == 'complete') {
+    //   logger.log("# connection connected");
+    //   this._setConnectionState('connected');
+    // }
     if (this.signalingState == 'stable' &&
-      this.iceConnectionState == 'connected' &&
-      this.iceGatheringState == 'complete') {
+      this.iceConnectionState == 'connected') {
       logger.log("# connection connected");
       this._setConnectionState('connected');
     }
