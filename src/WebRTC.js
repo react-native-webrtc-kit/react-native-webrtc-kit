@@ -55,7 +55,7 @@ export default class WebRTC {
     return WebRTCModule.peerConnectionAddTrack(trackValueTag, streamIds, valueTag);
   }
 
-  static peerConnectionRemoveTrack(valueTag: ValueTag, senderValueTag: ValueTag) {
+  static peerConnectionRemoveTrack(valueTag: ValueTag, senderValueTag: ValueTag): Promise<void> {
     WebRTCModule.peerConnectionRemoveTrack(senderValueTag, valueTag);
   }
 
