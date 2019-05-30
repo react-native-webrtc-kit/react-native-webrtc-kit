@@ -205,49 +205,12 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
     this._registerEventsFromNative();
   }
 
-  /** @private
-   * connectionState の状態を変更します。
-   */
-  _beginConnect(): void {
-    this._setConnectionState('connecting');
-  }
-
-  /** @private
-   * peer connection の状態を判断します。
-   */
-  _updateConnectionState(): void {
-    logger.group("# update connection state");
-    logger.log("# signaling state => ", this.signalingState);
-    logger.log("# ice connection state => ", this.iceConnectionState);
-    logger.log("# ice gathering state => ", this.iceGatheringState);
-    if (this.signalingState == 'stable' &&
-      this.iceConnectionState == 'connected' &&
-      this.iceGatheringState == 'complete') {
-      logger.log("# connection connected");
-      this._setConnectionState('connected');
-    }
-    logger.groupEnd();
-  }
-
-  _setConnectionState(state: RTCPeerConnectionState): void {
-    logger.log("# set connection state => ", state);
-    this.connectionState = state;
-    this.dispatchEvent(new RTCEvent('connectionstatechange'));
-  }
-
   /**
    * 接続を解除します。
    * すべてのストリームの接続も閉じられます。
    */
   close(): void {
     logger.log("# connection close");
-    this._setConnectionState('closed');
-    this._finish();
-  }
-
-  _fail(): void {
-    logger.log("# connection fail");
-    this._setConnectionState('failed');
     this._finish();
   }
 
@@ -421,13 +384,25 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
         this.dispatchEvent(new RTCEvent('negotiationneeded'));
       }),
 
+      DeviceEventEmitter.addListener('peerConnectionConnectionStateChanged', ev => {
+        logger.log("# event: peerConnectionConnectionStateChanged =>", ev.connectionState);
+        if (ev.valueTag !== this._valueTag) {
+          return;
+        }
+        this.connectionState = ev.connectionState;
+        this.dispatchEvent(new RTCEvent('connectionstatechange'));
+        if (ev.connectionState === 'closed') {
+          // This PeerConnection is done, clean up event handlers.
+          this._unregisterEventsFromNative();
+        }
+      }),
+
       DeviceEventEmitter.addListener('peerConnectionIceConnectionChanged', ev => {
         logger.log("# event: peerConnectionIceConnectionChanged");
         if (ev.valueTag !== this._valueTag) {
           return;
         }
         this.iceConnectionState = ev.iceConnectionState;
-        this._updateConnectionState();
         this.dispatchEvent(new RTCEvent('iceconnectionstatechange'));
         if (ev.iceConnectionState === 'closed') {
           // This PeerConnection is done, clean up event handlers.
@@ -441,7 +416,6 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
           return;
         }
         this.signalingState = ev.signalingState;
-        this._updateConnectionState();
         this.dispatchEvent(new RTCEvent('signalingstatechange'));
       }),
 
@@ -496,7 +470,6 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
           return;
         }
         this.iceGatheringState = ev.iceGatheringState;
-        this._updateConnectionState();
         if (this.iceGatheringState === 'complete') {
           this.dispatchEvent(new RTCIceCandidateEvent('icecandidate'));
         }

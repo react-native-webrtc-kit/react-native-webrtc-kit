@@ -2,6 +2,24 @@
 
 @implementation WebRTCUtils
 
++ (NSString *)stringForPeerConnectionState:(RTCPeerConnectionState)state
+{
+    switch (state) {
+        case RTCPeerConnectionStateNew:
+            return @"new";
+        case RTCPeerConnectionStateConnecting:
+            return @"connecting";
+        case RTCPeerConnectionStateConnected:
+            return @"connected";
+        case RTCPeerConnectionStateDisconnected:
+            return @"disconnected";
+        case RTCPeerConnectionStateFailed:
+            return @"failed";
+        case RTCPeerConnectionStateClosed:
+            return @"closed";
+    }
+}
+
 + (NSString *)stringForICEConnectionState:(RTCIceConnectionState)state
 {
     switch (state) {

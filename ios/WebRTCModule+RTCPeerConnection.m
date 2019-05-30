@@ -308,66 +308,18 @@ static void *peerConnectionValueTagKey = "peerConnectionValueTag";
                              OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-static void *connectionStateKey = "connectionState";
-
-- (RTCPeerConnectionState)connectionState
-{
-    return (RTCPeerConnectionState)
-        [objc_getAssociatedObject(self, connectionStateKey)
-         unsignedIntegerValue];
-}
-
-- (void)setConnectionState:(RTCPeerConnectionState)newState
-{
-    objc_setAssociatedObject(self,
-                             connectionStateKey,
-                             [NSNumber numberWithUnsignedInteger: newState],
-                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
 - (void)closeAndFinish
 {
-    if (self.connectionState == RTCPeerConnectionStateDisconnecting ||
-        self.connectionState == RTCPeerConnectionStateDisconnected)
+    if (self.connectionState != RTCPeerConnectionStateConnected)
         return;
-    
-    // モジュールの管理から外す
-    [SharedModule removePeerConnectionForKey: self.valueTag];
-    
-    self.connectionState = RTCPeerConnectionStateDisconnecting;
-    
     [self close];
-
-    self.connectionState = RTCPeerConnectionStateDisconnected;
+    [self finish];
 }
 
-- (void)detectConnectionStateAndFinishWithModule:(WebRTCModule *)module
+- (void)finish
 {
-    RTCPeerConnectionState connState = [self connectionState];
-    RTCSignalingState sigState = [self signalingState];
-    RTCIceGatheringState iceGathState = [self iceGatheringState];
-    RTCIceConnectionState iceConnState = [self iceConnectionState];
-    
-    if (connState == RTCPeerConnectionStateDisconnected)
-        return;
-    
-    else if (sigState == RTCSignalingStateStable &&
-        iceGathState == RTCIceGatheringStateComplete &&
-        iceConnState == RTCIceConnectionStateCompleted) {
-        if (connState == RTCPeerConnectionStateNew ||
-            connState == RTCPeerConnectionStateConnecting) {
-            [self setConnectionState: RTCPeerConnectionStateConnected];
-        }
-        
-    } else if (sigState == RTCSignalingStateClosed ||
-                iceConnState == RTCIceConnectionStateClosed ||
-                iceConnState == RTCIceConnectionStateFailed) {
-        if (connState == RTCPeerConnectionStateDisconnecting ||
-            connState == RTCPeerConnectionStateConnected) {
-            [self setConnectionState: RTCPeerConnectionStateDisconnected];
-            [self closeAndFinish];
-        }
-    }
+    // モジュールの管理から外す
+    [SharedModule removePeerConnectionForKey: self.valueTag];
 }
 
 @end
@@ -420,7 +372,6 @@ RCT_EXPORT_METHOD(peerConnectionInit:(nonnull RTCConfiguration *)configuration
     [self.peerConnectionFactory peerConnectionWithConfiguration:configuration
                                                     constraints: mediaConsts
                                                        delegate: self];
-    peerConnection.connectionState = RTCPeerConnectionStateNew;
     peerConnection.valueTag = valueTag;
     [self addPeerConnection: peerConnection forKey: valueTag];
 }
@@ -548,12 +499,7 @@ RCT_EXPORT_METHOD(peerConnectionSetLocalDescription:(nonnull RTCSessionDescripti
     if (!peerConnection) {
         return;
     }
-    
-    // RTCPeerConnection に明示的な接続開始メソッドはないため、
-    // local/remote SDP が指定されたら接続開始と判断する
-    if (peerConnection.connectionState == RTCPeerConnectionStateNew)
-        peerConnection.connectionState = RTCPeerConnectionStateConnecting;
-    
+
     [peerConnection setLocalDescription:sdp
                       completionHandler: ^(NSError *error) {
                           if (error) {
@@ -574,11 +520,6 @@ RCT_EXPORT_METHOD(peerConnectionSetRemoteDescription:(nonnull RTCSessionDescript
     if (!peerConnection) {
         return;
     }
-    
-    // RTCPeerConnection に明示的な接続開始メソッドはないため、
-    // local/remote SDP が指定されたら接続開始と判断する
-    if (peerConnection.connectionState == RTCPeerConnectionStateNew)
-        peerConnection.connectionState = RTCPeerConnectionStateConnecting;
     
     [peerConnection setRemoteDescription:sdp
                        completionHandler: ^(NSError *error) {
@@ -614,10 +555,7 @@ RCT_EXPORT_METHOD(peerConnectionClose:(nonnull NSString *)valueTag)
         return;
     }
     
-    if (peerConnection.connectionState == RTCPeerConnectionStateConnecting ||
-         peerConnection.connectionState == RTCPeerConnectionStateConnected) {
-        [peerConnection closeAndFinish];
-    }
+    [peerConnection closeAndFinish];
 }
 
 // MARK: -rtpEncodingParametersSetActive:ssrc:ownerValueTag:
@@ -670,8 +608,18 @@ RCT_EXPORT_METHOD(rtpEncodingParametersSetMinBitrate:(nonnull NSNumber *)bitrate
 
 #pragma mark - RTCPeerConnectionDelegate
 
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+didChangeConnectionState:(RTCPeerConnectionState)newState
+{
+    if (newState == RTCPeerConnectionStateClosed)
+        [peerConnection finish];
+    
+    [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionConnectionStateChanged"
+                                                    body:@{@"valueTag": peerConnection.valueTag,
+                                                           @"connectionState": [WebRTCUtils stringForPeerConnectionState:newState]}];
+}
+
 - (void)peerConnection:(RTCPeerConnection *)peerConnection didChangeSignalingState:(RTCSignalingState)newState {
-    [peerConnection detectConnectionStateAndFinishWithModule: self];
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionSignalingStateChanged"
                                                     body:@{@"valueTag": peerConnection.valueTag,
                                                            @"signalingState": [WebRTCUtils stringForSignalingState:newState]}];
@@ -749,14 +697,12 @@ didStartReceivingOnTransceiver:(RTCRtpTransceiver *)transceiver
 }
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection didChangeIceConnectionState:(RTCIceConnectionState)newState {
-    [peerConnection detectConnectionStateAndFinishWithModule: self];
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionIceConnectionChanged"
                                                     body:@{@"valueTag": peerConnection.valueTag,
                                                            @"iceConnectionState": [WebRTCUtils stringForICEConnectionState:newState]}];
 }
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection didChangeIceGatheringState:(RTCIceGatheringState)newState {
-    [peerConnection detectConnectionStateAndFinishWithModule: self];
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionIceGatheringChanged"
                                                     body:@{@"valueTag": peerConnection.valueTag,
                                                            @"iceGatheringState": [WebRTCUtils stringForICEGatheringState:newState]}];
