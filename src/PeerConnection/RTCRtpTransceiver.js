@@ -1,10 +1,13 @@
 // @flow
 
+import { NativeModules } from 'react-native';
 import RTCRtpSender from './RTCRtpSender';
 import RTCRtpReceiver from './RTCRtpReceiver';
 import { nativeBoolean } from '../Util/RTCUtil';
-import WebRTC from '../WebRTC';
 import type { ValueTag } from './RTCPeerConnection';
+
+/** @private */
+const { WebRTCModule } = NativeModules;
 
 /**
  * {@link RTCRtpTransceiver} のトラックの送受信の方向を表します。
@@ -31,6 +34,26 @@ export type RTCRtpTransceiverDirection =
  * @since 1.1.0
  */
 export default class RTCRtpTransceiver {
+
+  /** @private */
+  static nativeDirection(valueTag: ValueTag): Promise<RTCRtpTransceiverDirection> {
+    return WebRTCModule.transceiverDirection(valueTag)
+  }
+
+  /** @private */
+  static nativeSetDirection(valueTag: ValueTag, value: RTCRtpTransceiverDirection) {
+    WebRTCModule.transceiverSetDirection(valueTag, value)
+  }
+
+  /** @private */
+  static nativeCurrentDirection(valueTag: ValueTag): Promise<RTCRtpTransceiverDirection> {
+    return WebRTCModule.transceiverCurrentDirection(valueTag)
+  }
+
+  /** @private */
+  static nativeStop(valueTag: ValueTag) {
+    WebRTCModule.transceiverStop(valueTag);
+  }
 
   /**
    * メディア ID
@@ -70,7 +93,7 @@ export default class RTCRtpTransceiver {
    * 一旦停止すると、送受信を再開することはできません。
    */
   stop() {
-    WebRTC.transceiverStop(this._valueTag);
+    RTCRtpTransceiver.nativeStop(this._valueTag);
     this.stopped = true;
   }
 
@@ -80,14 +103,14 @@ export default class RTCRtpTransceiver {
    * `RTCPeerConnection.createAnswer` の次回実行時に参照されます。
    */
   direction(): Promise<RTCRtpTransceiverDirection> {
-    return WebRTC.transceiverDirection(this._valueTag)
+    return RTCRtpTransceiver.nativeDirection(this._valueTag)
   }
 
   /**
    * トランシーバーのデータ送受信の方向を指定します。
    */
   setDirection(value: RTCRtpTransceiverDirection) {
-    WebRTC.transceiverSetDirection(this._valueTag, value)
+    RTCRtpTransceiver.nativeSetDirection(this._valueTag, value)
   }
 
   /**
@@ -95,7 +118,7 @@ export default class RTCRtpTransceiver {
    * このメソッドの実行時点で使用されている値を返します。
    */
   currentDirection(): Promise<RTCRtpTransceiverDirection> {
-    return WebRTC.transceiverCurrentDirection(this._valueTag);
+    return RTCRtpTransceiver.nativeCurrentDirection(this._valueTag);
   }
 
 }

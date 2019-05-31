@@ -1,6 +1,7 @@
 // @flow
 
 import { DeviceEventEmitter } from 'react-native';
+import { NativeModules } from 'react-native';
 
 import * as RTCUtil from '../Util/RTCUtil';
 import RTCMediaStream from '../MediaStream/RTCMediaStream';
@@ -16,6 +17,9 @@ import RTCRtpTransceiver from './RTCRtpTransceiver';
 import logger from '../Util/RTCLogger';
 import RTCMediaConstraints from './RTCMediaConstraints';
 import WebRTC from '../WebRTC';
+
+/** @private */
+const { WebRTCModule } = NativeModules;
 
 /**
  * @package
@@ -114,6 +118,72 @@ let nextPeerConnectionValueTag = 0;
  */
 export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
+  /** @private */
+  static nativeInit(valueTag: ValueTag,
+    configuration: RTCConfiguration,
+    constraints: RTCMediaConstraints) {
+    WebRTCModule.peerConnectionInit(
+      configuration.toJSON(), constraints.toJSON(), valueTag);
+  }
+
+  /** @private */
+  static nativeAddICECandidate(valueTag: ValueTag,
+    candidate: RTCIceCandidate): Promise<void> {
+    return WebRTCModule.peerConnectionAddICECandidate(candidate.toJSON(), valueTag);
+  }
+
+  /** @private */
+  static nativeAddTrack(valueTag: ValueTag,
+    trackValueTag: ValueTag,
+    streamIds: Array<String>,
+  ): Promise<Object> {
+    return WebRTCModule.peerConnectionAddTrack(trackValueTag, streamIds, valueTag);
+  }
+
+  /** @private */
+  static nativeRemoveTrack(valueTag: ValueTag, senderValueTag: ValueTag) {
+    WebRTCModule.peerConnectionRemoveTrack(senderValueTag, valueTag);
+  }
+
+  /** @private */
+  static nativeClose(valueTag: ValueTag) {
+    WebRTCModule.peerConnectionClose(valueTag);
+  }
+
+  /** @private */
+  static nativeCreateAnswer(valueTag: ValueTag,
+    constraints: RTCMediaConstraints): Promise<RTCSessionDescription> {
+    return WebRTCModule.peerConnectionCreateAnswer(valueTag, constraints.toJSON());
+  }
+
+  /** @private */
+  static nativeCreateOffer(valueTag: ValueTag,
+    constraints: RTCMediaConstraints): Promise<RTCSessionDescription> {
+    return WebRTCModule.peerConnectionCreateOffer(valueTag, constraints.toJSON());
+  }
+
+  /** @private */
+  static nativeRemoveStream(valueTag: ValueTag, streamValueTag: ValueTag) {
+    WebRTCModule.peerConnectionRemoveStream(streamValueTag, valueTag);
+  }
+
+  /** @private */
+  static nativeSetConfiguration(valueTag: ValueTag,
+    configuration: RTCConfiguration) {
+    WebRTCModule.peerConnectionSetConfiguration(configuration.toJSON(), valueTag);
+  }
+
+  /** @private */
+  static nativeSetLocalDescription(valueTag: ValueTag,
+    sdp: RTCSessionDescription): Promise<void> {
+    return WebRTCModule.peerConnectionSetLocalDescription(sdp.toJSON(), valueTag);
+  }
+
+  /** @private */
+  static nativeSetRemoteDescription(valueTag: ValueTag, sdp: RTCSessionDescription): Promise<void> {
+    return WebRTCModule.peerConnectionSetRemoteDescription(sdp.toJSON(), valueTag);
+  }
+
   /**
    * クライアントとの総合的な接続状態を表します。
    */
@@ -199,7 +269,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
     }
     this._valueTag = (nextPeerConnectionValueTag++).toString();
     this._constraints = constraints;
-    WebRTC.peerConnectionInit(this._valueTag,
+    RTCPeerConnection.nativeInit(this._valueTag,
       configuration,
       constraints);
     this._registerEventsFromNative();
@@ -217,7 +287,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   _finish(): void {
     logger.log("# connection finish");
     this.senders.forEach(sender => this.removeTrack(sender));
-    WebRTC.peerConnectionClose(this._valueTag);
+    RTCPeerConnection.nativeClose(this._valueTag);
   }
 
   /**
@@ -228,7 +298,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    */
   createAnswer(constraints: Object): Promise<RTCSessionDescription> {
     logger.log("# create answer");
-    return WebRTC.peerConnectionCreateAnswer(this._valueTag, constraints)
+    return RTCPeerConnection.nativeCreateAnswer(this._valueTag, constraints)
       .then(data => new RTCSessionDescription(data.type, data.sdp));
   }
 
@@ -240,7 +310,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    */
   createOffer(constraints: RTCMediaConstraints): Promise<RTCSessionDescription> {
     logger.log("# create offer");
-    return WebRTC.peerConnectionCreateOffer(this._valueTag, constraints)
+    return RTCPeerConnection.nativeCreateOffer(this._valueTag, constraints)
       .then(data => new RTCSessionDescription(data.type, data.sdp));
   }
 
@@ -251,7 +321,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * @return {Promise<Void>} 結果を示す Promise
    */
   addIceCandidate(candidate: RTCIceCandidate): Promise<void> {
-    return WebRTC.peerConnectionAddICECandidate(this._valueTag, candidate);
+    return RTCPeerConnection.nativeAddICECandidate(this._valueTag, candidate);
   }
 
   /**
@@ -310,7 +380,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    */
   addTrack(track: RTCMediaStreamTrack, streamIds: Array<String>): Promise<RTCRtpSender> {
     var streamValueTags = [];
-    return WebRTC.peerConnectionAddTrack(this._valueTag, track._valueTag, streamIds)
+    return RTCPeerConnection.nativeAddTrack(this._valueTag, track._valueTag, streamIds)
       .then((info) => {
         console.log("addTrack: sender => ", info);
         let sender = new RTCRtpSender(info);
@@ -329,7 +399,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   removeTrack(sender: RTCRtpSender) {
     this.senders = this.senders.filter(
       e => e.id != sender.id);
-    WebRTC.peerConnectionRemoveTrack(this._valueTag, sender._valueTag);
+    RTCPeerConnection.nativeRemoveTrack(this._valueTag, sender._valueTag);
   }
 
   /**
@@ -339,7 +409,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    */
   setConfiguration(configuration: RTCConfiguration): void {
     logger.log("# set configuration");
-    WebRTC.peerConnectionSetConfiguration(this._valueTag, configuration);
+    RTCPeerConnection.nativeSetConfiguration(this._valueTag, configuration);
   }
 
   /**
@@ -350,7 +420,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    */
   setLocalDescription(sessionDescription: RTCSessionDescription): Promise<void> {
     logger.log("# set local description");
-    return WebRTC.peerConnectionSetLocalDescription(
+    return RTCPeerConnection.nativeSetLocalDescription(
       this._valueTag, sessionDescription).then(() => {
         this.localDescription = sessionDescription;
         return;
@@ -365,7 +435,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    */
   setRemoteDescription(sessionDescription: RTCSessionDescription): Promise<void> {
     logger.log("# set remote description");
-    return WebRTC.peerConnectionSetRemoteDescription(
+    return RTCPeerConnection.nativeSetRemoteDescription(
       this._valueTag, sessionDescription)
       .then(() => {
         this.remoteDescription = sessionDescription;
