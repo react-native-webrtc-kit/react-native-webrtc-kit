@@ -3,7 +3,7 @@
 import { NativeModules } from 'react-native';
 import RTCMediaStreamTrackEventTarget from './RTCMediaStreamTrackEventTarget';
 import WebRTC from '../WebRTC';
-import aspectRatioValue from './RTCMediaStreamConstraints';
+import { aspectRatioValue } from './RTCMediaStreamConstraints';
 import type { RTCAspectRatio } from './RTCMediaStreamConstraints';
 import type { ValueTag } from '../PeerConnection/RTCPeerConnection';
 
