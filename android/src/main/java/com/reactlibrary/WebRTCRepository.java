@@ -25,7 +25,9 @@ import static com.reactlibrary.WebRTCConverter.rtpTransceiverDump;
 
 /**
  * WebRTCモジュールが使用するすべてのWebRTC関連のオブジェクト (PeerConnection, MediaStream, MediaStreamTrack等) を管理するリポジトリです。
- * TODO: 現状一切同期処理を行っていないので、複数スレッドから同時に触られると壊れる可能性が高い。同期ロックが必要かどうかを調べて必要であれば追加する。
+ *
+ * XXX: 現状一切同期処理を行っていないので、複数スレッドから同時に触られると壊れる可能性が高いです。
+ *      同期ロックが必要になった場合追加してください。
  */
 final class WebRTCRepository {
 

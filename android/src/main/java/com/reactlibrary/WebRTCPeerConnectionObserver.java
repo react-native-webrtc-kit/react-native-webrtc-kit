@@ -180,10 +180,6 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
         module.repository.streams.removeById(mediaStream.getId());
         // このstream管理下のtrackはrepositoryから削除しなくてもよい
         // trackも削除したい場合は利用者側で明示的にremoveTrack()する仕様となっている
-
-        // TODO: onRemoveTrack()に相当するコールバックがAndroid実装にないので、代わりと言っては何だがここでonRemoveTrackに相当するイベントをJS側に投げてみたらどうか？
-        //       > なので、1track が 多くとも1stream という制限であれば native/Java の onRemoveStream から JS の onRemoveTrack よべばいいのかなぁと。
-        //       確かに合理的な気がする
     }
 
     @Override
@@ -205,23 +201,12 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
         sendDeviceEvent("peerConnectionAddedReceiver", params);
     }
 
-    // TODO: rtpReceiverがremoveされたタイミングで呼び出されるobserverが現状存在しない。
+    // TODO: rtpReceiverがremoveされたタイミングで呼び出されるobserverが現状存在しないため未実装になっている
     //       別口で調べてみたところ以下のコメントを見つけた
     //       > (shino): Unified plan に onRemoveTrack が来たらこっち = void onTrack(RtpTransceiver transceiver) で対応する。
     //       > 今は SDP semantics に関わらず onAddStream/onRemoveStream でシグナリングに通知している
-    //       とのこと、やはり何か実装が足りていない様子。一旦フローと各callbackの呼び出しタイミングを整理する。
-    //       ちなみにiOS側のonRemoveTrackに相当する実装は以下の通り
-    /*
-    if (rtpReceiver.valueTag != nil) {
-        [self removeReceiverForKey: rtpReceiver.valueTag];
-        [WebRTCValueManager removeValueTagForString: rtpReceiver.receiverId];
-    }
-
-    [self.bridge.eventDispatcher
-     sendDeviceEventWithName: @"peerConnectionRemoveReceiver"
-     body:@{@"valueTag": peerConnection.valueTag,
-            @"receiver": [rtpReceiver json]}];
-     */
+    //       現在libwebrtcのAndroid側実装にonRemoveTrackが存在しないため上記の様なワークアラウンドをするしかないようだが、
+    //       Streamに複数Trackが追加されている場合、onRemoveStreamを経由しないため、やはりすべてのケースには対応できない
 
     @Override
     public void onTrack(RtpTransceiver transceiver) {

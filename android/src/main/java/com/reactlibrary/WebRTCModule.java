@@ -381,7 +381,10 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
             throw new IllegalStateException("createPeerConnection failed");
         }
         final Pair<String, PeerConnection> peerConnectionPair = new Pair<>(valueTag, peerConnection);
-        // TODO: observerもrepositoryに保存するようにして、close時に明示的にかつ確実に破棄するようにする。
+        // observerもrepositoryに保存するようにして、close時に明示的にかつ確実に破棄するようにしたほうが良いかもしれないが、
+        // Java側で明示的に破棄してもしなくても結局はlibwebrtcのobserverのラッパーでしかないため、
+        // libwebrtc側できちんと破棄されればJava側もそのうち適切にGCされて消えることがわかったので、
+        // ひとまずこの状態で大丈夫
         observer.peerConnectionPair = peerConnectionPair;
         repository.addPeerConnection(peerConnectionPair);
     }
