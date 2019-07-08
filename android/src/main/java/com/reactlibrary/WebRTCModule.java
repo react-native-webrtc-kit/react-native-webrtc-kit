@@ -312,7 +312,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         Log.d(getName(), "transceiverDirection()");
         final RtpTransceiver transceiver = repository.transceivers.getByValueTag(valueTag);
         if (transceiver == null) {
-            promise.reject("NotFoundError", "transceiver is not found", null);
+            promise.reject("NotFoundError", "transceiver is not found", (Throwable) null);
             return;
         }
         promise.resolve(rtpTransceiverDirectionStringValue(transceiver.getDirection()));
@@ -326,7 +326,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         Log.d(getName(), "transceiverSetDirection()");
         final RtpTransceiver transceiver = repository.transceivers.getByValueTag(valueTag);
         if (transceiver == null) {
-            promise.reject("NotFoundError", "transceiver is not found", null);
+            promise.reject("NotFoundError", "transceiver is not found", (Throwable) null);
             return;
         }
         transceiver.setDirection(rtpTransceiverDirection(value));
@@ -341,7 +341,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         Log.d(getName(), "transceiverCurrentDirection()");
         final RtpTransceiver transceiver = repository.transceivers.getByValueTag(valueTag);
         if (transceiver == null) {
-            promise.reject("NotFoundError", "transceiver is not found", null);
+            promise.reject("NotFoundError", "transceiver is not found", (Throwable) null);
             return;
         }
         final RtpTransceiver.RtpTransceiverDirection currentDirection = transceiver.getCurrentDirection();
@@ -360,7 +360,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         Log.d(getName(), "transceiverStop()");
         final RtpTransceiver transceiver = repository.transceivers.getByValueTag(valueTag);
         if (transceiver == null) {
-            promise.reject("NotFoundError", "transceiver is not found", null);
+            promise.reject("NotFoundError", "transceiver is not found", (Throwable) null);
             return;
         }
         transceiver.stop();
