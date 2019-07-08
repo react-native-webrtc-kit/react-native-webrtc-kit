@@ -368,10 +368,14 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * 
    * @since 1.1.0
    */
-  removeTrack(sender: RTCRtpSender) {
+  removeTrack(sender: RTCRtpSender): Promise<void> {
     this.senders = this.senders.filter(
       e => e.id != sender.id);
-    WebRTC.peerConnectionRemoveTrack(this._valueTag, sender._valueTag);
+    return WebRTC.peerConnectionRemoveTrack(this._valueTag, sender._valueTag)
+      .then(() => {
+        console.log("removeTrack: sender => ", sender);
+        return;
+      });
   }
 
   /**
