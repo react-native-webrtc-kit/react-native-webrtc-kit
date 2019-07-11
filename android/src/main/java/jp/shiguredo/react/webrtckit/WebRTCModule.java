@@ -1,4 +1,3 @@
-
 package jp.shiguredo.react.webrtckit;
 
 import androidx.annotation.Nullable;
@@ -15,6 +14,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.module.annotations.ReactModule;
 
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
@@ -54,6 +54,7 @@ import static jp.shiguredo.react.webrtckit.WebRTCConverter.rtpTransceiverDirecti
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.sessionDescription;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.toStringList;
 
+@ReactModule(name = "WebRTCModule")
 public class WebRTCModule extends ReactContextBaseJavaModule {
 
     @NonNull
