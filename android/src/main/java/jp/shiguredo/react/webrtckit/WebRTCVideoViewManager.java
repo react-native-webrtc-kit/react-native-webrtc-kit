@@ -39,12 +39,15 @@ public class WebRTCVideoViewManager extends SimpleViewManager<WebRTCVideoView> {
         view.release();
     }
 
+    /*
+     XXX:とりあえずコメントアウト
     @Override
     public void onCatalystInstanceDestroy() {
         // 本メソッドは何をやってもどのようなタイミングでも一切呼び出されません
         // 本メソッドは使えないということを明示的に知らしめるためだけに実装してあります
         super.onCatalystInstanceDestroy();
     }
+    */
 
     //region ReactProp
 
