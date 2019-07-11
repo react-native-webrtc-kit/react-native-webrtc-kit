@@ -3,7 +3,7 @@ package com.touchstone;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.reactlibrary.WebRTCModulePackage;
+import jp.shiguredo.react.webrtckit.WebRTCModulePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;

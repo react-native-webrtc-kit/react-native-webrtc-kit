@@ -1,4 +1,4 @@
-package com.reactlibrary;
+package jp.shiguredo.react.webrtckit;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,7 +14,7 @@ import org.webrtc.VideoTrack;
 
 import java.util.NoSuchElementException;
 
-import static com.reactlibrary.Readables.string;
+import static jp.shiguredo.react.webrtckit.Readables.string;
 import static org.webrtc.RendererCommon.ScalingType.SCALE_ASPECT_FILL;
 import static org.webrtc.RendererCommon.ScalingType.SCALE_ASPECT_FIT;
 

@@ -1,4 +1,4 @@
-package com.reactlibrary;
+package jp.shiguredo.react.webrtckit;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,8 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static com.reactlibrary.WebRTCConverter.mediaStreamTrackDump;
-import static com.reactlibrary.WebRTCConverter.rtpTransceiverDump;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.mediaStreamTrackDump;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.rtpTransceiverDump;
 
 /**
  * WebRTCモジュールが使用するすべてのWebRTC関連のオブジェクト (PeerConnection, MediaStream, MediaStreamTrack等) を管理するリポジトリです。

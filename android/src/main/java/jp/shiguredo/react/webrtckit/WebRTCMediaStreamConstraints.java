@@ -1,15 +1,15 @@
-package com.reactlibrary;
+package jp.shiguredo.react.webrtckit;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableMap;
 
-import static com.reactlibrary.Readables.isTruthy;
-import static com.reactlibrary.Readables.jdouble;
-import static com.reactlibrary.Readables.jint;
-import static com.reactlibrary.Readables.map;
-import static com.reactlibrary.Readables.string;
+import static jp.shiguredo.react.webrtckit.Readables.isTruthy;
+import static jp.shiguredo.react.webrtckit.Readables.jdouble;
+import static jp.shiguredo.react.webrtckit.Readables.jint;
+import static jp.shiguredo.react.webrtckit.Readables.map;
+import static jp.shiguredo.react.webrtckit.Readables.string;
 
 final class WebRTCMediaStreamConstraints {
 

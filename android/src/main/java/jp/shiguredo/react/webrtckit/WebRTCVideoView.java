@@ -1,4 +1,4 @@
-package com.reactlibrary;
+package jp.shiguredo.react.webrtckit;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

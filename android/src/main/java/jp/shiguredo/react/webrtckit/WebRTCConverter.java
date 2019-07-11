@@ -1,4 +1,4 @@
-package com.reactlibrary;
+package jp.shiguredo.react.webrtckit;
 
 import android.support.annotation.NonNull;
 
@@ -25,13 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.reactlibrary.Readables.array;
-import static com.reactlibrary.Readables.booleans;
-import static com.reactlibrary.Readables.doubles;
-import static com.reactlibrary.Readables.jint;
-import static com.reactlibrary.Readables.map;
-import static com.reactlibrary.Readables.string;
-import static com.reactlibrary.Readables.type;
+import static jp.shiguredo.react.webrtckit.Readables.array;
+import static jp.shiguredo.react.webrtckit.Readables.booleans;
+import static jp.shiguredo.react.webrtckit.Readables.doubles;
+import static jp.shiguredo.react.webrtckit.Readables.jint;
+import static jp.shiguredo.react.webrtckit.Readables.map;
+import static jp.shiguredo.react.webrtckit.Readables.string;
+import static jp.shiguredo.react.webrtckit.Readables.type;
 
 final class WebRTCConverter {
 

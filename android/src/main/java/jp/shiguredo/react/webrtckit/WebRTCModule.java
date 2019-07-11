@@ -1,5 +1,5 @@
 
-package com.reactlibrary;
+package jp.shiguredo.react.webrtckit;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -44,15 +44,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.reactlibrary.WebRTCConverter.iceCandidate;
-import static com.reactlibrary.WebRTCConverter.mediaConstraints;
-import static com.reactlibrary.WebRTCConverter.mediaStreamTrackJsonValue;
-import static com.reactlibrary.WebRTCConverter.rtcConfiguration;
-import static com.reactlibrary.WebRTCConverter.rtpSenderJsonValue;
-import static com.reactlibrary.WebRTCConverter.rtpTransceiverDirection;
-import static com.reactlibrary.WebRTCConverter.rtpTransceiverDirectionStringValue;
-import static com.reactlibrary.WebRTCConverter.sessionDescription;
-import static com.reactlibrary.WebRTCConverter.toStringList;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.iceCandidate;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.mediaConstraints;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.mediaStreamTrackJsonValue;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.rtcConfiguration;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.rtpSenderJsonValue;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.rtpTransceiverDirection;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.rtpTransceiverDirectionStringValue;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.sessionDescription;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.toStringList;
 
 public class WebRTCModule extends ReactContextBaseJavaModule {
 

@@ -1,4 +1,4 @@
-package com.reactlibrary;
+package jp.shiguredo.react.webrtckit;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,11 +20,11 @@ import org.webrtc.RtpReceiver;
 import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
 
-import static com.reactlibrary.WebRTCConverter.iceConnectionStateStringValue;
-import static com.reactlibrary.WebRTCConverter.iceGatheringStateStringValue;
-import static com.reactlibrary.WebRTCConverter.rtpReceiverJsonValue;
-import static com.reactlibrary.WebRTCConverter.rtpTransceiverJsonValue;
-import static com.reactlibrary.WebRTCConverter.signalingStateStringValue;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.iceConnectionStateStringValue;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.iceGatheringStateStringValue;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.rtpReceiverJsonValue;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.rtpTransceiverJsonValue;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.signalingStateStringValue;
 
 final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
 
