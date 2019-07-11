@@ -42,5 +42,6 @@ repositories {
 dependencies {
     api "com.facebook.react:react-native:+"
     api "com.github.shiguredo:sora-webrtc-android:75.16.0"
+    implementation "androidx.annotation:annotation:1.1.0"
 }
   

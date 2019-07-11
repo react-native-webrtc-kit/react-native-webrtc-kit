@@ -1,6 +1,6 @@
 package jp.shiguredo.react.webrtckit;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.webrtc.CameraEnumerationAndroid;
 

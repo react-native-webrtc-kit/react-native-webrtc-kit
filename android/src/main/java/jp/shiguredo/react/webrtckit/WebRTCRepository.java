@@ -1,7 +1,7 @@
 package jp.shiguredo.react.webrtckit;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import android.util.Pair;
 
 import org.webrtc.MediaStream;
