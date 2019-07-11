@@ -234,7 +234,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
             module.repository.tracks.add(receiverTrack.id(), module.createNewValueTag(), receiverTrack);
         }
         // XXX: 本来であればここで sender.streams() や receiver.streams() を使ってstreamIdsを取得し、repository.setStreamIds(...)とする必要がある
-        //      しかしながら現在libwebrtcに sender.streams() や receiver.streams() の実装がないため実現不能、fxxk
+        //      しかしながら現在libwebrtcに sender.streams() や receiver.streams() の実装がないため実現不能
 
         final WritableMap params = Arguments.createMap();
         params.putString("valueTag", peerConnectionPair.first);
