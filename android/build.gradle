@@ -1,3 +1,10 @@
+apply plugin: 'com.android.library'
+
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+
 
 buildscript {
     repositories {
@@ -5,22 +12,16 @@ buildscript {
         google()
         maven { url 'https://jitpack.io' }
     }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
-    }
 }
 
-apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.3"
+    compileSdkVersion safeExtGet('compileSdkVersion', 23)
+    buildToolsVersion safeExtGet('buildToolsVersion', "23.0.1")
 
     defaultConfig {
-        minSdkVersion 16
-        compileSdkVersion 26
-        targetSdkVersion 26
+        minSdkVersion safeExtGet('minSdkVersion', 16)
+        targetSdkVersion safeExtGet('targetSdkVersion', 23)
         versionCode 1
         versionName "1.0"
     }
@@ -41,7 +42,8 @@ repositories {
 }
 
 dependencies {
-    api 'com.facebook.react:react-native:+'
-    api "com.github.shiguredo:sora-webrtc-android:66.8.1.1"
+    implementation 'com.facebook.react:react-native:+'
+    api "com.github.shiguredo:sora-webrtc-android:75.16.0"
+    implementation "androidx.annotation:annotation:1.1.0"
 }
   
