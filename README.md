@@ -87,7 +87,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
     - Android OS Version
 
 
-# ライセンス
+## ライセンス
 
 ```
 Copyright 2018-2019, Shiguredo Inc. and Masashi Ono (akisute) and Kyoko Kadowaki (kdxu)
