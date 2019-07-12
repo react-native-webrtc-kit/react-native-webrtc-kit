@@ -50,7 +50,14 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ### Android アプリケーションの開発
 
-現在、本ライブラリは Android アプリケーションの開発に対応していません。2019 年の夏頃リリースに向けて準備中です。
+- Android SDK Version 16 以降
+- Android Buld Tools Version 28.0.3
+
+また、以下の機能について、Android は未対応です。
+
+- オーディオポートの切り替え/取得機能 (getAudioPort, setAudioPort)
+- トラックの削除イベント検知機能 (onRemoveTrack)
+
 
 ## WebRTC ライブラリについて
 
@@ -74,6 +81,14 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
   - Xcode
 
   - iOS
+
+- Android
+  - Android SDK Version
+
+  - Android Build Tools Version
+
+  - Android OS Version
+
 
 # Copyright
 
