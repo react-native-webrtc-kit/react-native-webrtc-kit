@@ -84,6 +84,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
   - iOS
 
 - Android
+
   - Android SDK Version
 
   - Android Build Tools Version
