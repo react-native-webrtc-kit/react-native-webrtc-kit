@@ -51,6 +51,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 ### Android アプリケーションの開発
 
 - Android SDK Version 16 以降
+- Android API Level 23 以降
 - Android Buld Tools Version 28.0.3
 
 また、以下の機能について、Android は未対応です。
@@ -92,4 +93,4 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 # Copyright
 
-Copyright 2018-2019, Shiguredo Inc. and Masashi Ono (akisute)
+Copyright 2018-2019, Shiguredo Inc. and Masashi Ono (akisute) and Kyoko Kadowaki (kdxu)
