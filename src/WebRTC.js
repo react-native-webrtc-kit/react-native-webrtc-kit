@@ -16,5 +16,4 @@ export default class WebRTC {
   static finishLoading() {
     WebRTCModule.finishLoading();
   }
-
 }
