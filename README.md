@@ -59,15 +59,17 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 - オーディオポートの切り替え/取得機能 (getAudioPort, setAudioPort)
 - トラックの削除イベント検知機能 (onRemoveTrack)
 
-
 ## WebRTC ライブラリについて
 
-本ライブラリは WebRTC M70 に対応しています。
+本ライブラリは WebRTC M75 に対応しています。
 
-本ライブラリが利用する WebRTC ライブラリは、デフォルトの設定では弊社がビルドしたバイナリを指定しています (https://github.com/shiguredo/sora-webrtc-ios) 。
+本ライブラリが利用する WebRTC ライブラリは、デフォルトの設定では弊社がビルドしたバイナリを指定しています。
 このバイナリは弊社製品用の設定でビルドしてあるので、他のバイナリを使いたい場合は次の方法で入れ替えてください。
 
 - iOS: ビルドした `WebRTC.framework` を `ios/Pods/WebRTC/WebRTC.framework` と入れ替えます。
+    - https://github.com/shiguredo/sora-webrtc-ios
+- Android: ビルドした `libwebrtc.aar` を と入れ替えます。
+    - https://github.com/shiguredo/sora-webrtc-android
 
 ## Issues について
 
@@ -75,17 +77,14 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 これらの開発環境はメンテナンスバージョンの違いでも Sora iOS SDK の挙動が変わる可能性があります。
 
 - React Native WebRTC Kit
-
 - iOS
     - Mac OS X
     - Xcode
     - iOS
-
 - Android
     - Android SDK Version
     - Android Build Tools Version
     - Android OS Version
-
 
 ## ライセンス
 
