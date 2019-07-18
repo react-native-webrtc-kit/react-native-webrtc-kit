@@ -9,6 +9,11 @@
 - FIX
     - バグ修正
 
+## develop
+
+- [ADD] Android 対応
+- [UPDATE] iOS 向け libwebrtc M76 対応
+
 ## 2.1.2
 
 - [FIX] VideoView の使用時にトラックを追加または削除するとアプリケーションがクラッシュする現象を修正した
