@@ -402,6 +402,25 @@ final class WebRTCConverter {
 
 
     //region PeerConnection.PeerConnectionState
+    @NonNull
+    static String peerConnectionStateStringValue(@NonNull final PeerConnection.PeerConnectionState connectionState) {
+        switch (connectionState) {
+            case NEW:
+                return "new";
+            case CONNECTING:
+                return "connecting";
+            case CONNECTED:
+                return "connected";
+            case FAILED:
+                return "failed";
+            case DISCONNECTED:
+                return "disconnected";
+            case CLOSED:
+                return "closed";
+            default:
+                throw new IllegalArgumentException("invalid peerConnectionState");
+        }
+    }
     //endregion
 
 

@@ -20,6 +20,7 @@ import org.webrtc.RtpReceiver;
 import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
 
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.peerConnectionStateStringValue;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.iceConnectionStateStringValue;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.iceGatheringStateStringValue;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.rtpReceiverJsonValue;
@@ -85,6 +86,16 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
         params.putString("valueTag", peerConnectionPair.first);
         params.putString("signalingState", signalingStateStringValue(newSignalingState));
         sendDeviceEvent("peerConnectionSignalingStateChanged", params);
+    }
+
+    @Override
+    public  void onConnectionChange(@NonNull final PeerConnection.PeerConnectionState newState) {
+        if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onConnectionChange()[" + peerConnectionPair.first + "] - newState=" + newState);
+        final WritableMap params = Arguments.createMap();
+        params.putString("valueTag", peerConnectionPair.first);
+        params.putString("connectionState", peerConnectionStateStringValue(newState));
+        sendDeviceEvent("peerConnectionConnectionStateChanged", params);
     }
 
     @Override
