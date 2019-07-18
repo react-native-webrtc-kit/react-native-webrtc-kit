@@ -91,7 +91,7 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     @Override
     public  void onConnectionChange(@NonNull final PeerConnection.PeerConnectionState newState) {
         if (peerConnectionPair == null) return;
-        Log.d("WebRTCModule", "onConnectionChange()[" + peerConnectionPair.first + "] - neState=" + newState);
+        Log.d("WebRTCModule", "onConnectionChange()[" + peerConnectionPair.first + "] - newState=" + newState);
         final WritableMap params = Arguments.createMap();
         params.putString("valueTag", peerConnectionPair.first);
         params.putString("connectionState", peerConnectionStateStringValue(newState));
