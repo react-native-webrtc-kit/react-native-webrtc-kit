@@ -143,7 +143,7 @@ static const char *streamIdsKey = "streamIds";
 - (id)json
 {
     // RTCRtpSender/Receiver の track プロパティは
-    // RTCMediaStreamTrcak を動的に生成するので、
+    // RTCMediaStreamTrack を動的に生成するので、
     // 新しい value tag を割り当てる
     RTCMediaStreamTrack *track = self.track;
     if (track) {
@@ -682,9 +682,11 @@ didChangeConnectionState:(RTCPeerConnectionState)newState
 didStartReceivingOnTransceiver:(RTCRtpTransceiver *)transceiver
 {
     transceiver.valueTag = [self createNewValueTag];
-    [self removeTransceiverForKey: transceiver.valueTag];
-    [WebRTCValueManager removeValueTagForObject: transceiver];
-    
+    transceiver.receiver.valueTag = [self createNewValueTag];
+    transceiver.sender.valueTag = [self createNewValueTag];
+    [self addTransceiver:transceiver forKey:transceiver.valueTag];
+    [self addSender:transceiver.sender forKey:transceiver.sender.valueTag];
+    [self addReceiver: transceiver.receiver forKey: transceiver.receiver.valueTag];
     [self.bridge.eventDispatcher
      sendDeviceEventWithName: @"peerConnectionStartTransceiver"
      body:@{@"valueTag": peerConnection.valueTag,

@@ -221,13 +221,6 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
 
     @Override
     public void onTrack(RtpTransceiver transceiver) {
-        // XXX: iOS側のSDKだと何故かここで以下のようにtransceiverを削除しているが、絶対におかしい、ここは追加するタイミングのはず
-        //      恐らくiOS側が間違っていると判断する
-        /*
-        transceiver.valueTag = [self createNewValueTag];
-        [self removeTransceiverForKey: transceiver.valueTag];
-        [WebRTCValueManager removeValueTagForObject: transceiver];
-         */
         if (peerConnectionPair == null) return;
         Log.d("WebRTCModule", "onTrack()[" + peerConnectionPair.first + "] - transceiver=" + transceiver);
         final WebRTCModule module = getModule();
