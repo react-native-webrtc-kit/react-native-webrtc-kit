@@ -5,7 +5,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface WebRTCVideoView () <RTCEAGLVideoViewDelegate>
+@interface WebRTCVideoView () <RTCVideoViewDelegate>
 
 /**
  * -[RTCVideoTrack addRenderer:] がレンダラーを強参照するので、
@@ -115,7 +115,7 @@ NS_ASSUME_NONNULL_BEGIN
     [self.videoView renderFrame:frame];
 }
 
-#pragma mark - RTCEAGLVideoViewDelegate
+#pragma mark - RTCVideoViewDelegate
 
 - (void)videoView:(RTCEAGLVideoView *)videoView didChangeVideoSize:(CGSize)size {
     self.videoSize = size;

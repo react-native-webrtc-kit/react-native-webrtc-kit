@@ -1,6 +1,8 @@
-import { Platform } from 'react-native';
-import WebRTC from '../WebRTC';
+import { NativeModules, Platform } from 'react-native';
 import logger from '../Util/RTCLogger';
+
+/** @private */
+const { WebRTCModule } = NativeModules;
 
 /**
  * Audio Port の種別です。
@@ -16,6 +18,16 @@ export type RTCAudioPort =
   | 'speaker'
   | 'unknown'
 
+/** @private */
+function nativeGetAudioPort(): Promise<RTCAudioPort> {
+  return WebRTCModule.getAudioPort();
+}
+
+/** @private */
+function nativeSetAudioPort(port: RTCAudioPort): Promise<void> {
+  return WebRTCModule.setAudioPort(port);
+}
+
 /**
  * 音声の出力元を取得します。(iOS のみ)
  * 
@@ -27,7 +39,7 @@ export function getAudioPort(): Promise<RTCAudioPort> {
   // Android は未実装
   // TODO(kdxu): Android のオーディオポート取得機能を入れる
   if (Platform.OS === 'ios') {
-    return WebRTC.getAudioPort();
+    return nativeGetAudioPort();
   } else {
     logger.warn("# getAudioPort() does not support Android ");
   }
@@ -46,7 +58,7 @@ export function setAudioPort(port: RTCAudioPort): Promise<void> {
   // TODO(kdxu): Android のオーディオポート取得機能を入れる
   if (Platform.OS === 'ios') {
     logger.log("# audio route change => ", port);
-    return WebRTC.setAudioPort(port);
+    return nativeSetAudioPort(port);
   } else {
     logger.warn("# setAudioPort() does not support Android ");
   }

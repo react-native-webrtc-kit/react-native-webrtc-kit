@@ -3,6 +3,7 @@
 
 @interface WebRTCUtils : NSObject
 
++ (NSString *)stringForPeerConnectionState:(RTCPeerConnectionState)state;
 + (NSString *)stringForICEConnectionState:(RTCIceConnectionState)state;
 + (NSString *)stringForICEGatheringState:(RTCIceGatheringState)state;
 + (NSString *)stringForSignalingState:(RTCSignalingState)state;

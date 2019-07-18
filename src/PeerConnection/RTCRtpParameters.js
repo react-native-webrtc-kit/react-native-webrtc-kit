@@ -1,7 +1,10 @@
 // @flow
 
-import WebRTC from '../WebRTC';
+import { NativeModules } from 'react-native';
 import type { ValueTag } from './RTCPeerConnection';
+
+/** @private */
+const { WebRTCModule } = NativeModules;
 
 /**
  * RTCP に関するパラメーターです。
@@ -77,6 +80,27 @@ export class RTCRtpHeaderExtensionParameters {
  */
 export class RTCRtpEncodingParameters {
 
+  /** @private */
+  static nativeSetActive(owner: ValueTag, ssrc: number | null, flag: boolean) {
+    WebRTCModule.rtpEncodingParametersSetActive(flag, ssrc, owner);
+  }
+
+  /** @private */
+  static nativeSetMaxBitrate(owner: ValueTag, ssrc: number | null, value: number | null) {
+    if (value == null) {
+      value = -1;
+    }
+    WebRTCModule.rtpEncodingParametersSetMaxBitrate(value, ssrc, owner);
+  }
+
+  /** @private */
+  static nativeSetMinBitrate(owner: ValueTag, ssrc: number | null, value: number | null) {
+    if (value == null) {
+      value = -1;
+    }
+    WebRTCModule.rtpEncodingParametersSetMinBitrate(value, ssrc, owner);
+  }
+
   _active: boolean;
   _maxBitrate: number | null;
   _minBitrate: number | null;
@@ -97,7 +121,7 @@ export class RTCRtpEncodingParameters {
    */
   set active(flag: boolean) {
     this._active = flag;
-    WebRTC.rtpEncodingParametersSetActive(this._owner, this.ssrc, flag);
+    RTCRtpEncodingParameters.nativeSetActive(this._owner, this.ssrc, flag);
   }
 
   /**
@@ -116,7 +140,7 @@ export class RTCRtpEncodingParameters {
    */
   set maxBitrate(value: number | null) {
     this._maxBitrate = value;
-    WebRTC.rtpEncodingParametersSetMaxBitrate(this._owner, this.ssrc, value);
+    RTCRtpEncodingParameters.nativeSetMaxBitrate(this._owner, this.ssrc, value);
   }
 
   /**
@@ -135,7 +159,7 @@ export class RTCRtpEncodingParameters {
    */
   set minBitrate(value: number | null) {
     this._minBitrate = value;
-    WebRTC.rtpEncodingParametersSetMinBitrate(this._owner, this.ssrc, value);
+    RTCRtpEncodingParameters.nativeSetMinBitrate(this._owner, this.ssrc, value);
   }
 
   /**

@@ -3,9 +3,12 @@
 import { NativeModules } from 'react-native';
 import RTCMediaStreamTrackEventTarget from './RTCMediaStreamTrackEventTarget';
 import WebRTC from '../WebRTC';
-import aspectRatioValue from './RTCMediaStreamConstraints';
+import { aspectRatioValue } from './RTCMediaStreamConstraints';
 import type { RTCAspectRatio } from './RTCMediaStreamConstraints';
 import type { ValueTag } from '../PeerConnection/RTCPeerConnection';
+
+/** @private */
+const { WebRTCModule } = NativeModules;
 
 /**
  * トラックの種別を表します。
@@ -39,6 +42,17 @@ export type RTCMediaStreamTrackState =
  * トラックを表します。
  */
 export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget {
+
+    /** @private */
+    static nativeEnabled(valueTag: ValueTag, enabled: boolean) {
+        WebRTCModule.trackSetEnabled(enabled, valueTag);
+    }
+
+    /** @private */
+    static nativeAspectRatio(valueTag: ValueTag,
+        aspectRatio: number) {
+        WebRTCModule.trackSetAspectRatio(aspectRatio, valueTag);
+    }
 
     /**
      * トラック ID
@@ -88,7 +102,7 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
             return;
         }
         this._enabled = enabled;
-        WebRTC.trackSetEnabled(this._valueTag, enabled);
+        RTCMediaStreamTrack.nativeEnabled(this._valueTag, enabled);
     }
 
     /**
@@ -113,7 +127,7 @@ export default class RTCMediaStreamTrack extends RTCMediaStreamTrackEventTarget 
             return;
         }
         this._aspectRatio = value;
-        WebRTC.trackSetAspectRatio(this._valueTag, value);
+        RTCMediaStreamTrack.nativeAspectRatio(this._valueTag, value);
     }
 
     /**
