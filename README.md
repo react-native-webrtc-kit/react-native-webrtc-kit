@@ -68,7 +68,13 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 - iOS: ビルドした `WebRTC.framework` を `ios/Pods/WebRTC/WebRTC.framework` と入れ替えます。
     - https://github.com/shiguredo/sora-webrtc-ios
-- Android: ビルドした `libwebrtc.aar` を と入れ替えます。
+- Android: ビルドした `libwebrtc.aar` を `android/libs/` 下に配置し、`android/build.gradle` の dependencies に以下のように追記します。
+```
+dependencies {
+  force api fileTree(dir: 'libs')
+}
+
+```
     - https://github.com/shiguredo/sora-webrtc-android
 
 ## Issues について
