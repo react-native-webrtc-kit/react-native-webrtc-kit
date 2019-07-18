@@ -13,6 +13,8 @@
 
 - [ADD] Android 対応
 - [UPDATE] iOS 向け libwebrtc M76 対応
+- [FIX] iOS で sender の valueTag が登録できないバグを修正した
+- [UPDATE] AndroidX に対応する
 
 ## 2.1.2
 
