@@ -10,10 +10,6 @@ jobs:
     shell: /bin/bash --login -o pipefail
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - pods-{{ checksum "test/Touchstone/ios/Podfile.lock" }}
-            - pods-
       - run:
           command: yarn global add react-native-cli
           working_directory: test/Touchstone
@@ -32,10 +28,6 @@ jobs:
       - run:
           command: pod install
           working_directory: test/Touchstone/ios
-      - save_cache:
-          key: pods-{{ checksum "test/Touchstone/ios/Podfile.lock" }}
-          paths:
-            - test/Touchstone/ios/Pods
   android:
     docker:
       - image: circleci/android:api-23-node
@@ -43,6 +35,7 @@ jobs:
     environment:
       FL_OUTPUT_DIR: output
       FASTLANE_LANE: test
+    shell: /bin/bash --login -o pipefail
     steps:
       - checkout
       - run:
