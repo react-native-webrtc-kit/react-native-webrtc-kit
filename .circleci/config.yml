@@ -39,6 +39,10 @@ jobs:
   android:
     docker:
       - image: circleci/android:api-23-node
+    working_directory: ~/react-native-webrtc-kit/
+    environment:
+      FL_OUTPUT_DIR: output
+      FASTLANE_LANE: test
     steps:
       - checkout
       - run:
