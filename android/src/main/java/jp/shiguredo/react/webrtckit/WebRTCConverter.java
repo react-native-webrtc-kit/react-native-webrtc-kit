@@ -487,9 +487,15 @@ final class WebRTCConverter {
 
     @NonNull
     static IceCandidate iceCandidate(@NonNull final ReadableMap json) {
-        final String sdp = string(json, "sdp");
+        String sdp = "";
+        String sdpMid = "";
         final int sdpMLineIndex = jint(json, "sdpMLineIndex");
-        final String sdpMid = string(json, "sdpMid");
+        if (json.hasKey("sdp") && !json.isNull("sdp")) {
+          sdp = string(json, "sdp");
+        }
+        if (json.hasKey("sdpMid") && !json.isNull("sdpMid")) {
+          sdpMid = string(json, "sdpMid");
+        }
         return new IceCandidate(sdpMid, sdpMLineIndex, sdp);
     }
 
