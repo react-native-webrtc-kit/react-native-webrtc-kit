@@ -29,7 +29,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-               BuildableName = "Touchstone-tvOS.app"
+               BuildableName = "Touchstone-tvOS"
                BlueprintName = "Touchstone-tvOS"
                ReferencedContainer = "container:Touchstone.xcodeproj">
             </BuildableReference>
@@ -71,7 +71,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "Touchstone-tvOS.app"
+            BuildableName = "Touchstone-tvOS"
             BlueprintName = "Touchstone-tvOS"
             ReferencedContainer = "container:Touchstone.xcodeproj">
          </BuildableReference>
@@ -94,7 +94,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "Touchstone-tvOS.app"
+            BuildableName = "Touchstone-tvOS"
             BlueprintName = "Touchstone-tvOS"
             ReferencedContainer = "container:Touchstone.xcodeproj">
          </BuildableReference>
@@ -113,7 +113,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "Touchstone-tvOS.app"
+            BuildableName = "Touchstone-tvOS"
             BlueprintName = "Touchstone-tvOS"
             ReferencedContainer = "container:Touchstone.xcodeproj">
          </BuildableReference>

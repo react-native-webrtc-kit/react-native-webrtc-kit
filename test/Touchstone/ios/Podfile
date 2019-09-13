@@ -3,8 +3,6 @@ source 'https://github.com/CocoaPods/Specs.git'
 
 platform :ios, '12.0'
 
-inhibit_all_warnings!
-
 node_modules_path = '../node_modules'
 
 react_native_webrtc_kit_path = '../../..'
