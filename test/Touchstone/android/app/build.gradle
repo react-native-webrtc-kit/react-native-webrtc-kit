@@ -114,7 +114,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.hellosora"
+        applicationId "com.touchstone"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
