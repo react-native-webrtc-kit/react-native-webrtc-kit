@@ -7,6 +7,7 @@ jobs:
     environment:
       FL_OUTPUT_DIR: output
       FASTLANE_LANE: test
+      PATH: /usr/local/bin/:$PATH
     shell: /bin/bash --login -o pipefail
     steps:
       - checkout
