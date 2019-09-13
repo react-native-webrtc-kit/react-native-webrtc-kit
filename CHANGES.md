@@ -9,12 +9,13 @@
 - FIX
     - バグ修正
 
-## develop
+## 3.0.0
 
-- [ADD] Android 対応
-- [UPDATE] iOS 向け libwebrtc M76 対応
-- [FIX] iOS で sender の valueTag が登録できないバグを修正した
-- [UPDATE] AndroidX に対応する
+- [CHANGE] Android に対応した
+
+- [CHANGE] iOS: WebRTC M76 に対応した
+
+- [FIX] iOS: sender の valueTag が登録できないバグを修正した
 
 ## 2.1.2
 
