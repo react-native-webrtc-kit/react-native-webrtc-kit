@@ -20,7 +20,7 @@ jobs:
           command: git clone ../../../react-native-webrtc-kit node_modules/react-native-webrtc-kit
           working_directory: test/Touchstone
       - run:
-          command: /node_modules/react-native/cli.js link
+          command: ./node_modules/react-native/cli.js link
           working_directory: test/Touchstone
       - run:
           command: pod install
@@ -45,7 +45,7 @@ jobs:
           command: git clone ../../../react-native-webrtc-kit node_modules/react-native-webrtc-kit
           working_directory: test/Touchstone
       - run:
-          command: /node_modules/react-native/cli.js link
+          command: ./node_modules/react-native/cli.js link
           working_directory: test/Touchstone
 
 workflows:
