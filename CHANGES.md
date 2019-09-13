@@ -11,6 +11,12 @@
 
 ## 3.0.0
 
+- [CHANGE] システム要件を変更した
+
+  - npm 6.11.3
+ 
+  - yarn 1.17.3
+
 - [CHANGE] Android に対応した
 
 - [CHANGE] iOS: WebRTC M76 に対応した
