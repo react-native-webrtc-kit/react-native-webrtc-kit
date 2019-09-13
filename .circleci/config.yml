@@ -7,7 +7,6 @@ jobs:
     environment:
       FL_OUTPUT_DIR: output
       FASTLANE_LANE: test
-      PATH: /usr/local/bin/:$PATH
     shell: /bin/bash --login -o pipefail
     steps:
       - checkout
@@ -24,7 +23,7 @@ jobs:
           command: git clone ../../../react-native-webrtc-kit node_modules/react-native-webrtc-kit
           working_directory: test/Touchstone
       - run:
-          command: react-native link
+          command: /usr/local/bin/react-native link
           working_directory: test/Touchstone
       - run:
           command: pod install
@@ -52,7 +51,7 @@ jobs:
           command: git clone ../../../react-native-webrtc-kit node_modules/react-native-webrtc-kit
           working_directory: test/Touchstone
       - run:
-          command: react-native link
+          command: /usr/local/bin/react-native link
           working_directory: test/Touchstone
 
 
