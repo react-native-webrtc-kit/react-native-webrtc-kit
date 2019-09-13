@@ -11,9 +11,6 @@ jobs:
     steps:
       - checkout
       - run:
-          command: yarn global add react-native-cli
-          working_directory: test/Touchstone
-      - run:
           command: yarn install
           working_directory: test/Touchstone
       - run:
@@ -23,7 +20,7 @@ jobs:
           command: git clone ../../../react-native-webrtc-kit node_modules/react-native-webrtc-kit
           working_directory: test/Touchstone
       - run:
-          command: /usr/local/bin/react-native link
+          command: /node_modules/react-native/cli.js link
           working_directory: test/Touchstone
       - run:
           command: pod install
@@ -39,9 +36,6 @@ jobs:
     steps:
       - checkout
       - run:
-          command: yarn global add react-native-cli
-          working_directory: test/Touchstone
-      - run:
           command: yarn install
           working_directory: test/Touchstone
       - run:
@@ -51,9 +45,8 @@ jobs:
           command: git clone ../../../react-native-webrtc-kit node_modules/react-native-webrtc-kit
           working_directory: test/Touchstone
       - run:
-          command: /usr/local/bin/react-native link
+          command: /node_modules/react-native/cli.js link
           working_directory: test/Touchstone
-
 
 workflows:
   version: 2
