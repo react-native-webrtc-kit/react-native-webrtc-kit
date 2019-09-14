@@ -1,0 +1,39 @@
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - 'feature/*'
+jobs:
+  test:
+    name: iOS Test on node 11.x and macos-latest
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js 11.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 11.x
+      - name: yarn install
+        run: |
+          yarn install
+        working-directory: ./test/Touchstone
+      - name: rm -rf node_modules/react-native-webrtc-kit
+        run: |
+          rm -rf node_modules/react-native-webrtc-kit
+        working-directory: ./test/Touchstone
+      - name: git clone ../../../react-native-webrtc-kit node_modules/react-native-webrtc-kit
+        run: |
+          git clone ../../../react-native-webrtc-kit node_modules/react-native-webrtc-kit
+        working-directory: ./test/Touchstone
+      - name: react-native link
+          $(npm bin)/react-native link --platforms ios
+        working-directory: ./test/Touchstone
+      - name: pod install
+        env:
+          FL_OUTPUT_DIR: output
+          FASTLANE_LANE: test
+        run: |
+          cd ios/
+          pod install
+        working-directory: ./test/Touchstone
