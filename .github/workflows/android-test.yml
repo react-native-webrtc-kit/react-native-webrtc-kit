@@ -27,6 +27,7 @@ jobs:
           git clone ../../../react-native-webrtc-kit node_modules/react-native-webrtc-kit
         working-directory: ./test/Touchstone
       - name: react-native link
+        run: |
           $(npm bin)/react-native link --platforms android
         working-directory: ./test/Touchstone
       - name: gradlew check
