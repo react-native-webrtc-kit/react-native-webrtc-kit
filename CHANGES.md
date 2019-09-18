@@ -19,7 +19,7 @@
 
 - [CHANGE] Android に対応した
 
-- [CHANGE] iOS: WebRTC M76 に対応した
+- [CHANGE] iOS: WebRTC M75 に対応した
 
 - [FIX] iOS: sender の valueTag が登録できないバグを修正した
 
