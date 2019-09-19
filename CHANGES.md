@@ -9,12 +9,19 @@
 - FIX
     - バグ修正
 
-## develop
+## 3.0.0
 
-- [ADD] Android 対応
-- [UPDATE] iOS 向け libwebrtc M76 対応
-- [FIX] iOS で sender の valueTag が登録できないバグを修正した
-- [UPDATE] AndroidX に対応する
+- [CHANGE] システム要件を変更した
+
+  - npm 6.11.3
+ 
+  - yarn 1.17.3
+
+- [CHANGE] Android に対応した
+
+- [CHANGE] iOS: WebRTC M75 に対応した
+
+- [FIX] iOS: sender の valueTag が登録できないバグを修正した
 
 ## 2.1.2
 
