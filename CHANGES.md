@@ -9,6 +9,20 @@
 - FIX
     - バグ修正
 
+## 3.0.0
+
+- [CHANGE] システム要件を変更した
+
+  - npm 6.11.3
+ 
+  - yarn 1.17.3
+
+- [CHANGE] Android に対応した
+
+- [CHANGE] iOS: WebRTC M75 に対応した
+
+- [FIX] iOS: sender の valueTag が登録できないバグを修正した
+
 ## 2.1.2
 
 - [FIX] VideoView の使用時にトラックを追加または削除するとアプリケーションがクラッシュする現象を修正した

@@ -1,25 +1,33 @@
+apply plugin: 'com.android.library'
+
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+
 
 buildscript {
     repositories {
         jcenter()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        google()
+        maven { url 'https://jitpack.io' }
     }
 }
 
-apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    compileSdkVersion safeExtGet('compileSdkVersion', 23)
+    buildToolsVersion safeExtGet('buildToolsVersion', "23.0.1")
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 22
+        minSdkVersion safeExtGet('minSdkVersion', 16)
+        targetSdkVersion safeExtGet('targetSdkVersion', 23)
         versionCode 1
         versionName "1.0"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     lintOptions {
         abortOnError false
@@ -28,11 +36,14 @@ android {
 
 repositories {
     mavenCentral()
+    jcenter()
+    google()
     maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    compile 'com.facebook.react:react-native:+'
-    compile "com.github.shiguredo:sora-webrtc-android:66.8.1.1" // should be `api` if android gradle plugin is 3.0+
+    implementation 'com.facebook.react:react-native:+'
+    api "com.github.shiguredo:sora-webrtc-android:75.16.0"
+    implementation "androidx.annotation:annotation:1.1.0"
 }
   

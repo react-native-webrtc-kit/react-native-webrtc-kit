@@ -1,6 +1,7 @@
 // @flow
 
 import { DeviceEventEmitter } from 'react-native';
+import { NativeModules } from 'react-native';
 
 import * as RTCUtil from '../Util/RTCUtil';
 import RTCMediaStream from '../MediaStream/RTCMediaStream';
@@ -16,6 +17,9 @@ import RTCRtpTransceiver from './RTCRtpTransceiver';
 import logger from '../Util/RTCLogger';
 import RTCMediaConstraints from './RTCMediaConstraints';
 import WebRTC from '../WebRTC';
+
+/** @private */
+const { WebRTCModule } = NativeModules;
 
 /**
  * @package
@@ -114,6 +118,72 @@ let nextPeerConnectionValueTag = 0;
  */
 export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
+  /** @private */
+  static nativeInit(valueTag: ValueTag,
+    configuration: RTCConfiguration,
+    constraints: RTCMediaConstraints) {
+    WebRTCModule.peerConnectionInit(
+      configuration.toJSON(), constraints.toJSON(), valueTag);
+  }
+
+  /** @private */
+  static nativeAddICECandidate(valueTag: ValueTag,
+    candidate: RTCIceCandidate): Promise<void> {
+    return WebRTCModule.peerConnectionAddICECandidate(candidate.toJSON(), valueTag);
+  }
+
+  /** @private */
+  static nativeAddTrack(valueTag: ValueTag,
+    trackValueTag: ValueTag,
+    streamIds: Array<String>,
+  ): Promise<Object> {
+    return WebRTCModule.peerConnectionAddTrack(trackValueTag, streamIds, valueTag);
+  }
+
+  /** @private */
+  static nativeRemoveTrack(valueTag: ValueTag, senderValueTag: ValueTag) {
+    WebRTCModule.peerConnectionRemoveTrack(senderValueTag, valueTag);
+  }
+
+  /** @private */
+  static nativeClose(valueTag: ValueTag) {
+    WebRTCModule.peerConnectionClose(valueTag);
+  }
+
+  /** @private */
+  static nativeCreateAnswer(valueTag: ValueTag,
+    constraints: RTCMediaConstraints): Promise<RTCSessionDescription> {
+    return WebRTCModule.peerConnectionCreateAnswer(valueTag, constraints.toJSON());
+  }
+
+  /** @private */
+  static nativeCreateOffer(valueTag: ValueTag,
+    constraints: RTCMediaConstraints): Promise<RTCSessionDescription> {
+    return WebRTCModule.peerConnectionCreateOffer(valueTag, constraints.toJSON());
+  }
+
+  /** @private */
+  static nativeRemoveStream(valueTag: ValueTag, streamValueTag: ValueTag) {
+    WebRTCModule.peerConnectionRemoveStream(streamValueTag, valueTag);
+  }
+
+  /** @private */
+  static nativeSetConfiguration(valueTag: ValueTag,
+    configuration: RTCConfiguration) {
+    WebRTCModule.peerConnectionSetConfiguration(configuration.toJSON(), valueTag);
+  }
+
+  /** @private */
+  static nativeSetLocalDescription(valueTag: ValueTag,
+    sdp: RTCSessionDescription): Promise<void> {
+    return WebRTCModule.peerConnectionSetLocalDescription(sdp.toJSON(), valueTag);
+  }
+
+  /** @private */
+  static nativeSetRemoteDescription(valueTag: ValueTag, sdp: RTCSessionDescription): Promise<void> {
+    return WebRTCModule.peerConnectionSetRemoteDescription(sdp.toJSON(), valueTag);
+  }
+
   /**
    * クライアントとの総合的な接続状態を表します。
    */
@@ -199,40 +269,10 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
     }
     this._valueTag = (nextPeerConnectionValueTag++).toString();
     this._constraints = constraints;
-    WebRTC.peerConnectionInit(this._valueTag,
+    RTCPeerConnection.nativeInit(this._valueTag,
       configuration,
       constraints);
     this._registerEventsFromNative();
-  }
-
-  /** @private
-   * connectionState の状態を変更します。
-   */
-  _beginConnect(): void {
-    this._setConnectionState('connecting');
-  }
-
-  /** @private
-   * peer connection の状態を判断します。
-   */
-  _updateConnectionState(): void {
-    logger.group("# update connection state");
-    logger.log("# signaling state => ", this.signalingState);
-    logger.log("# ice connection state => ", this.iceConnectionState);
-    logger.log("# ice gathering state => ", this.iceGatheringState);
-    if (this.signalingState == 'stable' &&
-      this.iceConnectionState == 'connected' &&
-      this.iceGatheringState == 'complete') {
-      logger.log("# connection connected");
-      this._setConnectionState('connected');
-    }
-    logger.groupEnd();
-  }
-
-  _setConnectionState(state: RTCPeerConnectionState): void {
-    logger.log("# set connection state => ", state);
-    this.connectionState = state;
-    this.dispatchEvent(new RTCEvent('connectionstatechange'));
   }
 
   /**
@@ -240,21 +280,14 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * すべてのストリームの接続も閉じられます。
    */
   close(): void {
-    logger.log("# connection close");
-    this._setConnectionState('closed');
-    this._finish();
-  }
-
-  _fail(): void {
-    logger.log("# connection fail");
-    this._setConnectionState('failed');
+    logger.log(`# PeerConnection[${this._valueTag}]: connection close`);
     this._finish();
   }
 
   _finish(): void {
-    logger.log("# connection finish");
+    logger.log(`# PeerConnection[${this._valueTag}]: connection finish`);
     this.senders.forEach(sender => this.removeTrack(sender));
-    WebRTC.peerConnectionClose(this._valueTag);
+    RTCPeerConnection.nativeClose(this._valueTag);
   }
 
   /**
@@ -264,8 +297,8 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * @return {Promise<RTCSessionDescription>} 生成結果を示す Promise
    */
   createAnswer(constraints: Object): Promise<RTCSessionDescription> {
-    logger.log("# create answer");
-    return WebRTC.peerConnectionCreateAnswer(this._valueTag, constraints)
+    logger.log(`# PeerConnection[${this._valueTag}]: create answer`);
+    return RTCPeerConnection.nativeCreateAnswer(this._valueTag, constraints)
       .then(data => new RTCSessionDescription(data.type, data.sdp));
   }
 
@@ -276,8 +309,8 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * @return {Promise<RTCSessionDescription>} 生成結果を示す Promise
    */
   createOffer(constraints: RTCMediaConstraints): Promise<RTCSessionDescription> {
-    logger.log("# create offer");
-    return WebRTC.peerConnectionCreateOffer(this._valueTag, constraints)
+    logger.log(`# PeerConnection[${this._valueTag}]: create offer`);
+    return RTCPeerConnection.nativeCreateOffer(this._valueTag, constraints)
       .then(data => new RTCSessionDescription(data.type, data.sdp));
   }
 
@@ -288,7 +321,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * @return {Promise<Void>} 結果を示す Promise
    */
   addIceCandidate(candidate: RTCIceCandidate): Promise<void> {
-    return WebRTC.peerConnectionAddICECandidate(this._valueTag, candidate);
+    return RTCPeerConnection.nativeAddICECandidate(this._valueTag, candidate);
   }
 
   /**
@@ -347,9 +380,9 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    */
   addTrack(track: RTCMediaStreamTrack, streamIds: Array<String>): Promise<RTCRtpSender> {
     var streamValueTags = [];
-    return WebRTC.peerConnectionAddTrack(this._valueTag, track._valueTag, streamIds)
+    return RTCPeerConnection.nativeAddTrack(this._valueTag, track._valueTag, streamIds)
       .then((info) => {
-        console.log("addTrack: sender => ", info);
+        logger.log(`# PeerConnection[${this._valueTag}]: addTrack finished: sender => `, info);
         let sender = new RTCRtpSender(info);
         this.senders.push(sender);
         return sender;
@@ -363,10 +396,10 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * 
    * @since 1.1.0
    */
-  removeTrack(sender: RTCRtpSender) {
+  removeTrack(sender: RTCRtpSender): Promise<void> {
     this.senders = this.senders.filter(
       e => e.id != sender.id);
-    WebRTC.peerConnectionRemoveTrack(this._valueTag, sender._valueTag);
+    return RTCPeerConnection.nativeRemoveTrack(this._valueTag, sender._valueTag);
   }
 
   /**
@@ -375,8 +408,8 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * @param {RTCConfiguration} configuration 設定
    */
   setConfiguration(configuration: RTCConfiguration): void {
-    logger.log("# set configuration");
-    WebRTC.peerConnectionSetConfiguration(this._valueTag, configuration);
+    logger.log(`# PeerConnection[${this._valueTag}]: set configuration`);
+    RTCPeerConnection.nativeSetConfiguration(this._valueTag, configuration);
   }
 
   /**
@@ -386,8 +419,8 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * @return {Promise<void>} セットした結果を示す Promise
    */
   setLocalDescription(sessionDescription: RTCSessionDescription): Promise<void> {
-    logger.log("# set local description");
-    return WebRTC.peerConnectionSetLocalDescription(
+    logger.log(`# PeerConnection[${this._valueTag}]: set local description`);
+    return RTCPeerConnection.nativeSetLocalDescription(
       this._valueTag, sessionDescription).then(() => {
         this.localDescription = sessionDescription;
         return;
@@ -401,8 +434,8 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * @return {Promise<void>} セットした結果を示す Promise
    */
   setRemoteDescription(sessionDescription: RTCSessionDescription): Promise<void> {
-    logger.log("# set remote description");
-    return WebRTC.peerConnectionSetRemoteDescription(
+    logger.log(`# PeerConnection[${this._valueTag}]: set remote description`);
+    return RTCPeerConnection.nativeSetRemoteDescription(
       this._valueTag, sessionDescription)
       .then(() => {
         this.remoteDescription = sessionDescription;
@@ -411,23 +444,35 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   }
 
   _registerEventsFromNative(): void {
-    logger.log("# register events from native");
+    logger.log(`# PeerConnection[${this._valueTag}]: register events from native`);
     this._nativeEventListeners = [
       DeviceEventEmitter.addListener('peerConnectionShouldNegotiate', ev => {
-        logger.log("# event: peerConnectionShouldNegotiate");
         if (ev.valueTag !== this._valueTag) {
           return;
         }
+        logger.log(`# PeerConnection[${this._valueTag}]: event: peerConnectionShouldNegotiate`);
         this.dispatchEvent(new RTCEvent('negotiationneeded'));
       }),
 
-      DeviceEventEmitter.addListener('peerConnectionIceConnectionChanged', ev => {
-        logger.log("# event: peerConnectionIceConnectionChanged");
+      DeviceEventEmitter.addListener('peerConnectionConnectionStateChanged', ev => {
+        logger.log("# event: peerConnectionConnectionStateChanged =>", ev.connectionState);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
+        this.connectionState = ev.connectionState;
+        this.dispatchEvent(new RTCEvent('connectionstatechange'));
+        if (ev.connectionState === 'closed') {
+          // This PeerConnection is done, clean up event handlers.
+          this._unregisterEventsFromNative();
+        }
+      }),
+
+      DeviceEventEmitter.addListener('peerConnectionIceConnectionChanged', ev => {
+        if (ev.valueTag !== this._valueTag) {
+          return;
+        }
+        logger.log(`# PeerConnection[${this._valueTag}]: event: peerConnectionIceConnectionChanged`);
         this.iceConnectionState = ev.iceConnectionState;
-        this._updateConnectionState();
         this.dispatchEvent(new RTCEvent('iceconnectionstatechange'));
         if (ev.iceConnectionState === 'closed') {
           // This PeerConnection is done, clean up event handlers.
@@ -436,21 +481,19 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
       }),
 
       DeviceEventEmitter.addListener('peerConnectionSignalingStateChanged', ev => {
-        logger.log("# event: peerConnectionSignalingStateChanged");
         if (ev.valueTag !== this._valueTag) {
           return;
         }
+        logger.log(`# PeerConnection[${this._valueTag}]: event: peerConnectionSignalingStateChanged`);
         this.signalingState = ev.signalingState;
-        this._updateConnectionState();
         this.dispatchEvent(new RTCEvent('signalingstatechange'));
       }),
 
       DeviceEventEmitter.addListener('peerConnectionAddedReceiver', ev => {
-        logger.log("# event: peerConnectionAddedReceiver =>", ev.valueTag);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
-
+        logger.log(`# PeerConnection[${this._valueTag}]: event: peerConnectionAddedReceiver`);
         let receiver = new RTCRtpReceiver(ev.receiver);
         this.receivers.push(receiver);
         this.dispatchEvent(new RTCMediaStreamTrackEvent('track',
@@ -458,11 +501,10 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
       }),
 
       DeviceEventEmitter.addListener('peerConnectionRemovedReceiver', ev => {
-        logger.log("# event: peerConnectionRemovedReceiver =>", ev.valueTag);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
-
+        logger.log(`# PeerConnection[${this._valueTag}]: event: peerConnectionRemovedReceiver`);
         let receiver = new RTCRtpReceiver(ev.receiver);
         this.receivers.push(receiver);
         this.dispatchEvent(new RTCMediaStreamTrackEvent('track',
@@ -470,11 +512,10 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
       }),
 
       DeviceEventEmitter.addListener('peerConnectionStartTransceiver', ev => {
-        logger.log("# event: peerConnectionStartTransceiver =>", ev.valueTag);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
-
+        logger.log(`# PeerConnection[${this._valueTag}]: event: peerConnectionStartTransceiver`);
         let trans = new RTCRtpTransceiver(ev.transceiver);
         this.transceivers.push(trans);
         this.dispatchEvent(new RTCMediaStreamTrackEvent('track',
@@ -482,21 +523,20 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
       }),
 
       DeviceEventEmitter.addListener('peerConnectionGotICECandidate', ev => {
-        logger.log("# event: peerConnectionGotICECandidate =>", ev.valueTag);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
+        logger.log(`# PeerConnection[${this._valueTag}]: event: peerConnectionGotICECandidate`);
         const candidate = new RTCIceCandidate(ev.candidate);
         this.dispatchEvent(new RTCIceCandidateEvent('icecandidate', { candidate }));
       }),
 
       DeviceEventEmitter.addListener('peerConnectionIceGatheringChanged', ev => {
-        logger.log("# event: peerConnectionIceGatheringChanged=>", ev.valueTag);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
+        logger.log(`# PeerConnection[${this._valueTag}]: event: peerConnectionIceGatheringChanged`);
         this.iceGatheringState = ev.iceGatheringState;
-        this._updateConnectionState();
         if (this.iceGatheringState === 'complete') {
           this.dispatchEvent(new RTCIceCandidateEvent('icecandidate'));
         }
@@ -506,7 +546,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   }
 
   _unregisterEventsFromNative(): void {
-    logger.log("# unregister events from native");
+    logger.log(`# PeerConnection[${this._valueTag}]: unregister events from native`);
     this._nativeEventListeners.forEach(e => e.remove());
     this._nativeEventListeners = [];
   }

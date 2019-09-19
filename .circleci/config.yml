@@ -2,7 +2,7 @@ version: 2
 jobs:
   ios:
     macos:
-      xcode: "10.1.0"
+      xcode: "10.3.0"
     working_directory: ~/react-native-webrtc-kit/
     environment:
       FL_OUTPUT_DIR: output
@@ -10,13 +10,6 @@ jobs:
     shell: /bin/bash --login -o pipefail
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - pods-{{ checksum "test/Touchstone/ios/Podfile.lock" }}
-            - pods-
-      - run:
-          command: yarn global add react-native-cli
-          working_directory: test/Touchstone
       - run:
           command: yarn install
           working_directory: test/Touchstone
@@ -27,21 +20,46 @@ jobs:
           command: git clone ../../../react-native-webrtc-kit node_modules/react-native-webrtc-kit
           working_directory: test/Touchstone
       - run:
-          command: react-native link
+          command: ./node_modules/react-native/cli.js link
           working_directory: test/Touchstone
       - run:
           command: pod install
           working_directory: test/Touchstone/ios
-      - save_cache:
-          key: pods-{{ checksum "test/Touchstone/ios/Podfile.lock" }}
-          paths:
-            - test/Touchstone/ios/Pods
+  android:
+    docker:
+      - image: circleci/android:api-23-node
+    working_directory: ~/react-native-webrtc-kit/
+    environment:
+      FL_OUTPUT_DIR: output
+      FASTLANE_LANE: test
+    shell: /bin/bash --login -o pipefail
+    steps:
+      - checkout
+      - run:
+          command: yarn install
+          working_directory: test/Touchstone
+      - run:
+          command: rm -rf node_modules/react-native-webrtc-kit
+          working_directory: test/Touchstone
+      - run:
+          command: git clone ../../../react-native-webrtc-kit node_modules/react-native-webrtc-kit
+          working_directory: test/Touchstone
+      - run:
+          command: ./node_modules/react-native/cli.js link
+          working_directory: test/Touchstone
 
 workflows:
   version: 2
   react-native:
     jobs:
       - ios:
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+                - /feature\/.*/
+      - android:
           filters:
             branches:
               only:

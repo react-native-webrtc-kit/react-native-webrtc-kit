@@ -1,5 +1,6 @@
 // @flow
 
+import { NativeModules } from 'react-native';
 import WebRTC from '../WebRTC';
 import RTCMediaStream from '../MediaStream/RTCMediaStream';
 import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
@@ -7,12 +8,25 @@ import RTCMediaStreamConstraints from '../MediaStream/RTCMediaStreamConstraints'
 import RTCMediaStreamError from '../MediaStream/RTCMediaStreamError';
 import logger from '../Util/RTCLogger';
 
+/** @private */
+const { WebRTCModule } = NativeModules;
+
 /**
  * {@link getUserMedia} で取得できるメディア情報入力トラックの情報です。
  * 
  * @since 1.1.0
  */
 export class RTCUserMedia {
+
+  /** @private */
+  static nativeGetUserMedia(constraints: RTCMediaStreamConstraints): Promise<Object> {
+    return WebRTCModule.getUserMedia(constraints.toJSON());
+  }
+
+  /** @private */
+  static nativeStopUserMedia() {
+    WebRTCModule.stopUserMedia();
+  }
 
   /** 入力トラックのリスト。
    * リストの並びは順不同です。
@@ -62,7 +76,7 @@ export function getUserMedia(constraints: RTCMediaStreamConstraints | null):
   if (constraints == null) {
     constraints = new RTCMediaStreamConstraints();
   }
-  return WebRTC.getUserMedia(constraints)
+  return RTCUserMedia.nativeGetUserMedia(constraints)
     .then(ev => {
       var tracks = [];
       for (const track of ev.tracks) {
@@ -94,5 +108,5 @@ export function getUserMedia(constraints: RTCMediaStreamConstraints | null):
  */
 export function stopUserMedia(): void {
   logger.log("# stop user media");
-  WebRTC.stopUserMedia();
+  RTCUserMedia.nativeStopUserMedia();
 }

@@ -1,4 +1,17 @@
-import WebRTC from '../WebRTC';
+import { NativeModules } from 'react-native';
+
+/** @private */
+const { WebRTCModule } = NativeModules;
+
+/** @private */
+function nativeEnableMetrics() {
+  WebRTCModule.enableMetrics();
+}
+
+/** @private */
+function nativeGetAndResetMetrics(): Promise<Array<RTCMetricsSampleInfo>> {
+  return WebRTCModule.getAndResetMetrics();
+}
 
 /**
  * メトリクスの計測を有効にします。
@@ -8,7 +21,7 @@ import WebRTC from '../WebRTC';
  * @since 2.0.0
  */
 export function enableMetrics() {
-  WebRTC.enableMetrics();
+  nativeEnableMetrics();
 }
 
 /**
@@ -20,7 +33,7 @@ export function enableMetrics() {
  * @since 2.0.0
  */
 export function getAndResetMetrics(): Promise<Array<RTCMetricsSampleInfo>> {
-  return WebRTC.getAndResetMetrics();
+  return nativeGetAndResetMetrics();
 }
 
 /**

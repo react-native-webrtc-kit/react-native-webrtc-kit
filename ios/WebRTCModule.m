@@ -190,8 +190,10 @@ static WebRTCModule *sharedModule;
            forKey:(NSString *)key
 {
     NSAssert(key != nil, @"key must not be nil");
-
-    dispatch_sync(self.lock, ^{});
+    
+    dispatch_sync(self.lock, ^{
+        self.senderDict[key] = sender;
+    });
 }
 
 - (void)removeSenderForKey:(NSString *)key
