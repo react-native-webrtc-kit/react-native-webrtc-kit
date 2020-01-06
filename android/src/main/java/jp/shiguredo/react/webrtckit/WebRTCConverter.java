@@ -222,12 +222,16 @@ final class WebRTCConverter {
 
     @NonNull
     static String rtpTransceiverDump(@NonNull final RtpTransceiver transceiver) {
-        return String.format("%s, %s %b [%s] [%s]",
-                transceiver.getMediaType(),
-                rtpTransceiverDirectionStringValue(transceiver.getDirection()),
-                transceiver.isStopped(),
-                rtpReceiverDump(transceiver.getReceiver()),
-                rtpSenderDump(transceiver.getSender()));
+        try {
+            return String.format("%s, %s %b [%s] [%s]",
+                    transceiver.getMediaType(),
+                    rtpTransceiverDirectionStringValue(transceiver.getDirection()),
+                    transceiver.isStopped(),
+                    rtpReceiverDump(transceiver.getReceiver()),
+                    rtpSenderDump(transceiver.getSender()));
+        } catch (IllegalStateException e) {
+            return e.getMessage();
+        }
     }
 
     //endregion
@@ -521,10 +525,14 @@ final class WebRTCConverter {
 
     @NonNull
     static String mediaStreamTrackDump(@NonNull final MediaStreamTrack track) {
-        return String.format("%s (%s) %b",
-                track.kind(),
-                mediaStreamTrackStateStringValue(track.state()),
-                track.enabled());
+        try {
+            return String.format("%s (%s) %b",
+                    track.kind(),
+                    mediaStreamTrackStateStringValue(track.state()),
+                    track.enabled());
+        } catch (IllegalStateException e) {
+            return e.getMessage();
+        }
     }
 
     //endregion
