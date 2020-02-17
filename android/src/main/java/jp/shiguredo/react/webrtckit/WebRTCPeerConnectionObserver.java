@@ -218,6 +218,21 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     //       > 今は SDP semantics に関わらず onAddStream/onRemoveStream でシグナリングに通知している
     //       現在libwebrtcのAndroid側実装にonRemoveTrackが存在しないため上記の様なワークアラウンドをするしかないようだが、
     //       Streamに複数Trackが追加されている場合、onRemoveStreamを経由しないため、やはりすべてのケースには対応できない
+    @Override
+    public void onRemoveTrack(RtpReceiver receiver) {
+        if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onRemoveTrack()[" + peerConnectionPair.first + "] - receiver=" + receiver);
+        final WebRTCModule module = getModule();
+        final MediaStreamTrack track = receiver.track();
+        if (track != null) {
+            module.repository.tracks.removeById(track.id());
+        }
+
+        final WritableMap params = Arguments.createMap();
+        params.putString("valueTag", peerConnectionPair.first);
+        params.putMap("receiver", rtpReceiverJsonValue(receiver, module.repository));
+        sendDeviceEvent("peerConnectionRemovedReceiver", params);
+    }
 
     @Override
     public void onTrack(RtpTransceiver transceiver) {

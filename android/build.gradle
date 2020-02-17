@@ -43,7 +43,7 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    api "com.github.shiguredo:shiguredo-webrtc-android:79.5.0"
+    api "com.github.shiguredo:shiguredo-webrtc-android:79.5.0-onremovetrack"
     implementation "androidx.annotation:annotation:1.1.0"
 }
   
