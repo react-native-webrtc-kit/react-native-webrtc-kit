@@ -7,18 +7,16 @@
 React Native WebRTC Kit は、 React Native アプリケーションから WebRTC ネイティブライブラリを使うためのライブラリです。
 本ライブラリを使うと、マルチプラットフォームに対応する WebRTC ネイティブアプリケーションを React Native で開発できます。
 
-本ライブラリの主な目的は、 [WebRTC SFU Sora](https://sora.shiguredo.jp) (以下 Sora) を React Native アプリケーションで利用することでしたが、
-今後は汎用的なライブラリを目指していく予定です。
-
 ## About Support
 
 We check PRs or Issues only when written in JAPANESE.
 In other languages, we won't be able to deal with them. Thank you for your understanding.
 
-## サポートについて
+## Discord
 
-React Native WebRTC Kit に関する質問・要望・バグなどの報告やプルリクエストは Issues の利用をお願いします。
-ただし、 Sora のライセンス契約の有無に関わらず、 Issue への応答時間と問題の解決を保証しませんのでご了承ください。
+https://discord.gg/HqfAgEs
+
+React Native WebRTC Kit に関する質問・要望・バグなどの報告やプルリクエストは Discord へお願いします。
 
 ソースコードに関する Issue とプルリクエストに関しては、基本的にバグ修正のみ対応します。
 機能の追加や変更を要望する Issue とプルリクエストには対応しません。機能の追加や変更を行いたい場合は、本ライブラリをフォークしてご利用ください。
