@@ -94,7 +94,8 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 ## ライセンス
 
 ```
-Copyright 2018-2020, Shiguredo Inc. and Masashi Ono (akisute)
+Copyright 2018-2019, Masashi Ono (akisute) (Original Author)
+Copyright 2018-2020, Shiguredo Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
