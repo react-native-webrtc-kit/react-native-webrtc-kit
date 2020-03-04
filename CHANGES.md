@@ -11,6 +11,21 @@
 
 ## develop
 
+## 2020.2.0
+
+- [CHANGE] システム要件を変更する
+    - Android 5 以降 (シミュレーターは不可)
+    - Android Studio 3.5.1 以降
+- [CHANGE] WebRTC M79 に対応する
+    - @szktty @enm10k
+- [FIX] Android アプリのクラッシュを修正する
+    - @enm10k
+- [CHANGE] 依存パッケージ handlebars を更新する
+    - @enm10k
+
+## 2020.1.0
+
+- リリースミスによりスキップ
 
 ## 3.0.0
 
