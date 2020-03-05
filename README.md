@@ -29,7 +29,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ## ドキュメント
 
-ドキュメントは https://sora.shiguredo.jp/react-native-webrtc-kit-doc にあります。
+ドキュメントは https://react-native-webrtc-kit-doc.shiguredo.jp/ にあります。
 
 ## システム要件
 
