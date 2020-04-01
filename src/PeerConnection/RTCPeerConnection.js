@@ -563,7 +563,17 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
           this.dispatchEvent(new RTCIceCandidateEvent('icecandidate'));
         }
         this.dispatchEvent(new RTCEvent('icegatheringstatechange'));
-      })
+      }),
+      DeviceEventEmitter.addListener('peerConnectionOnDataChannel', ev => {
+        if (ev.valueTag !== this._valueTag) {
+          return;
+        }
+        logger.log(`# PeerConnection[${this._valueTag}]: event: peerConnectionOnDataChannel`);
+        // TODO: JSON で受け渡されたデータから RTC DataChannel をイニシャライズする
+        const channel = new RTCDataChannel();
+        this.dispatchEvent(new RTCEvent('datachannel', { channel }));
+      }),
+
     ]
   }
 
