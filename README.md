@@ -7,19 +7,16 @@
 React Native WebRTC Kit は、 React Native アプリケーションから WebRTC ネイティブライブラリを使うためのライブラリです。
 本ライブラリを使うと、マルチプラットフォームに対応する WebRTC ネイティブアプリケーションを React Native で開発できます。
 
-本ライブラリの主な目的は、 [WebRTC SFU Sora](https://sora.shiguredo.jp) (以下 Sora) を React Native アプリケーションで利用することでしたが、
-今後は汎用的なライブラリを目指していく予定です。
-
 ## About Support
 
-Support for React Native WebRTC Kit by Shiguredo Inc. are limited
-**ONLY in JAPANESE** through GitHub issues and there is no guarantee such
-as response time or resolution.
+We check PRs or Issues only when written in JAPANESE.
+In other languages, we won't be able to deal with them. Thank you for your understanding.
 
-## サポートについて
+## Discord
 
-React Native WebRTC Kit に関する質問・要望・バグなどの報告やプルリクエストは Issues の利用をお願いします。
-ただし、 Sora のライセンス契約の有無に関わらず、 Issue への応答時間と問題の解決を保証しませんのでご了承ください。
+https://discord.gg/HqfAgEs
+
+React Native WebRTC Kit に関する質問・要望・バグなどの報告やプルリクエストは Discord へお願いします。
 
 ソースコードに関する Issue とプルリクエストに関しては、基本的にバグ修正のみ対応します。
 機能の追加や変更を要望する Issue とプルリクエストには対応しません。機能の追加や変更を行いたい場合は、本ライブラリをフォークしてご利用ください。
@@ -32,7 +29,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ## ドキュメント
 
-ドキュメントは https://sora.shiguredo.jp/react-native-webrtc-kit-doc にあります。
+ドキュメントは https://react-native-webrtc-kit.shiguredo.jp/ にあります。
 
 ## システム要件
 
@@ -49,9 +46,8 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ### Android アプリケーションの開発
 
-- Android SDK Version 16 以降
-- Android API Level 23 以降
-- Android Buld Tools Version 28.0.3
+- Android 5 以降 (シミュレーターは不可)
+- Android Studio 3.5.1 以降
 
 また、以下の機能について、Android は未対応です。
 
@@ -60,21 +56,23 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ## WebRTC ライブラリについて
 
-本ライブラリは WebRTC M75 に対応しています。
+本ライブラリは WebRTC M79 に対応しています。
 
 本ライブラリが利用する WebRTC ライブラリは、デフォルトの設定では弊社がビルドしたバイナリを指定しています。
 このバイナリは弊社製品用の設定でビルドしてあるので、他のバイナリを使いたい場合は次の方法で入れ替えてください。
 
 - iOS: ビルドした `WebRTC.framework` を `ios/Pods/WebRTC/WebRTC.framework` と入れ替えます。
-    - https://github.com/shiguredo/sora-webrtc-ios
-- Android: ビルドした `libwebrtc.aar` を `android/libs/` 下に配置し、`android/build.gradle` の dependencies に以下のように追記します。
-    - https://github.com/shiguredo/sora-webrtc-android
+    - https://github.com/shiguredo/shiguredo-webrtc-ios
+- Android: ビルドした `libwebrtc.aar` を `android/libs/` 下に配置し、`android/build.gradle` の dependencies に以下のように編集します。
+    - https://github.com/shiguredo/shiguredo-webrtc-android
 
 ```
-dependencies {
-  force api fileTree(dir: 'libs')
-}
-
+ dependencies {
+     implementation 'com.facebook.react:react-native:+'
+     // api "com.github.shiguredo:shiguredo-webrtc-android:79.5.0"
+     implementation "androidx.annotation:annotation:1.1.0"
+     api fileTree(dir: 'libs')
+ }
 ```
 
 ## Issues について
@@ -95,7 +93,8 @@ dependencies {
 ## ライセンス
 
 ```
-Copyright 2018-2019, Shiguredo Inc. and Masashi Ono (akisute) and Kyoko Kadowaki (kdxu)
+Copyright 2018-2019, Masashi Ono aka akisute (Original Author)
+Copyright 2018-2020, Shiguredo Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
