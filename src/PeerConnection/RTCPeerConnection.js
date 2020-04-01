@@ -184,6 +184,12 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
     return WebRTCModule.peerConnectionSetRemoteDescription(sdp.toJSON(), valueTag);
   }
 
+  /** @private */
+  static nativeCreateDataChannel(valueTag: ValueTag, label: string, options: RTCDataChannelInit | null): RTCDataChannel {
+    // TODO(kdxu): nativwe module に `peerConnectionCreateDataChannel` を追加する
+    return WebRTCModule.peerConnectionCreateDataChannel(label, options, valueTag);
+  }
+
   /**
    * クライアントとの総合的な接続状態を表します。
    */
@@ -442,6 +448,22 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
         return;
       });
   }
+
+  /**
+  * DataChannel を作成します。
+  *
+  *  @param {string} label DataChannel の label
+  *  @param {options} RTCDataChannelInit | null オプション
+  *  @return RTCDataChannel 作成した DataChannel
+  * */
+ createDataChannel(label: string, options: RTCDataChannelInit | null = null): RTCDataChannel {
+   logger.log(`# PeerConnection[${this._valueTag}]: create data channel`)
+   return RTCPeerConnection.nativeCreateDataChannel(
+     this._valueTag,
+     label,
+     options
+   )
+ }
 
   _registerEventsFromNative(): void {
     logger.log(`# PeerConnection[${this._valueTag}]: register events from native`);
