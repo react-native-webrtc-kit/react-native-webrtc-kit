@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable RTCIceServer *)RTCIceServer:(nullable id)json;
 + (nullable RTCConfiguration *)RTCConfiguration:(nullable id)json;
 + (nullable WebRTCMediaStreamConstraints *)WebRTCMediaStreamConstraints:(nullable id)json;
++ (nullable RTCDataChannelConfiguration *)RTCDataChannelConfiguration:(nullable id)json;
 
 @end
 

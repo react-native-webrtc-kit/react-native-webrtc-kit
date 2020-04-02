@@ -195,6 +195,17 @@ NS_ASSUME_NONNULL_BEGIN
     return consts;
 }
 
++ (nullable RTCDataChannelConfiguration *)RTCDataChannelConfiguration:(nullable id)json {
+    RTCDataChannelConfiguration *config = [[RTCDataChannelConfiguration alloc] init];
+    NSNumber *ordered = Nullable(json[@"ordered"]);
+    if (ordered) {
+        config.isOrdered = ordered;
+    }
+    // TODO(kdxu): 他のプロパティも変換して RTCDataChannelConfiguration に追加する
+    return config;
+}
+
+
 @end
 
 NS_ASSUME_NONNULL_END
