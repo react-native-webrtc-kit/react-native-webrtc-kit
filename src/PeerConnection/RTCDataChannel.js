@@ -1,12 +1,12 @@
 import RTCDataChannelEventTarget from "./RTCDataChannelEventTarget";
 
 // RTCDataChannelInit のクラスです。
-type RTCDataChannelInit = {
+type RTCDataChannelInit {
     id?: number;
     ordered?: boolean;
     maxPacketLifeTime?: number;
     maxRetransmits?: number;
-    protocol?: number;
+    protocol?: string;
     negotiated?: boolean;
     // maxRetransmitTime は duplicated。代わりに maxPacketLifeTime を用いる
     // cf: https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/sdk/objc/api/peerconnection/RTCDataChannel.h#78
@@ -30,6 +30,7 @@ export type RTCDataChannelState =
 
 // RTCDataChannel のクラスです。
 export default class RTCDataChannel extends RTCDataChannelEventTarget {
+    _valueTag: string;
     binaryType: string = 'arraybuffer';
     id: number = -1;
     label: string;
@@ -40,6 +41,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     readyState: RTCDataChannelState = 'connecting';
     bufferedAmount: number = 0;
     bufferedAmountLowThreshold: number = 0;
+    protocol: string = '';
 
     constructor(label: string, options: RTCDataChannelInit | null = null) {
         super();
@@ -49,7 +51,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
             this.maxPacketLifeTime = options.maxPacketLifeTime;
             this.maxRetransmits = options.maxRetransmits;
             this.ordered = options.ordered;
-            this.protocol = options.protocol;
+            this.protocol = options.protocol || '';
         }
     }
 
@@ -61,4 +63,35 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     close() {
      // WebRTCModule.nativeCloseDataChannel()
     }
+
+  _registerEventsFromNative(): void {
+    logger.log(`# DataChannel[${this._valueTag}]: register events from native`);
+    this._nativeEventListeners = [
+      DeviceEventEmitter.addListener('dataChannelOpen', ev => {
+        if (ev.valueTag !== this._valueTag) {
+          return;
+        }
+        this.dispatchEvent(new RTCEvent('open'));
+      }),
+
+      DeviceEventEmitter.addListener('dataChannelStateChanged', ev => {
+        logger.log("# event: dataChannelStateChanged =>", ev.readyState);
+        if (ev.valueTag !== this._valueTag) {
+          return;
+        }
+        this.readyState = ev.readyState;
+        this.dispatchEvent(new RTCEvent('statechange'));
+        if (ev.connectionState === 'closed') {
+          // This DataChannel is done, clean up event handlers.
+          this._unregisterEventsFromNative();
+        }
+      }),
+    ]
+  }
+
+  _unregisterEventsFromNative(): void {
+    logger.log(`# DataChannel[${this._valueTag}]: unregister events from native`);
+    this._nativeEventListeners.forEach(e => e.remove());
+    this._nativeEventListeners = [];
+  }
 }
