@@ -16,32 +16,39 @@ NS_ASSUME_NONNULL_BEGIN
     [WebRTCValueManager setValueTag: valueTag forObject: self];
 }
 
+- (id)json
+{
+    NSString *state;
+    switch (self.readyState) {
+        case RTCDataChannelStateConnecting:
+            state = @"connecting";
+            break;
+        case RTCDataChannelStateOpen:
+            state = @"open";
+            break;
+        case RTCDataChannelStateClosing:
+            state = @"closing";
+            break;
+        case RTCDataChannelStateClosed :
+            state = @"closed";
+            break;
+        default:
+            NSAssert(NO, @"invalid ready state");
+    }
+    return @{@"valueTag": self.valueTag,
+             @"bufferedAmount": self.bufferedAmount,
+             @"maxRetransmits": self.maxRetransmits,
+             @"maxPacketLifeTime": self.maxPacketLifeTime,
+             @"protocol": self.protocol,
+             @"negotiated": @(self.isNegotiated),
+             @"id": self.channelId,
+             @"readyState": state};
+}
+
 @end
 
 
 @implementation WebRTCModule (RTCDataChannel)
-
-// MARK: -peerConnectionCreateDataChannel:label:config:valueTag:resolver:rejecter
-
-RCT_EXPORT_METHOD(peerConnectionCreateDataChannel: (NSString *)label
-                  config:(RTCDataChannelConfiguration *)config
-                  valueTag: (NSString *) valueTag
-                  resolver:(nonnull RCTPromiseResolveBlock)resolve
-                  rejecter:(nonnull RCTPromiseRejectBlock)reject)
-{
-  // valueTag に相当する peer Connection を見つける
-  RTCPeerConnection *peerConnection = [self peerConnectionForKey: valueTag];
-  if (!peerConnection) {
-    // peer connection がなければ reject する
-    reject(@"NotFoundError", @"peer connection is not found", nil);
-    return;
-  }
-  // DataChannel を Peer Connection に追加する
-  RTCDataChannel *dataChannel = [peerConnection dataChannelForLabel:label configuration:config];
-  // 新たに valueTag を紐付ける
-  dataChannel.valueTag = [self createValueTag];
-  resolve([dataChannel json]);
-}
 
 // MARK: -dataChannelSend:message:valueTag:
 // TODO(kdxu): RTCDataChannelSend 関数を実装する

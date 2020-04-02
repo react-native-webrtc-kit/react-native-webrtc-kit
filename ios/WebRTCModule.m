@@ -1,4 +1,5 @@
 #import "WebRTCModule.h"
+#import "WebRTCModule+RTCDataChannel.h"
 #import "WebRTCModule+RTCPeerConnection.h"
 #import "WebRTCModule+getUserMedia.h"
 
@@ -24,6 +25,7 @@ static WebRTCModule *sharedModule;
 @property (nonatomic) NSMutableDictionary<NSString*, RTCRtpSender *> *senderDict;
 @property (nonatomic) NSMutableDictionary<NSString*, RTCRtpReceiver *> *receiverDict;
 @property (nonatomic) NSMutableDictionary<NSString*, RTCRtpTransceiver *> *transceiverDict;
+@property (nonatomic) NSMutableDictionary<NSString*, RTCDataChannel *> *dataChannelDict;
 
 @end
 
@@ -60,6 +62,7 @@ static WebRTCModule *sharedModule;
         self.senderDict = [NSMutableDictionary dictionary];
         self.receiverDict = [NSMutableDictionary dictionary];
         self.transceiverDict = [NSMutableDictionary dictionary];
+        self.dataChannelDict = [NSMutableDictionary dictionary];
         self.portOverride = AVAudioSessionPortOverrideNone;
         dispatch_queue_attr_t attributes =
         dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL,
@@ -262,6 +265,11 @@ static WebRTCModule *sharedModule;
     dispatch_sync(self.lock, ^{
         [self.transceiverDict removeObjectForKey: key];
     });
+}
+
+- (nullable RTCDataChannel *)dataChannelForKey:(NSString *)key
+{
+    return self.dataChannelDict[key];
 }
 
 #pragma mark - React Native Exports

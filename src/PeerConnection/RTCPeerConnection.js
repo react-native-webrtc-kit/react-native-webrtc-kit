@@ -185,7 +185,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   }
 
   /** @private */
-  static nativeCreateDataChannel(valueTag: ValueTag, label: string, options: RTCDataChannelInit | null): RTCDataChannel {
+  static nativeCreateDataChannel(valueTag: ValueTag, label: string, options: RTCDataChannelInit | null): Promise<RTCDataChannel> {
     // TODO(kdxu): nativwe module に `peerConnectionCreateDataChannel` を追加する
     return WebRTCModule.peerConnectionCreateDataChannel(label, options, valueTag);
   }
