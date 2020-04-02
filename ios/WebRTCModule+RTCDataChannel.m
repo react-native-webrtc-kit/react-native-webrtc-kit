@@ -36,12 +36,12 @@ NS_ASSUME_NONNULL_BEGIN
             NSAssert(NO, @"invalid ready state");
     }
     return @{@"valueTag": self.valueTag,
-             @"bufferedAmount": self.bufferedAmount,
-             @"maxRetransmits": self.maxRetransmits,
-             @"maxPacketLifeTime": self.maxPacketLifeTime,
+             @"bufferedAmount": [[NSNumber alloc] initWithUnsignedLong: self.bufferedAmount],
+             @"maxRetransmits": [[NSNumber alloc] initWithInt: self.maxRetransmits],
+             @"maxPacketLifeTime": [[NSNumber alloc] initWithInt: self.maxPacketLifeTime],
              @"protocol": self.protocol,
              @"negotiated": @(self.isNegotiated),
-             @"id": self.channelId,
+             @"id":  [[NSNumber alloc] initWithInt: self.channelId],
              @"readyState": state};
 }
 
