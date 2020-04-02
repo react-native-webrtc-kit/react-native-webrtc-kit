@@ -71,6 +71,11 @@ NS_ASSUME_NONNULL_BEGIN
                 forKey:(NSString *)key;
 - (void)removeTransceiverForKey:(NSString *)key;
 
+- (nullable RTCDataChannel *)dataChannelForKey:(NSString *)key;
+- (void)addDataChannel:(RTCDataChannel *)channel
+                forKey:(NSString *)key;
+- (void)removeDataChannelForKey:(NSString *)key;
+
 @end
 
 NS_ASSUME_NONNULL_END

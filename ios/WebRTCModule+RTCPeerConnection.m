@@ -1,5 +1,6 @@
 #import <objc/runtime.h>
 
+#import "WebRTCModule+RTCDataChannel.h"
 #import "WebRTCModule+RTCMediaStream.h"
 #import "WebRTCModule+RTCPeerConnection.h"
 #import "WebRTCModule+getUserMedia.h"
@@ -609,7 +610,7 @@ RCT_EXPORT_METHOD(rtpEncodingParametersSetMinBitrate:(nonnull NSNumber *)bitrate
 // MARK: -peerConnectionCreateDataChannel:label:config:valueTag:resolver:rejecter
 
 RCT_EXPORT_METHOD(peerConnectionCreateDataChannel: (NSString *)label
-                  config:(RTCDataChannelConfiguration *)config
+                  options:(nullable RTCDataChannelConfiguration *)options
                   valueTag: (NSString *) valueTag
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject)
@@ -621,12 +622,15 @@ RCT_EXPORT_METHOD(peerConnectionCreateDataChannel: (NSString *)label
     reject(@"NotFoundError", @"peer connection is not found", nil);
     return;
   }
+  RTCDataChannelConfiguration *config = [[RTCDataChannelConfiguration alloc] init];
+  if (options) {
+    config = options;
+  }
   // DataChannel を Peer Connection に追加する
-  RTCDataChannel *dataChannel = [peerConnection dataChannelForLabel:label configuration:config];
+  RTCDataChannel *dataChannel = [peerConnection dataChannelForLabel:label configuration:options];
   // 新たに valueTag を紐付ける
   dataChannel.valueTag = [self createNewValueTag];
   [self addDataChannel: dataChannel forKey: dataChannel.valueTag];
-
   resolve([dataChannel json]);
 }
 

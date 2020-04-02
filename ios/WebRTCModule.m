@@ -272,6 +272,26 @@ static WebRTCModule *sharedModule;
     return self.dataChannelDict[key];
 }
 
+- (void)addDataChannel:(RTCDataChannel *)channel
+           forKey:(NSString *)key
+{
+    NSAssert(key != nil, @"key must not be nil");
+    dispatch_sync(self.lock, ^{
+        NSLog(@"key = %@", [key description]);
+        self.dataChannelDict[key] = channel;
+    });
+}
+
+- (void)removeDataChannelForKey:(NSString *)key
+{
+    NSAssert(key != nil, @"key must not be nil");
+
+    dispatch_sync(self.lock, ^{
+        [self.dataChannelDict removeObjectForKey: key];
+    });
+}
+
+
 #pragma mark - React Native Exports
 
 RCT_EXPORT_MODULE();
