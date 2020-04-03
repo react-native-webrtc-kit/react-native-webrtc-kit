@@ -622,10 +622,6 @@ RCT_EXPORT_METHOD(peerConnectionCreateDataChannel: (NSString *)label
     reject(@"NotFoundError", @"peer connection is not found", nil);
     return;
   }
-  RTCDataChannelConfiguration *config = [[RTCDataChannelConfiguration alloc] init];
-  if (options) {
-    config = options;
-  }
   // DataChannel を Peer Connection に追加する
   RTCDataChannel *dataChannel = [peerConnection dataChannelForLabel:label configuration:options];
   // 新たに valueTag を紐付ける
