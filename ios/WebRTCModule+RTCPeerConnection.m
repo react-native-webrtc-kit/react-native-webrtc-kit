@@ -744,7 +744,9 @@ didStartReceivingOnTransceiver:(RTCRtpTransceiver *)transceiver
 }
 
 - (void)peerConnection:(RTCPeerConnection*)peerConnection didOpenDataChannel:(RTCDataChannel*)dataChannel {
-    // DataChannel は現在対応しない
+    [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionOnDataChannel"
+                                                        body:@{@"valueTag": peerConnection.valueTag,
+                                                               @"channel": [dataChannel json]}];
 }
 
 // MARK: Deprecated
