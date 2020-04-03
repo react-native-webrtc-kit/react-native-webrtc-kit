@@ -6,7 +6,7 @@ import { NativeModules } from 'react-native';
 import * as RTCUtil from '../Util/RTCUtil';
 import RTCMediaStream from '../MediaStream/RTCMediaStream';
 import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
-import { RTCEvent, RTCMediaStreamTrackEvent, RTCIceCandidateEvent } from '../Event/RTCEvents';
+import { RTCEvent, RTCMediaStreamTrackEvent, RTCIceCandidateEvent, RTCDataChannelEvent } from '../Event/RTCEvents';
 import RTCIceCandidate from './RTCIceCandidate';
 import RTCPeerConnectionEventTarget from './RTCPeerConnectionEventTarget';
 import RTCSessionDescription from './RTCSessionDescription';
@@ -185,8 +185,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   }
 
   /** @private */
-  static nativeCreateDataChannel(valueTag: ValueTag, label: string, options: RTCDataChannelInit | null): Promise<RTCDataChannel> {
-    // TODO(kdxu): nativwe module に `peerConnectionCreateDataChannel` を追加する
+  static nativeCreateDataChannel(valueTag: ValueTag, label: string, options: RTCDataChannelInit | null): Promise<Object> {
     return WebRTCModule.peerConnectionCreateDataChannel(label, options, valueTag);
   }
 
@@ -261,6 +260,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * @listens {negotiationneeded} `RTCEvent`: ネゴシエーションが必要になったときに送信されます。
    * @listens {signalingstatechange} `RTCEvent`: `signalingState` が変更されると送信されます。
    * @listens {track} `RTCEvent`: RTCPeerConnection にトラックが追加・削除されると送信されます。
+   * @listens {datachannel} `RTCDataChannelEvent`: RTCPeerConnection に DataChannel がリモートから追加されると送信されます。
    * @listens {addstream} このイベントは廃止されました。
    * @listens {removestream} このイベントは廃止されました。
    */
@@ -454,16 +454,20 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   *
   *  @param {string} label DataChannel の label
   *  @param {options} RTCDataChannelInit | null オプション
-  *  @return RTCDataChannel 作成した DataChannel
+  *  @return {Promise<RTCDataChannel>} 作成した DataChannel
   * */
- createDataChannel(label: string, options: RTCDataChannelInit | null = null): RTCDataChannel {
-   logger.log(`# PeerConnection[${this._valueTag}]: create data channel`)
-   return RTCPeerConnection.nativeCreateDataChannel(
-     this._valueTag,
-     label,
-     options
-   )
- }
+  createDataChannel(label: string, options: RTCDataChannelInit | null = null): Promise<RTCDataChannel> {
+    logger.log(`# PeerConnection[${this._valueTag}]: create data channel`)
+    return RTCPeerConnection.nativeCreateDataChannel(
+      this._valueTag,
+      label,
+      options
+    ).then((info) => {
+      logger.log(`# PeerConnection[${this._valueTag}]: createDataChannel finished: channel => `, info);
+      const channel = new RTCDataChannel(info);
+      return channel;
+    })
+  }
 
   _registerEventsFromNative(): void {
     logger.log(`# PeerConnection[${this._valueTag}]: register events from native`);
@@ -569,11 +573,10 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
           return;
         }
         logger.log(`# PeerConnection[${this._valueTag}]: event: peerConnectionOnDataChannel`);
-        // TODO: JSON で受け渡されたデータから RTC DataChannel をイニシャライズする
-        const channel = new RTCDataChannel();
-        this.dispatchEvent(new RTCEvent('datachannel', { channel }));
+        const channel = new RTCDataChannel(ev.channel);
+        this.dataChannels.push(channel);
+        this.dispatchEvent(new RTCDataChannelEvent('datachannel', channel));
       }),
-
     ]
   }
 
