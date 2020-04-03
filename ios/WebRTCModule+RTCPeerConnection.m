@@ -744,6 +744,8 @@ didStartReceivingOnTransceiver:(RTCRtpTransceiver *)transceiver
 }
 
 - (void)peerConnection:(RTCPeerConnection*)peerConnection didOpenDataChannel:(RTCDataChannel*)dataChannel {
+    // dataChannel に新しい valueTag を割り当てる
+    dataChannel.valueTag = [self createNewValueTag];
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionOnDataChannel"
                                                         body:@{@"valueTag": peerConnection.valueTag,
                                                                @"channel": [dataChannel json]}];
