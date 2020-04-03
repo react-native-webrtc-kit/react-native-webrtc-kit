@@ -1,4 +1,7 @@
 import RTCDataChannelEventTarget from "./RTCDataChannelEventTarget";
+import { RTCEvent, RTCDataChannelMessageEvent } from '../Event/RTCEvents';
+import { nativeBoolean } from '../Util/RTCUtil';
+import type { ValueTag } from './RTCPeerConnection';
 
 // RTCDataChannelInit のクラスです。
 type RTCDataChannelInit {
@@ -30,7 +33,7 @@ export type RTCDataChannelState =
 
 // RTCDataChannel のクラスです。
 export default class RTCDataChannel extends RTCDataChannelEventTarget {
-    _valueTag: string;
+    _valueTag: ValueTag;
     binaryType: string = 'arraybuffer';
     id: number = -1;
     label: string;
@@ -43,16 +46,18 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     bufferedAmountLowThreshold: number = 0;
     protocol: string = '';
 
-    constructor(label: string, options: RTCDataChannelInit | null = null) {
+    constructor(info: Object) {
         super();
-        this.label = label;
-        if (options) {
-            this.id = options.id;
-            this.maxPacketLifeTime = options.maxPacketLifeTime;
-            this.maxRetransmits = options.maxRetransmits;
-            this.ordered = options.ordered;
-            this.protocol = options.protocol || '';
-        }
+        this._valueTag = info.valueTag;
+        this.label = info.label;
+        this.maxPacketLifeTime = info.maxPacketLifeTime;
+        this.maxRetransmits = info.maxRetransmits;
+        this.negotiated = nativeBoolean(info.negotiated);
+        this.ordered = nativeBoolean(info.ordered);
+        this.readyState = info.readyState;
+        this.bufferedAmount = info.bufferedAmount;
+        this.bufferedAmountLowThreshold = info.bufferedAmountLowThreshold;
+        this._registerEventsFromNative();
     }
 
     // TODO(kdxu) 必要なメソッドを実装する
@@ -64,28 +69,51 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
      // WebRTCModule.nativeCloseDataChannel()
     }
 
-  _registerEventsFromNative(): void {
+    /**
+     * ネイティブレイヤーからのコールバックイベントを登録します。
+     * 受け取るイベントは以下の通りです。
+      - 'open'
+      - 'message'
+      - 'bufferedamountlow'
+      - 'close'
+      - 'closing'
+     */
+    _registerEventsFromNative(): void {
     logger.log(`# DataChannel[${this._valueTag}]: register events from native`);
     this._nativeEventListeners = [
-      DeviceEventEmitter.addListener('dataChannelOpen', ev => {
-        if (ev.valueTag !== this._valueTag) {
-          return;
-        }
-        this.dispatchEvent(new RTCEvent('open'));
-      }),
-
       DeviceEventEmitter.addListener('dataChannelStateChanged', ev => {
         logger.log("# event: dataChannelStateChanged =>", ev.readyState);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
         this.readyState = ev.readyState;
-        this.dispatchEvent(new RTCEvent('statechange'));
-        if (ev.connectionState === 'closed') {
-          // This DataChannel is done, clean up event handlers.
-          this._unregisterEventsFromNative();
+        switch (ev.readyState) {
+            case 'connecting':
+                // connecting は initial state なので、onstatechange でここに来ることは無いはず
+                // cf: https://www.w3.org/TR/webrtc/#creating-a-data-channel
+                break;
+            case 'open':
+                this.dispatchEvent(new RTCEvent('open'));
+                break;
+            case 'closing':
+                this.dispatchEvent(new RTCEvent('closing'));
+                break;
+            case 'closed':
+                // This DataChannel is done, clean up event handlers.
+                this._unregisterEventsFromNative();
+                break;
+            default:
+                // 予測していない state type が来た場合警告を出す
+                logger.warn('# event: dataChannelStateChanged, invalid state=>', ev.readyState);
         }
       }),
+      DeviceEventEmitter.addListener('dataChannelOnMessage', ev => {
+        this.dispatchEvent(new RTCDataChannelMessageEvent(ev));
+      }),
+      DeviceEventEmitter.addListener('dataChannelOnChangeBufferedAmount', ev => {
+        this.dispatchEvent(new RTCEvent('bufferedamountlow', ev));
+      }),
+
     ]
   }
 
