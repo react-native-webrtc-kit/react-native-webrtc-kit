@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface WebRTCModule (RTCDataChannel)
+@interface WebRTCModule (RTCDataChannel) <RTCDataChannelDelegate>
 
 @end
 

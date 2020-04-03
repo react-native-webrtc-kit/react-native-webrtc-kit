@@ -100,6 +100,10 @@ export class RTCIceCandidateEvent {
 export class RTCDataChannelEvent {
 
     /**
+     * イベントの種別
+     */
+    type: string;
+    /**
      * datachannel
      */
     channel: RTCDataChannel;
@@ -107,7 +111,8 @@ export class RTCDataChannelEvent {
     /**
      * @package
      */
-    constructor(channel: RTCDataChannel) {
+    constructor(type: string, channel: RTCDataChannel) {
+        this.type = type.toString();
         this.channel = channel;
     }
 }
@@ -117,7 +122,10 @@ export class RTCDataChannelEvent {
  * cf: https://developer.mozilla.org/ja/docs/Web/API/MessageEvent
  */
 export class RTCDataChannelMessageEvent {
-
+    /**
+     * イベントの種別
+     */
+    type: string;
     /**
      * message
      */
@@ -131,7 +139,8 @@ export class RTCDataChannelMessageEvent {
     /**
      * @package
      */
-    constructor(eventInitDict?: Object) {
+    constructor(type: string, eventInitDict?: Object) {
+        this.type = type.toString();
         this.message = null;
         this.origin = null;
         Object.assign(this, eventInitDict);

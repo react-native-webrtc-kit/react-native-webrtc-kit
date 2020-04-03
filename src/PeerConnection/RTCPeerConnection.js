@@ -575,7 +575,6 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
         }
         logger.log(`# PeerConnection[${this._valueTag}]: event: peerConnectionOnDataChannel`);
         const channel = new RTCDataChannel(ev.channel);
-        this.dataChannels.push(channel);
         this.dispatchEvent(new RTCDataChannelEvent('datachannel', channel));
       }),
     ]

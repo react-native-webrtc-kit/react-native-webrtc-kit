@@ -1,7 +1,12 @@
+// @flow
+
+import { DeviceEventEmitter } from 'react-native';
+import { NativeModules } from 'react-native';
 import RTCDataChannelEventTarget from "./RTCDataChannelEventTarget";
 import { RTCEvent, RTCDataChannelMessageEvent } from '../Event/RTCEvents';
 import { nativeBoolean } from '../Util/RTCUtil';
 import type { ValueTag } from './RTCPeerConnection';
+import logger from '../Util/RTCLogger';
 
 // RTCDataChannelInit のクラスです。
 type RTCDataChannelInit = {
@@ -37,13 +42,12 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   binaryType: string = 'arraybuffer';
   id: number = -1;
   label: string;
-  maxPacketLifeTime: number | null = null;
-  maxRetransmits: number | null = null;
+  maxPacketLifeTime: number;
+  maxRetransmits: number;
   negotiated: boolean = false;
   ordered: boolean = false;
   readyState: RTCDataChannelState = 'connecting';
   bufferedAmount: number = 0;
-  bufferedAmountLowThreshold: number = 0;
   protocol: string = '';
 
   constructor(info: Object) {
@@ -55,8 +59,8 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     this.negotiated = nativeBoolean(info.negotiated);
     this.ordered = nativeBoolean(info.ordered);
     this.readyState = info.readyState;
+    this.id = info.id;
     this.bufferedAmount = info.bufferedAmount;
-    this.bufferedAmountLowThreshold = info.bufferedAmountLowThreshold;
     this._registerEventsFromNative();
   }
 
@@ -108,7 +112,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
         }
       }),
       DeviceEventEmitter.addListener('dataChannelOnMessage', ev => {
-        this.dispatchEvent(new RTCDataChannelMessageEvent(ev));
+        this.dispatchEvent(new RTCDataChannelMessageEvent('message', ev));
       }),
       DeviceEventEmitter.addListener('dataChannelOnChangeBufferedAmount', ev => {
         this.dispatchEvent(new RTCEvent('bufferedamountlow', ev));
