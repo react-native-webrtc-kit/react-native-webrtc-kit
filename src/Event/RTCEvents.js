@@ -5,6 +5,7 @@ import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
 import RTCIceCandidate from '../PeerConnection/RTCIceCandidate';
 import RTCRtpReceiver from '../PeerConnection/RTCRtpReceiver';
 import RTCRtpTransceiver from '../PeerConnection/RTCRtpTransceiver';
+import RTCDataChannel from '../PeerConnection/RTCDataChannel';
 
 /**
  * 特にプロパティを持たない一般的なイベントを表します。
@@ -89,5 +90,50 @@ export class RTCIceCandidateEvent {
         if (eventInitDict && eventInitDict.candidate) {
             this.candidate = eventInitDict.candidate;
         }
+    }
+}
+
+/**
+ * RTCDataChannel に関するイベントを表します。
+ * RTCPeerConnection.ondatachannel にて利用します。
+ */
+export class RTCDataChannelEvent {
+
+    /**
+     * datachannel
+     */
+    channel: RTCDataChannel;
+
+    /**
+     * @package
+     */
+    constructor(channel: RTCDataChannel) {
+        this.channel = channel;
+    }
+}
+
+/**
+ * RTCDataChannel.onmessage に関するイベントを表します。
+ * cf: https://developer.mozilla.org/ja/docs/Web/API/MessageEvent
+ */
+export class RTCDataChannelMessageEvent {
+
+    /**
+     * message
+     */
+    message: string | Blob | null;
+    /**
+     * origin
+     */
+    origin: string | null;
+
+
+    /**
+     * @package
+     */
+    constructor(eventInitDict?: Object) {
+        this.message = null;
+        this.origin = null;
+        Object.assign(this, eventInitDict);
     }
 }
