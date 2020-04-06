@@ -36,43 +36,51 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation WebRTCModule (RTCDataChannel)
 
-// MARK: -dataChannelSend:message:valueTag:
-
+// MARK: -dataChannelSend:message:valueTag:reslver:rejecter:
 RCT_EXPORT_METHOD(dataChannelSend:(nonnull RTCDataBuffer*) buffer
-                     valueTag:(nonnull NSString *) valueTag)
+                  valueTag:(nonnull NSString *) valueTag
+                  resolver:(nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject)
 {
     RTCDataChannel *channel = [self dataChannelForKey:valueTag];
-    if (channel) {
-        [channel sendData:buffer];
+    if (!channel) {
+        return reject(@"NotFoundError", @"datachannel is not found", nil);
     }
+    [channel sendData:buffer];
+    resolve(nil);
 }
 
-// MARK: -close:message:valueTag:
-RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag)
+// MARK: -close:message:valueTag:resolver:rejecter
+RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag
+                  resolver:(nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject)
 {
     RTCDataChannel *channel = [self dataChannelForKey:valueTag];
-    if (channel) {
-        [channel close];
-        [self removeDataChannelForKey:valueTag];
+    if (!channel) {
+        reject(@"NotFoundError", @"datachannel is not found", nil);
     }
+    [channel close];
+    [self removeDataChannelForKey:valueTag];
+    resolve(nil);
 }
 
 #pragma mark - RTCDataChannelDelegate
 
 - (void)dataChannelDidChangeState:(RTCDataChannel*)channel
 {
-  [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelStateChanged"
-                                                  body: @{@"id": @(channel.channelId),
-                                                  @"valueTag": channel.valueTag,
-                                                  @"readyState": [WebRTCUtils stringForDataChannelState:channel.readyState]}];
+    [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelStateChanged"
+                                                    body: @{@"id": @(channel.channelId),
+                                                            @"valueTag": channel.valueTag,
+                                                            @"readyState": [WebRTCUtils stringForDataChannelState:channel.readyState]}];
 }
 
 - (void)dataChannel:(RTCDataChannel *)channel didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer
 {
     id event = @{@"id": @(channel.channelId),
                  @"valueTag": channel.valueTag,
-                 @"buffer": buffer};
-  [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelOnMessage" body:event];
+                 @"binary": @(buffer.isBinary),
+                 @"data": [RCTConvert NSData:buffer.data]};
+    [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelOnMessage" body:event];
 }
 
 - (void) dataChannel:(RTCDataChannel *)channel didChangeBufferedAmount:(uint64_t)amount {

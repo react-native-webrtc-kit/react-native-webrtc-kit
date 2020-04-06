@@ -11,7 +11,7 @@ import logger from '../Util/RTCLogger';
 /** @private */
 const { WebRTCModule } = NativeModules;
 
-type RTCDataBuffer = {
+export type RTCDataBuffer = {
   data: string;
   binary: boolean;
 }
@@ -74,21 +74,28 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
 
   /** @private */
   static nativeSendDataChannel(valueTag: ValueTag,
-    buffer: RTCDataBuffer): void {
+    buffer: RTCDataBuffer): Promise<void> {
     return WebRTCModule.dataChannelSend(buffer, valueTag);
   }
 
   /** @private */
-  static nativeCloseDataChannel(valueTag: ValueTag): void {
+  static nativeCloseDataChannel(valueTag: ValueTag): Promise<void> {
     return WebRTCModule.dataChannelClose(valueTag)
   }
 
-  send(buffer: RTCDataBuffer) {
-    RTCDataChannel.nativeSendDataChannel(this._valueTag, buffer);
+  /**
+   * RTCDataChannel でデータを送信します。
+   * @param {RTCDataBuffer} data 送信するデータ
+   */
+  send(data: RTCDataBuffer): Promise<void> {
+    return RTCDataChannel.nativeSendDataChannel(this._valueTag, data);
   }
 
-  close() {
-    RTCDataChannel.nativeCloseDataChannel(this._valueTag);
+  /**
+   * RTCDataChannel を閉じます。
+   */
+  close(): Promise<void> {
+    return RTCDataChannel.nativeCloseDataChannel(this._valueTag);
   }
 
   /**
@@ -130,10 +137,11 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
         }
       }),
       DeviceEventEmitter.addListener('dataChannelOnMessage', ev => {
+        logger.log("# event: dataChannelOnMessage =>", ev.data);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
-        this.dispatchEvent(new RTCDataChannelMessageEvent('message', ev));
+        this.dispatchEvent(new RTCDataChannelMessageEvent('message', ev.data));
       }),
       DeviceEventEmitter.addListener('dataChannelOnChangeBufferedAmount', ev => {
         if (ev.valueTag !== this._valueTag) {

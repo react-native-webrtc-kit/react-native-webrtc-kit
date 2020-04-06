@@ -5,7 +5,7 @@ import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
 import RTCIceCandidate from '../PeerConnection/RTCIceCandidate';
 import RTCRtpReceiver from '../PeerConnection/RTCRtpReceiver';
 import RTCRtpTransceiver from '../PeerConnection/RTCRtpTransceiver';
-import RTCDataChannel from '../PeerConnection/RTCDataChannel';
+import RTCDataChannel, { RTCDataBuffer } from '../PeerConnection/RTCDataChannel';
 
 /**
  * 特にプロパティを持たない一般的なイベントを表します。
@@ -126,23 +126,13 @@ export class RTCDataChannelMessageEvent {
      * イベントの種別
      */
     type: string;
-    /**
-     * message
-     */
-    message: string | Blob | null;
-    /**
-     * origin
-     */
-    origin: string | null;
-
+    data: string | null;
 
     /**
      * @package
      */
-    constructor(type: string, eventInitDict?: Object) {
+    constructor(type: string, data: string | null) {
         this.type = type.toString();
-        this.message = null;
-        this.origin = null;
-        Object.assign(this, eventInitDict);
+        this.data = data.toString();
     }
 }
