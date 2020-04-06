@@ -223,8 +223,8 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 + (nullable RTCDataBuffer *)RTCDataBuffer:(nullable id)json {
-    AssertNonNull(@"data", NSString, json);
-    AssertNonNull(@"binary", BOOL, json);
+    AssertNonNull(@"data", NSString, json[@"data"]);
+    AssertNonNull(@"binary", NSNumber, json[@"binary"]);
     BOOL isBinary = [RCTConvert BOOL:json[@"binary"]];
     NSData *data;
     if (isBinary) {

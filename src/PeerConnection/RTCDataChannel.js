@@ -8,6 +8,14 @@ import { nativeBoolean } from '../Util/RTCUtil';
 import type { ValueTag } from './RTCPeerConnection';
 import logger from '../Util/RTCLogger';
 
+/** @private */
+const { WebRTCModule } = NativeModules;
+
+type RTCDataBuffer = {
+  data: string;
+  binary: boolean;
+}
+
 // RTCDataChannelInit のクラスです。
 type RTCDataChannelInit = {
   id?: number;
@@ -64,13 +72,23 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     this._registerEventsFromNative();
   }
 
-  // TODO(kdxu) 必要なメソッドを実装する
-  send() {
-    // WebRTCModule.nativeSendDataChannel()
+  /** @private */
+  static nativeSendDataChannel(valueTag: ValueTag,
+    buffer: RTCDataBuffer): void {
+    return WebRTCModule.dataChannelSend(buffer, valueTag);
+  }
+
+  /** @private */
+  static nativeCloseDataChannel(valueTag: ValueTag): void {
+    return WebRTCModule.dataChannelClose(valueTag)
+  }
+
+  send(buffer: RTCDataBuffer) {
+    RTCDataChannel.nativeSendDataChannel(this._valueTag, buffer);
   }
 
   close() {
-    // WebRTCModule.nativeCloseDataChannel()
+    RTCDataChannel.nativeCloseDataChannel(this._valueTag);
   }
 
   /**
