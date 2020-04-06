@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)json
 {
     return @{@"valueTag": self.valueTag,
-             @"bufferedAmount": [[NSNumber alloc] initWithUnsignedLong: self.bufferedAmount],
+             @"bufferedAmount": [[NSNumber alloc] initWithUnsignedLongLong: self.bufferedAmount],
              @"maxRetransmits": [[NSNumber alloc] initWithInt: self.maxRetransmits],
              @"maxPacketLifeTime": [[NSNumber alloc] initWithInt: self.maxPacketLifeTime],
              @"protocol": self.protocol,
@@ -37,17 +37,24 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation WebRTCModule (RTCDataChannel)
 
 // MARK: -dataChannelSend:message:valueTag:
-// TODO(kdxu): RTCDataChannelSend 関数を実装する
-// RCT_EXPORT_METHOD(dataChannelSend:(nonnull NSString*) message
-//                     valueTag:(nonnull NSString *) valueTag)
-//{
-//}
+RCT_EXPORT_METHOD(dataChannelSend:(nonnull RTCDataBuffer*) buffer
+                     valueTag:(nonnull NSString *) valueTag)
+{
+    RTCDataChannel *channel = [self dataChannelForKey:valueTag];
+    if (channel) {
+        [channel sendData:buffer];
+    }
+}
 
 // MARK: -close:message:valueTag:
-// TODO(kdxu): RTCDataChannelClose 関数を実装する
-// RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag)
-//{
-//}
+RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag)
+{
+    RTCDataChannel *channel = [self dataChannelForKey:valueTag];
+    if (channel) {
+        [channel close];
+        [self removeDataChannelForKey:valueTag];
+    }
+}
 
 #pragma mark - RTCDataChannelDelegate
 
@@ -61,9 +68,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)dataChannel:(RTCDataChannel *)channel didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer
 {
+    id event = @{@"id": @(channel.channelId),
+                 @"valueTag": channel.valueTag,
+                 @"buffer": buffer};
+  [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelOnMessage" body:event];
+}
 
-//  [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelReceiveMessage"
- //                                                 body:event];
+- (void) dataChannel:(RTCDataChannel *)channel didChangeBufferedAmount:(uint64_t)amount {
+    [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelOnChangeBufferedAmount"
+                                                    body: @{@"id": @(channel.channelId),
+                                                            @"valueTag": channel.valueTag,
+                                                            @"bufferedAmount": [[NSNumber alloc] initWithUnsignedLongLong: amount]}];
 }
 
 

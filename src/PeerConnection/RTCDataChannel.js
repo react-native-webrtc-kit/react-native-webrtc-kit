@@ -112,9 +112,15 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
         }
       }),
       DeviceEventEmitter.addListener('dataChannelOnMessage', ev => {
+        if (ev.valueTag !== this._valueTag) {
+          return;
+        }
         this.dispatchEvent(new RTCDataChannelMessageEvent('message', ev));
       }),
       DeviceEventEmitter.addListener('dataChannelOnChangeBufferedAmount', ev => {
+        if (ev.valueTag !== this._valueTag) {
+          return;
+        }
         this.dispatchEvent(new RTCEvent('bufferedamountlow', ev));
       }),
 

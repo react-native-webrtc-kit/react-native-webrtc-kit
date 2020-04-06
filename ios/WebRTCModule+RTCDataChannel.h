@@ -3,6 +3,7 @@
 
 #import "WebRTCModule.h"
 #import "WebRTCValueManager.h"
+#import <WebRTC/RTCDataChannel.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
