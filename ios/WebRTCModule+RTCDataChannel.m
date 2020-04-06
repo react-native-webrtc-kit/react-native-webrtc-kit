@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation WebRTCModule (RTCDataChannel)
 
-// MARK: -dataChannelSend:message:valueTag:reslver:rejecter:
+// MARK: -dataChannelSend:message:valueTag:resolver:rejecter:
 RCT_EXPORT_METHOD(dataChannelSend:(nonnull RTCDataBuffer*) buffer
                   valueTag:(nonnull NSString *) valueTag
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
@@ -44,7 +44,8 @@ RCT_EXPORT_METHOD(dataChannelSend:(nonnull RTCDataBuffer*) buffer
 {
     RTCDataChannel *channel = [self dataChannelForKey:valueTag];
     if (!channel) {
-        return reject(@"NotFoundError", @"datachannel is not found", nil);
+        reject(@"NotFoundError", @"datachannel is not found", nil);
+        return;
     }
     [channel sendData:buffer];
     resolve(nil);
@@ -58,34 +59,56 @@ RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag
     RTCDataChannel *channel = [self dataChannelForKey:valueTag];
     if (!channel) {
         reject(@"NotFoundError", @"datachannel is not found", nil);
+        return;
     }
     [channel close];
     [self removeDataChannelForKey:valueTag];
     resolve(nil);
 }
 
+- (void) dataChannelInit:(RTCDataChannel *)channel {
+    // 新たに valueTag を紐付ける
+    channel.valueTag = [self createNewValueTag];
+    channel.delegate = self;
+    [self addDataChannel:channel forKey:channel.valueTag];
+}
+
 #pragma mark - RTCDataChannelDelegate
 
 - (void)dataChannelDidChangeState:(RTCDataChannel*)channel
 {
+    if (!channel.valueTag) {
+        return;
+    }
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelStateChanged"
-                                                    body: @{@"id": @(channel.channelId),
+                                                    body: @{@"id": [[NSNumber alloc] initWithInt: channel.channelId],
                                                             @"valueTag": channel.valueTag,
                                                             @"readyState": [WebRTCUtils stringForDataChannelState:channel.readyState]}];
 }
 
 - (void)dataChannel:(RTCDataChannel *)channel didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer
 {
-    id event = @{@"id": @(channel.channelId),
-                 @"valueTag": channel.valueTag,
-                 @"binary": @(buffer.isBinary),
-                 @"data": [RCTConvert NSData:buffer.data]};
-    [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelOnMessage" body:event];
+
+    NSString *data;
+    if (buffer.isBinary) {
+      // バイナリデータの場合は base64 で string に戻す
+      data = [buffer.data base64EncodedStringWithOptions:0];
+    } else {
+       // バイナリデータでない場合、UTF-8 エンコーディングで string に戻す
+      data = [[NSString alloc] initWithData:buffer.data
+                                   encoding:NSUTF8StringEncoding];
+    }
+    [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelOnMessage"
+                                                    body:@{@"id": [[NSNumber alloc] initWithInt: channel.channelId],
+                                                           @"valueTag": channel.valueTag,
+                                                           @"binary": @(buffer.isBinary),
+                                                           @"data": data
+                                                    }];
 }
 
 - (void) dataChannel:(RTCDataChannel *)channel didChangeBufferedAmount:(uint64_t)amount {
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelOnChangeBufferedAmount"
-                                                    body: @{@"id": @(channel.channelId),
+                                                    body: @{@"id": [[NSNumber alloc] initWithInt: channel.channelId],
                                                             @"valueTag": channel.valueTag,
                                                             @"bufferedAmount": [[NSNumber alloc] initWithUnsignedLongLong: amount]}];
 }

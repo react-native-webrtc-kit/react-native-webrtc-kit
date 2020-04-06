@@ -626,6 +626,7 @@ RCT_EXPORT_METHOD(peerConnectionCreateDataChannel: (NSString *)label
   RTCDataChannel *dataChannel = [peerConnection dataChannelForLabel:label configuration:options];
   // 新たに valueTag を紐付ける
   dataChannel.valueTag = [self createNewValueTag];
+  dataChannel.delegate = self;
   [self addDataChannel: dataChannel forKey: dataChannel.valueTag];
   resolve([dataChannel json]);
 }
@@ -746,6 +747,8 @@ didStartReceivingOnTransceiver:(RTCRtpTransceiver *)transceiver
 - (void)peerConnection:(RTCPeerConnection*)peerConnection didOpenDataChannel:(RTCDataChannel*)dataChannel {
     // dataChannel に新しい valueTag を割り当てる
     dataChannel.valueTag = [self createNewValueTag];
+    dataChannel.delegate = self;
+    [self addDataChannel: dataChannel forKey: dataChannel.valueTag];
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionOnDataChannel"
                                                         body:@{@"valueTag": peerConnection.valueTag,
                                                                @"channel": [dataChannel json]}];

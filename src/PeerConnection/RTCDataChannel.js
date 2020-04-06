@@ -57,6 +57,18 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   readyState: RTCDataChannelState = 'connecting';
   bufferedAmount: number = 0;
   protocol: string = '';
+  _nativeEventListeners: Array<any> = [];
+
+  /** @private */
+  static nativeSendDataChannel(valueTag: ValueTag,
+    buffer: RTCDataBuffer): Promise<void> {
+    return WebRTCModule.dataChannelSend(buffer, valueTag);
+  }
+
+  /** @private */
+  static nativeCloseDataChannel(valueTag: ValueTag): Promise<void> {
+    return WebRTCModule.dataChannelClose(valueTag)
+  }
 
   constructor(info: Object) {
     super();
@@ -70,17 +82,6 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     this.id = info.id;
     this.bufferedAmount = info.bufferedAmount;
     this._registerEventsFromNative();
-  }
-
-  /** @private */
-  static nativeSendDataChannel(valueTag: ValueTag,
-    buffer: RTCDataBuffer): Promise<void> {
-    return WebRTCModule.dataChannelSend(buffer, valueTag);
-  }
-
-  /** @private */
-  static nativeCloseDataChannel(valueTag: ValueTag): Promise<void> {
-    return WebRTCModule.dataChannelClose(valueTag)
   }
 
   /**
@@ -141,7 +142,8 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
         if (ev.valueTag !== this._valueTag) {
           return;
         }
-        this.dispatchEvent(new RTCDataChannelMessageEvent('message', ev.data));
+        // TODO(kdxu): バイナリデータの場合ここで Array Buffer にして event に渡す？
+        this.dispatchEvent(new RTCDataChannelMessageEvent('message', ev.data, ev.binary));
       }),
       DeviceEventEmitter.addListener('dataChannelOnChangeBufferedAmount', ev => {
         if (ev.valueTag !== this._valueTag) {

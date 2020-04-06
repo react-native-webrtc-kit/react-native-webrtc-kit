@@ -127,12 +127,14 @@ export class RTCDataChannelMessageEvent {
      */
     type: string;
     data: string | null;
+    binary: boolean;
 
     /**
      * @package
      */
-    constructor(type: string, data: string | null) {
+    constructor(type: string, data: string, binary: boolean) {
         this.type = type.toString();
         this.data = data.toString();
+        this.binary = binary;
     }
 }
