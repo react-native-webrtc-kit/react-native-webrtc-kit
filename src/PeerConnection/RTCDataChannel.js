@@ -50,7 +50,7 @@ export type RTCDataChannelState =
 // RTCDataChannel のクラスです。
 export default class RTCDataChannel extends RTCDataChannelEventTarget {
   _valueTag: ValueTag;
-  // React Native では Blob をビルトインに利用できないので、binaryType は arraybuffer のみとなる
+  // XXX(kdxu): 現在 Chrome / Safari は binaryType = 'blob' をサポートしていない。RNKit で対応するか要検討
   binaryType: string = 'arraybuffer';
   id: number = -1;
   label: string;
@@ -109,7 +109,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
       byteArray = new Uint8Array(data);
     }
     return RTCDataChannel.nativeSendDataChannel(this._valueTag, { data: Base64.fromByteArray(byteArray), binary: true });
-    // XXX: (kdxu) Blob は一旦考えない
+    // XXX(kdxu): Chrome, Safari でサポートされていない Blob については一旦実装を保留する
   }
 
   /**
