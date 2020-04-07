@@ -7,7 +7,7 @@ import { RTCEvent, RTCDataChannelMessageEvent } from '../Event/RTCEvents';
 import { nativeBoolean } from '../Util/RTCUtil';
 import type { ValueTag } from './RTCPeerConnection';
 import logger from '../Util/RTCLogger';
-import { Base64 } from 'js-base64';
+import * as Base64 from 'base64-js';
 
 /** @private */
 const { WebRTCModule } = NativeModules;
@@ -122,7 +122,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
           // ArrayBuffer が渡された場合、そのまま byteArray に変換する
           byteArray = new Uint8Array(data);
         }
-        return RTCDataChannel.nativeSendDataChannel(this._valueTag, { data: Base64.encode(byteArray), binary: true });
+        return RTCDataChannel.nativeSendDataChannel(this._valueTag, { data: Base64.fromByteArray(byteArray), binary: true });
     }
   }
 
@@ -179,7 +179,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
         let data = ev.data;
         // バイナリデータの場合、base64 decode を行う
         if (ev.binary === true) {
-          data = Base64.atob(ev.data);
+          data = Base64.toByteArray(ev.data);
         }
         this.dispatchEvent(new RTCDataChannelMessageEvent('message', data, ev.binary));
       }),
