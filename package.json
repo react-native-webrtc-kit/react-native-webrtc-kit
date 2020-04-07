@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "event-target-shim": "^3.0.2",
+    "js-base64": "^2.5.2",
     "prop-types": "^15.6.2"
   },
   "directories": {
