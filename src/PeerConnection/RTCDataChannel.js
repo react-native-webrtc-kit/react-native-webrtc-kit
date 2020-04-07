@@ -7,12 +7,15 @@ import { RTCEvent, RTCDataChannelMessageEvent } from '../Event/RTCEvents';
 import { nativeBoolean } from '../Util/RTCUtil';
 import type { ValueTag } from './RTCPeerConnection';
 import logger from '../Util/RTCLogger';
+import { Base64 } from 'js-base64';
 
 /** @private */
 const { WebRTCModule } = NativeModules;
 
-export type RTCDataBuffer = {
-  data: string;
+// DataChannel で送受信するデータのクラスです。
+type RTCDataBuffer = {
+  data: string | ArrayBuffer | ArrayBufferView | Blob;
+  // バイナリデータかどうかのフラグ
   binary: boolean;
 }
 
@@ -47,6 +50,7 @@ export type RTCDataChannelState =
 // RTCDataChannel のクラスです。
 export default class RTCDataChannel extends RTCDataChannelEventTarget {
   _valueTag: ValueTag;
+  // React Native では Blob をビルトインに利用できないので、binaryType は arraybuffer のみとなる
   binaryType: string = 'arraybuffer';
   id: number = -1;
   label: string;
@@ -86,10 +90,40 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
 
   /**
    * RTCDataChannel でデータを送信します。
-   * @param {RTCDataBuffer} data 送信するデータ
+   * @param {string | ArrayBuffer | ArrayBufferView | Blob} data 送信するデータ
    */
-  send(data: RTCDataBuffer): Promise<void> {
-    return RTCDataChannel.nativeSendDataChannel(this._valueTag, data);
+  send(data: string | ArrayBuffer | ArrayBufferView): Promise<void> {
+    switch (typeof data) {
+      case 'string':
+        return RTCDataChannel.nativeSendDataChannel(this._valueTag, { data: data, binary: false });
+      case 'Blob':
+        return new Promise((resolve, reject) => {
+          const fs = new FileReader();
+          // react-native では現在 `readAsArrayBuffer` が未実装のため readAsBinaryString を用いる
+          fs.onloadend = (result => {
+            // 読み込みが終わったら　base64 encode してデータを送信する
+            resolve(RTCDataChannel.nativeSendDataChannel(this._valueTag, { data: Base64.encode(result), binary: true }));
+          });
+          fs.onerror((error: Error) => {
+            logger.warn(`# DataChannel[${this._valueTag}]: failed to read blob file, error=>`, error);
+            reject(error);
+          });
+          fs.readAsText(data);
+        })
+        break;
+      // 以下は ArrayBuffer | ArrayBufferView への対応
+      case 'ArrayBuffer':
+      case 'ArrayBufferView':
+        let byteArray;
+        if (ArrayBuffer.isView(data)) {
+          // ArrayBufferView が渡された場合は buffer, byteoffset, bytelength を渡す
+          byteArray = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+        } else {
+          // ArrayBuffer が渡された場合、そのまま byteArray に変換する
+          byteArray = new Uint8Array(data);
+        }
+        return RTCDataChannel.nativeSendDataChannel(this._valueTag, { data: Base64.encode(byteArray), binary: true });
+    }
   }
 
   /**
@@ -142,8 +176,12 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
         if (ev.valueTag !== this._valueTag) {
           return;
         }
-        // TODO(kdxu): バイナリデータの場合ここで Array Buffer にして event に渡す？
-        this.dispatchEvent(new RTCDataChannelMessageEvent('message', ev.data, ev.binary));
+        let data = ev.data;
+        // バイナリデータの場合、base64 decode を行う
+        if (ev.binary === true) {
+          data = Base64.atob(ev.data);
+        }
+        this.dispatchEvent(new RTCDataChannelMessageEvent('message', data, ev.binary));
       }),
       DeviceEventEmitter.addListener('dataChannelOnChangeBufferedAmount', ev => {
         if (ev.valueTag !== this._valueTag) {
