@@ -126,7 +126,7 @@ export class RTCDataChannelMessageEvent {
      * イベントの種別
      */
     type: string;
-    data: string | null;
+    data: string | ArrayBuffer | null;
     binary: boolean;
 
     /**

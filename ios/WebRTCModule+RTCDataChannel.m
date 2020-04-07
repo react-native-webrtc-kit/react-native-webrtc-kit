@@ -47,6 +47,7 @@ RCT_EXPORT_METHOD(dataChannelSend:(nonnull RTCDataBuffer*) buffer
         reject(@"NotFoundError", @"datachannel is not found", nil);
         return;
     }
+    NSLog(@"# dataChannelSend: buffer %@", [[buffer data] description]);
     [channel sendData:buffer];
     resolve(nil);
 }
