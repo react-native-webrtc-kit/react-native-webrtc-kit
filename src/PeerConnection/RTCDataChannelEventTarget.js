@@ -10,9 +10,10 @@ import EventTarget from 'event-target-shim';
 export const DATA_CHANNEL_EVENTS = [
     'open',
     'message',
-    'bufferedamountlow',
     'close',
     'closing',
+    // XXX(kdxu): objc では onbufferedamountlow に関連する delegate は実装されていないので実装を保留する
+    // 'onbufferedamountlow',
     //  XXX(kdxu): objc では error 時に発火する delegate は実装されていない (Android は未調査)
     // cf: https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/sdk/objc/api/peerconnection/RTCDataChannel.h#39
     // 'error',

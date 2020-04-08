@@ -32,6 +32,21 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 
+- (void)closeAndFinish
+{
+    if (self.readyState != RTCDataChannelStateOpen)
+        return;
+    [self close];
+    [self finish];
+}
+
+- (void)finish
+{
+    // モジュールの管理から外す
+    [SharedModule removeDataChannelForKey: self.valueTag];
+}
+
+
 @end
 
 @implementation WebRTCModule (RTCDataChannel)
@@ -62,8 +77,7 @@ RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag
         reject(@"NotFoundError", @"datachannel is not found", nil);
         return;
     }
-    [channel close];
-    [self removeDataChannelForKey:valueTag];
+    [channel closeAndFinish];
     resolve(nil);
 }
 

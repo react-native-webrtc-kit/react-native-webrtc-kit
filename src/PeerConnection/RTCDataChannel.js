@@ -61,6 +61,10 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   ordered: boolean = false;
   readyState: RTCDataChannelState = 'connecting';
   bufferedAmount: number = 0;
+  // XXX(kdxu): libwebrtc objc で bufferedAmountLowThreshold に関連するプロパティは存在しない
+  // RNKit での実装も保留となる
+  // cf: https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/sdk/objc/api/peerconnection/RTCDataChannel.mm#
+  // bufferedAmountLowThreshold: number = 0;
   protocol: string = '';
   _nativeEventListeners: Array<any> = [];
 
@@ -75,16 +79,25 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     return WebRTCModule.dataChannelClose(valueTag)
   }
 
+  /**
+   * RTCDataChannel のオブジェクトを生成します。
+   * ユーザはここから直接 RTCDataChannel インスタンスを作成することはありません。
+   * @listens {onopen} `RTCEvent`: `readyState` が `open` になると送信されます。
+   * @listens {onclosing} `RTCEvent`: `readyState` が `close` になると送信されます。
+   * @listens {onclose} `RTCEvent`: `readyState` が `close` になると送信されます。
+   * @listens {onmessage} `RTCDataChannelMessageEvent`: リモートからデータを受信すると送信されます。
+   */
   constructor(info: Object) {
     super();
     this._valueTag = info.valueTag;
     this.label = info.label;
+    this.id = info.id;
     this.maxPacketLifeTime = info.maxPacketLifeTime;
     this.maxRetransmits = info.maxRetransmits;
     this.negotiated = nativeBoolean(info.negotiated);
     this.ordered = nativeBoolean(info.ordered);
     this.readyState = info.readyState;
-    this.id = info.id;
+    this.protocol = info.protocol;
     this.bufferedAmount = info.bufferedAmount;
     this._registerEventsFromNative();
   }
@@ -126,7 +139,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
 
   /**
    * ネイティブレイヤーからのコールバックイベントを登録します。
-   * 受け取るイベントは以下の通りです。
+   * 発火するイベントは以下の通りです。
     - 'open'
     - 'message'
     - 'bufferedamountlow'
@@ -136,6 +149,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   _registerEventsFromNative(): void {
     logger.log(`# DataChannel[${this._valueTag}]: register events from native`);
     this._nativeEventListeners = [
+
       DeviceEventEmitter.addListener('dataChannelStateChanged', ev => {
         logger.log("# event: dataChannelStateChanged =>", ev.readyState);
         if (ev.valueTag !== this._valueTag) {
@@ -163,6 +177,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
             logger.warn('# event: dataChannelStateChanged, invalid state=>', ev.readyState);
         }
       }),
+
       DeviceEventEmitter.addListener('dataChannelOnMessage', ev => {
         logger.log("# event: dataChannelOnMessage =>", ev.data);
         if (ev.valueTag !== this._valueTag) {
@@ -176,12 +191,17 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
         }
         return this.dispatchEvent(new RTCDataChannelMessageEvent('message', ev.data, ev.binary));
       }),
+
+      // bufferedAmount が変更された際に発火する
+      // bufferedAmount の数値は更新するが、イベントとしてユーザには通知を行わない
       DeviceEventEmitter.addListener('dataChannelOnChangeBufferedAmount', ev => {
         logger.log("# event: dataChannelOnChangeBufferedAmount =>", ev.data);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
-        this.dispatchEvent(new RTCEvent('bufferedamountlow', ev));
+        if (ev.bufferedAmount) {
+          this.bufferedAmount = ev.bufferedAmount;
+        }
       }),
     ]
   }

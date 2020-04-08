@@ -454,7 +454,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   * DataChannel を作成します。
   *
   *  @param {string} label DataChannel の label
-  *  @param {options} RTCDataChannelInit | null オプション
+  *  @param {RTCDataChannelInit | null} options オプション
   *  @return {Promise<RTCDataChannel>} 作成した DataChannel
   * */
   createDataChannel(label: string, options: RTCDataChannelInit | null = null): Promise<RTCDataChannel> {
@@ -465,8 +465,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
       options
     ).then((info) => {
       logger.log(`# PeerConnection[${this._valueTag}]: createDataChannel finished: channel => `, info);
-      const channel = new RTCDataChannel(info);
-      return channel;
+      return new RTCDataChannel(info);
     })
   }
 
@@ -569,6 +568,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
         }
         this.dispatchEvent(new RTCEvent('icegatheringstatechange'));
       }),
+
       DeviceEventEmitter.addListener('peerConnectionOnDataChannel', ev => {
         if (ev.valueTag !== this._valueTag) {
           return;

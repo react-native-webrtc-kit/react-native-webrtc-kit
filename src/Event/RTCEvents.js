@@ -5,7 +5,11 @@ import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
 import RTCIceCandidate from '../PeerConnection/RTCIceCandidate';
 import RTCRtpReceiver from '../PeerConnection/RTCRtpReceiver';
 import RTCRtpTransceiver from '../PeerConnection/RTCRtpTransceiver';
-import RTCDataChannel, { RTCDataBuffer } from '../PeerConnection/RTCDataChannel';
+// TODO(kdxu): ここでビルド時に `cycle requirements` の警告が出ている
+// RTCDataChannel で RTCEvent モジュールをインポートし、このファイルで RTCDataChannel をインポートしているため。
+// RTCDataChannel をインポートしている RTCDataChannelEvent を別ファイルに定義すれば解消されるが、設計上良くなさそう
+// ただし重大な問題ではないので、別途対応手段を考える
+import RTCDataChannel from '../PeerConnection/RTCDataChannel';
 
 /**
  * 特にプロパティを持たない一般的なイベントを表します。

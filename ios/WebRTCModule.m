@@ -285,7 +285,6 @@ static WebRTCModule *sharedModule;
 - (void)removeDataChannelForKey:(NSString *)key
 {
     NSAssert(key != nil, @"key must not be nil");
-
     dispatch_sync(self.lock, ^{
         [self.dataChannelDict removeObjectForKey: key];
     });
@@ -324,6 +323,7 @@ RCT_EXPORT_METHOD(finishLoading) {
         [self.senderDict removeAllObjects];
         [self.receiverDict removeAllObjects];
         [self.transceiverDict removeAllObjects];
+        [self.dataChannelDict removeAllObjects];
     });
 }
 
