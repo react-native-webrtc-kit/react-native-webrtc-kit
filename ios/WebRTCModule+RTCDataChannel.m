@@ -92,6 +92,10 @@ RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag
                                                     body: @{@"id": [[NSNumber alloc] initWithInt: channel.channelId],
                                                             @"valueTag": channel.valueTag,
                                                             @"readyState": [WebRTCUtils stringForDataChannelState:channel.readyState]}];
+    // data channel が閉じられている場合は dict から該当の channel を取り除く
+    if(channel.readyState == RTCDataChannelStateClosed) {
+        [self removeDataChannelForKey:channel.valueTag];
+    }
 }
 
 - (void)dataChannel:(RTCDataChannel *)channel didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer
@@ -112,6 +116,7 @@ RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag
                                                            @"binary": @(buffer.isBinary),
                                                            @"data": data
                                                     }];
+
 }
 
 - (void) dataChannel:(RTCDataChannel *)channel didChangeBufferedAmount:(uint64_t)amount {
