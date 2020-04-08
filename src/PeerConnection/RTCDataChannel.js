@@ -62,24 +62,6 @@ export type RTCDataChannelState =
  * DataChannel 接続を表すオブジェクトです。
  */
 export default class RTCDataChannel extends RTCDataChannelEventTarget {
-  _valueTag: ValueTag;
-  // XXX(kdxu): 現在 Chrome / Safari は binaryType = 'blob' をサポートしていない
-  // RNKit での対応も保留する
-  binaryType: string = 'arraybuffer';
-  id: number = -1;
-  label: string;
-  maxPacketLifeTime: number;
-  maxRetransmits: number;
-  negotiated: boolean = false;
-  ordered: boolean = false;
-  readyState: RTCDataChannelState = 'connecting';
-  bufferedAmount: number = 0;
-  // XXX(kdxu): libwebrtc objc で bufferedAmountLowThreshold に関連するプロパティは存在しない
-  // RNKit での実装も保留となる
-  // cf: https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/sdk/objc/api/peerconnection/RTCDataChannel.mm#
-  // bufferedAmountLowThreshold: number = 0;
-  protocol: string = '';
-  _nativeEventListeners: Array<any> = [];
 
   /** @private */
   static nativeSendDataChannel(valueTag: ValueTag,
@@ -91,6 +73,66 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   static nativeCloseDataChannel(valueTag: ValueTag): Promise<void> {
     return WebRTCModule.dataChannelClose(valueTag)
   }
+
+  // XXX(kdxu): 現在 Chrome / Safari は binaryType = 'blob' をサポートしていない
+  // RNKit での対応も保留する
+
+  /**
+   * 送信できるデータのbinaryType を表します。
+   * 現在は `'arraybuffer'` のみ対応しています。
+   */
+  binaryType: string = 'arraybuffer';
+  /**
+   * DataChannel の id を表します。
+   * デフォルトは -1 です。
+   */
+  id: number = -1;
+  /**
+   * DataChannel のラベルを表します。
+   */
+  label: string;
+  /**
+   * DataChannel の maxPacketLifeTime を表します。
+   * デフォルトは null です。
+   */
+  maxPacketLifeTime: number | null;
+  /**
+   * DataChannel の maxRetransmits を表します。
+   * デフォルトは null です。
+   */
+  maxRetransmits: number | null;
+  /**
+   * DataChannel の negotiated フラグです。
+   * デフォルトは false です。
+   */
+  negotiated: boolean = false;
+  /**
+   * DataChannel の ordered フラグです。
+   * デフォルトは false です。
+   */
+  ordered: boolean = false;
+  /**
+   * DataChannel の現在の接続状態を表します。
+   */
+  readyState: RTCDataChannelState = 'connecting';
+  /**
+   * DataChannel の現在の bufferedAmount を表します。
+   */
+  bufferedAmount: number = 0;
+  /**
+   * DataChannel の user-defined に指定した protocol を表します。
+   * デフォルトは `''` です。
+   */
+  protocol: string = '';
+
+  _valueTag: ValueTag;
+
+  // XXX(kdxu): libwebrtc objc で bufferedAmountLowThreshold に関連するプロパティは存在しない
+  // RNKit での実装も保留となる
+  // cf: https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/sdk/objc/api/peerconnection/RTCDataChannel.mm#
+  // bufferedAmountLowThreshold: number = 0;
+  _nativeEventListeners: Array<any> = [];
+
 
   /**
    * RTCDataChannel のオブジェクトを生成します。
