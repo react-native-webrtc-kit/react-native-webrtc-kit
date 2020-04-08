@@ -130,7 +130,13 @@ export class RTCDataChannelMessageEvent {
      * イベントの種別
      */
     type: string;
+    /**
+     * 送信するデータ
+     */
     data: string | ArrayBuffer | null;
+    /**
+     * データがバイナリかどうかのフラグ
+     */
     binary: boolean;
 
     /**

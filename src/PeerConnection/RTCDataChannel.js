@@ -13,13 +13,24 @@ import * as Base64 from 'base64-js';
 const { WebRTCModule } = NativeModules;
 
 // DataChannel で送受信するデータのクラスです。
+/** @private */
 type RTCDataBuffer = {
   data: string;
   // バイナリデータかどうかのフラグ
   binary: boolean;
 }
 
-// RTCDataChannelInit のクラスです。
+/**
+ * RTCDataChannelInit のクラスです。
+ * - `id`: number
+ * - `ordered`: boolean
+ * - `maxPacketLifeTime`: number
+ * - `maxRetransmits`: number
+ * - `protocol`: string
+ * - `negotiated`: boolean
+ * 
+ * @typedef {Object} RTCDataChannelInit
+ */
 type RTCDataChannelInit = {
   id?: number;
   ordered?: boolean;
@@ -47,7 +58,9 @@ export type RTCDataChannelState =
   | 'closing'
   | 'closed';
 
-// RTCDataChannel のクラスです。
+/**
+ * DataChannel 接続を表すオブジェクトです。
+ */
 export default class RTCDataChannel extends RTCDataChannelEventTarget {
   _valueTag: ValueTag;
   // XXX(kdxu): 現在 Chrome / Safari は binaryType = 'blob' をサポートしていない
@@ -105,13 +118,10 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   /**
    * RTCDataChannel でデータを送信します。
    * @param {string | ArrayBuffer | ArrayBufferView} data 送信するデータ
+   * @return {Promise<void>} 結果を表す Promise
    */
   send(data: string | ArrayBuffer | ArrayBufferView): Promise<void> {
-    // XXX(kdxu): Chrome, Safari でサポートされていない Blob については一旦実装を保留する
-    if (typeof data === 'Blob') {
-      logger.warn('Blob support not implemented');
-      return;
-    }
+    // XXX(kdxu): Chrome, Safari でサポートされていない Blob については実装を保留する
     if (typeof data === 'string') {
       // string の場合は特に変換処理をせずに native にわたす
       return RTCDataChannel.nativeSendDataChannel(this._valueTag, { data: data, binary: false });
@@ -132,6 +142,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
 
   /**
    * RTCDataChannel を閉じます。
+   * @return {Promise<void>} 結果を表す Promise
    */
   close(): Promise<void> {
     return RTCDataChannel.nativeCloseDataChannel(this._valueTag);

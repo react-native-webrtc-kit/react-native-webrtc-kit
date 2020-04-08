@@ -454,8 +454,8 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   * DataChannel を作成します。
   *
   *  @param {string} label DataChannel の label
-  *  @param {RTCDataChannelInit | null} options オプション
-  *  @return {Promise<RTCDataChannel>} 作成した DataChannel
+  *  @param {RTCDataChannelInit | null} options DataChannel で指定するオプション
+  *  @return {Promise<RTCDataChannel>} 結果を表す Promise。作成した DataChannel を返す
   * */
   createDataChannel(label: string, options: RTCDataChannelInit | null = null): Promise<RTCDataChannel> {
     logger.log(`# PeerConnection[${this._valueTag}]: create data channel`)
