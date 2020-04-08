@@ -229,10 +229,10 @@ NS_ASSUME_NONNULL_BEGIN
     BOOL isBinary = [RCTConvert BOOL:json[@"binary"]];
     NSData *data;
     if (isBinary) {
-        // バイナリデータの場合 Base64 Encoded String に変換
+        // バイナリデータの場合 Base64 Encoded した NS Data  に変換
         data = [[NSData alloc] initWithBase64EncodedString:json[@"data"] options:0];
     } else {
-        // それ以外の場合は UTF8 String に変換する
+        // それ以外の場合は UTF8 String Encoding で NSData に変換
         data = [json[@"data"] dataUsingEncoding:NSUTF8StringEncoding];
     }
     RTCDataBuffer *buffer = [[RTCDataBuffer alloc] initWithData:data isBinary:isBinary];

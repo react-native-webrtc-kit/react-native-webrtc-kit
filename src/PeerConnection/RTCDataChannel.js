@@ -154,6 +154,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
             this.dispatchEvent(new RTCEvent('closing'));
             break;
           case 'closed':
+            this.dispatchEvent(new RTCEvent('close'));
             // This DataChannel is done, clean up event handlers.
             this._unregisterEventsFromNative();
             break;
@@ -182,7 +183,6 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
         }
         this.dispatchEvent(new RTCEvent('bufferedamountlow', ev));
       }),
-
     ]
   }
 
