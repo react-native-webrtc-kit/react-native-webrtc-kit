@@ -67,13 +67,6 @@ RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag
     resolve(nil);
 }
 
-- (void) dataChannelInit:(RTCDataChannel *)channel {
-    // 新たに valueTag を紐付ける
-    channel.valueTag = [self createNewValueTag];
-    channel.delegate = self;
-    [self addDataChannel:channel forKey:channel.valueTag];
-}
-
 #pragma mark - RTCDataChannelDelegate
 
 - (void)dataChannelDidChangeState:(RTCDataChannel*)channel

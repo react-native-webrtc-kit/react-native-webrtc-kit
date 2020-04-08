@@ -354,6 +354,13 @@ static void *peerConnectionValueTagKey = "peerConnectionValueTag";
     return nil;
 }
 
+- (void) dataChannelInit:(RTCDataChannel *)channel {
+    // 新たに valueTag を紐付ける
+    channel.valueTag = [self createNewValueTag];
+    channel.delegate = self;
+    [self addDataChannel:channel forKey:channel.valueTag];
+}
+
 #pragma mark - React Native Exports
 
 /**
@@ -624,10 +631,7 @@ RCT_EXPORT_METHOD(peerConnectionCreateDataChannel: (NSString *)label
   }
   // DataChannel を Peer Connection に追加する
   RTCDataChannel *dataChannel = [peerConnection dataChannelForLabel:label configuration:options];
-  // 新たに valueTag を紐付ける
-  dataChannel.valueTag = [self createNewValueTag];
-  dataChannel.delegate = self;
-  [self addDataChannel: dataChannel forKey: dataChannel.valueTag];
+  [self dataChannelInit:dataChannel];
   resolve([dataChannel json]);
 }
 
@@ -745,10 +749,7 @@ didStartReceivingOnTransceiver:(RTCRtpTransceiver *)transceiver
 }
 
 - (void)peerConnection:(RTCPeerConnection*)peerConnection didOpenDataChannel:(RTCDataChannel*)dataChannel {
-    // dataChannel に新しい valueTag を割り当てる
-    dataChannel.valueTag = [self createNewValueTag];
-    dataChannel.delegate = self;
-    [self addDataChannel: dataChannel forKey: dataChannel.valueTag];
+    [self dataChannelInit:dataChannel];
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionOnDataChannel"
                                                         body:@{@"valueTag": peerConnection.valueTag,
                                                                @"channel": [dataChannel json]}];
