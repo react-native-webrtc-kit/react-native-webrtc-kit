@@ -50,7 +50,8 @@ export type RTCDataChannelState =
 // RTCDataChannel のクラスです。
 export default class RTCDataChannel extends RTCDataChannelEventTarget {
   _valueTag: ValueTag;
-  // XXX(kdxu): 現在 Chrome / Safari は binaryType = 'blob' をサポートしていない。RNKit で対応するか要検討
+  // XXX(kdxu): 現在 Chrome / Safari は binaryType = 'blob' をサポートしていない
+  // RNKit での対応も保留する
   binaryType: string = 'arraybuffer';
   id: number = -1;
   label: string;
@@ -93,23 +94,27 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
    * @param {string | ArrayBuffer | ArrayBufferView} data 送信するデータ
    */
   send(data: string | ArrayBuffer | ArrayBufferView): Promise<void> {
+    // XXX(kdxu): Chrome, Safari でサポートされていない Blob については一旦実装を保留する
+    if (typeof data === 'Blob') {
+      logger.warn('Blob support not implemented');
+      return;
+    }
     if (typeof data === 'string') {
+      // string の場合は特に変換処理をせずに native にわたす
       return RTCDataChannel.nativeSendDataChannel(this._valueTag, { data: data, binary: false });
     }
     // 以下は ArrayBuffer | ArrayBufferView への対応
     let byteArray;
     if (ArrayBuffer.isView(data)) {
-      logger.log('#ArrayBufferView')
-      // ArrayBufferView が渡された場合は buffer, byteoffset, bytelength を渡す
+      // ArrayBufferView が渡された場合は buffer, byteoffset, bytelength から Uint8Array を構築
       byteArray = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
     }
     if (data instanceof ArrayBuffer) {
-      logger.log('#ArrayBuffer')
       // ArrayBuffer が渡された場合、そのまま byteArray に変換する
       byteArray = new Uint8Array(data);
     }
+    // バイナリデータは一旦 base64 エンコードしてネイティブレイヤーに渡す
     return RTCDataChannel.nativeSendDataChannel(this._valueTag, { data: Base64.fromByteArray(byteArray), binary: true });
-    // XXX(kdxu): Chrome, Safari でサポートされていない Blob については一旦実装を保留する
   }
 
   /**
@@ -163,13 +168,15 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
           return;
         }
         if (ev.binary === true) {
-          // バイナリデータの場合、base64 decode を行う
+          // バイナリデータの場合、ネイティブレイヤーで base64 encode されたものが来ているはずなので
+          // base64 decode を行って受け取る
           const byteArray = Base64.toByteArray(ev.data);
           return this.dispatchEvent(new RTCDataChannelMessageEvent('message', byteArray.buffer, ev.binary));
         }
         return this.dispatchEvent(new RTCDataChannelMessageEvent('message', ev.data, ev.binary));
       }),
       DeviceEventEmitter.addListener('dataChannelOnChangeBufferedAmount', ev => {
+        logger.log("# event: dataChannelOnChangeBufferedAmount =>", ev.data);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
