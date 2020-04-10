@@ -7,6 +7,13 @@
 React Native WebRTC Kit は、 React Native アプリケーションから WebRTC ネイティブライブラリを使うためのライブラリです。
 本ライブラリを使うと、マルチプラットフォームに対応する WebRTC ネイティブアプリケーションを React Native で開発できます。
 
+## Web API (ブラウザ) との互換性について
+
+本ライブラリの API は できるだけ [WebRTC の Web API](https://developer.mozilla.org/ja/docs/Web/API/WebRTC_API) に近づけていますが、
+ネイティブ API では実装が難しい API や本ライブラリの都合で同一にできない API があります。
+
+相違点については [ドキュメント](https://react-native-webrtc-kit.shiguredo.jp/apidiff.html) を参照してください。
+
 ## About Support
 
 We check PRs or Issues only when written in JAPANESE.
