@@ -37,6 +37,7 @@ import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
+import org.webrtc.DataChannel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.dataChannelBuffer;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.dataChannelInit;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.iceCandidate;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.mediaConstraints;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.mediaStreamTrackJsonValue;
@@ -681,6 +684,59 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         final RtpParameters.Encoding encodingParams = repository.getRtpEncodingParametersByValueTag(ownerValueTag, ssrc);
         if (encodingParams == null) return;
         encodingParams.minBitrateBps = bitrate;
+    }
+
+    /**
+     * peerConnectionAddICECandidate(valueTag: ValueTag, String label, DataChannel.Init init): Promise<RTCDataChannel>
+     */
+    @ReactMethod
+    public void peerConnectionCreateDataChannel(@NonNull String valueTag, @NonNull  String label, @Nullable ReadableMap initJson, @NonNull Promise promise) {
+        Log.d(getName(), "peerConnectionCreateDataChannel()");
+        final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
+        if (peerConnection == null) {
+            promise.reject("NotFoundError", "peer connection is not found");
+            return;
+        }
+        // TODO(kdxu): init が null の場合もこれで大丈夫か？
+        final DataChannel dataChannel = peerConnection.createDataChannel(label, dataChannelInit(initJson));
+        if (dataChannel == null) {
+            throw new IllegalStateException("createDataChannel failed");
+        }
+        // observer を登録する
+        final WebRTCDataChannelObserver observer = new WebRTCDataChannelObserver(reactContext);
+
+        final Pair<String, DataChannel> dataChannelPair = new Pair<>(valueTag, dataChannel);
+        observer.dataChannelPair = dataChannelPair;
+        repository.addDataChannel(dataChannelPair);
+        promise.resolve(dataChannel);
+    }
+
+    /**
+     * dataChannelClose(valueTag: ValueTag): Promise<void>
+     */
+    @ReactMethod
+    public void dataChannelClose(@NonNull String valueTag, @NonNull Promise promise) {
+        Log.d(getName(), "dataChannelClose() - valueTag=" + valueTag);
+        final DataChannel dataChannel = repository.getDataChannelByValueTag(valueTag);
+        if (dataChannel == null) {
+            promise.reject("NotFoundError", "dataChannel is not found");
+            return;
+        }
+        repository.removeDataChannelByValueTag(valueTag);
+        dataChannel.close();
+        promise.resolve(null);
+    }
+
+    @ReactMethod
+    public  void dataChannelSend(@NonNull String valueTag, @NonNull ReadableMap sendBufferJson, @NonNull Promise promise) {
+        Log.d(getName(), "dataChannelClose() - valueTag=" + valueTag);
+        final DataChannel dataChannel = repository.getDataChannelByValueTag(valueTag);
+        if (dataChannel == null) {
+            promise.reject("NotFoundError", "dataChannel is not found");
+            return;
+        }
+        dataChannel.send(dataChannelBuffer(sendBufferJson));
+
     }
 
     //endregion

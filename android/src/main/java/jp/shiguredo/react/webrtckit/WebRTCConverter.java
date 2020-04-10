@@ -1,6 +1,7 @@
 package jp.shiguredo.react.webrtckit;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
@@ -10,6 +11,7 @@ import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
+import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStreamTrack;
@@ -24,6 +26,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 
 import static jp.shiguredo.react.webrtckit.Readables.array;
 import static jp.shiguredo.react.webrtckit.Readables.booleans;
@@ -611,6 +614,59 @@ final class WebRTCConverter {
 
     //endregion
 
+    //region DataChannel
+
+    @NonNull
+    static WritableMap dataChannelJsonValue(@NonNull final DataChannel dataChannel, @NonNull String valueTag) {
+        final WritableMap json = Arguments.createMap();
+        // TODO(kdxu) dataChannel => WritableMap の処理をきちんと書く
+        json.putInt("id", dataChannel.id());
+        json.putString("readyState", dataChannelStateStringValue(dataChannel.state()));
+        if (valueTag != null) {
+            json.putString("valueTag", valueTag);
+        }
+        return json;
+    }
+    //endregion
+
+    //region DataChannel.Init
+
+    @NonNull
+    static DataChannel.Init dataChannelInit(@Nullable final ReadableMap json) {
+        final DataChannel.Init init = new DataChannel.Init();
+        // TODO(kdxu): JSON をパースして DataChannel.Init のプロパティとして代入する処理を書く
+        return init;
+    }
+
+    //endregion
+
+    //region DataChannel.Buffer
+
+    @NonNull
+    static DataChannel.Buffer dataChannelBuffer(@NonNull final ReadableMap json) {
+        final DataChannel.Buffer buffer = new DataChannel.Buffer(byteBuffer, binary);
+        // TODO(kdxu): JSON をパースして DataChannel.Buffer　を初期化する処理を書く
+        return buffer;
+    }
+
+
+    // region DataChannel.State
+
+    @Nonnull
+    static String dataChannelStateStringValue(@NonNull final DataChannel.State dataChannelState) {
+        switch (dataChannelState) {
+            case CONNECTING:
+                return "connecting";
+            case OPEN:
+                return "open";
+            case CLOSING:
+                return "closing";
+            case CLOSED:
+                return "closed";
+            default:
+                throw new IllegalArgumentException("invalid dataChannelState");
+        }
+    }
 
     @NonNull
     static List<String> toStringList(@NonNull final ReadableArray arrayJson) {
@@ -624,5 +680,4 @@ final class WebRTCConverter {
         }
         return result;
     }
-
 }

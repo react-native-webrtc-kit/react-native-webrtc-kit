@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import android.util.Pair;
 
+import org.webrtc.DataChannel;
 import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.PeerConnection;
@@ -100,6 +101,30 @@ final class WebRTCRepository {
     //region RTP Sender
 
     final DualKeyMap<RtpSender> senders = new DualKeyMap<>();
+
+    //region Data Channel
+
+    private final Map<String, DataChannel> dataChannelMap = new HashMap<>();
+
+    void addDataChannel(@NonNull final Pair<String, DataChannel> dataChannelPair) {
+        dataChannelMap.put(dataChannelPair.first, dataChannelPair.second);
+    }
+
+    void removeDataChannelByValueTag(@Nullable final String valueTag) {
+        if (valueTag == null) {
+            return;
+        }
+        dataChannelMap.remove(valueTag);
+    }
+
+    @Nullable
+    DataChannel getDataChannelByValueTag(@Nullable final String valueTag) {
+        if (valueTag == null) {
+            return null;
+        }
+        return dataChannelMap.get(valueTag);
+    }
+    // endregion
     /**
      * Key is id, Value is associated stream ids.
      */
@@ -223,6 +248,8 @@ final class WebRTCRepository {
         receiverStreamIdsMap.clear();
 
         transceivers.clear();
+
+        dataChannelMap.clear();
     }
 
     static final class DualKeyMap<V> {

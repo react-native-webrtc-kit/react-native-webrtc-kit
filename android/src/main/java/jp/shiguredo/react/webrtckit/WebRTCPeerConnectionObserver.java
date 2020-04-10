@@ -248,7 +248,11 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
 
     @Override
     public void onDataChannel(DataChannel dataChannel) {
-        // DataChannel は現在対応しない
+        if (peerConnectionPair === null) return;
+        Log.d("WebRTCModule", "onDataChannel()[" + peerConnectionPair.first + "]");
+        final WritableMap params = Arguments.createMap();
+        params.putString("valueTag", peerConnectionPair.first);
+        sendDeviceEvent("peerConnectionOnDataChannel", params);
     }
 
     @Override
