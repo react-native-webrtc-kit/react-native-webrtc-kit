@@ -52,7 +52,6 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 また、以下の機能について、Android は未対応です。
 
 - オーディオポートの切り替え/取得機能 (getAudioPort, setAudioPort)
-- トラックの削除イベント検知機能 (onRemoveTrack)
 
 ## WebRTC ライブラリについて
 
@@ -65,6 +64,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
     - https://github.com/shiguredo/shiguredo-webrtc-ios
 - Android: ビルドした `libwebrtc.aar` を `android/libs/` 下に配置し、`android/build.gradle` の dependencies に以下のように編集します。
     - https://github.com/shiguredo/shiguredo-webrtc-android
+    - トラックの削除イベント検知機能 (onRemoveTrack) を利用するには、 "com.github.shiguredo:shiguredo-webrtc-android:79.5.1" 以降の WebRTC ライブラリを利用する必要があるので、留意してください。
 
 ```
  dependencies {
