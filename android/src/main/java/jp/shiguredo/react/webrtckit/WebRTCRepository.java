@@ -102,29 +102,8 @@ final class WebRTCRepository {
 
     final DualKeyMap<RtpSender> senders = new DualKeyMap<>();
 
-    //region Data Channel
-
-    private final Map<String, DataChannel> dataChannelMap = new HashMap<>();
-
-    void addDataChannel(@NonNull final Pair<String, DataChannel> dataChannelPair) {
-        dataChannelMap.put(dataChannelPair.first, dataChannelPair.second);
-    }
-
-    void removeDataChannelByValueTag(@Nullable final String valueTag) {
-        if (valueTag == null) {
-            return;
-        }
-        dataChannelMap.remove(valueTag);
-    }
-
-    @Nullable
-    DataChannel getDataChannelByValueTag(@Nullable final String valueTag) {
-        if (valueTag == null) {
-            return null;
-        }
-        return dataChannelMap.get(valueTag);
-    }
     // endregion
+
     /**
      * Key is id, Value is associated stream ids.
      */
@@ -228,6 +207,29 @@ final class WebRTCRepository {
 
     //endregion
 
+
+    //region Data Channel
+
+    private final Map<String, DataChannel> dataChannelMap = new HashMap<>();
+
+    void addDataChannel(@NonNull final Pair<String, DataChannel> dataChannelPair) {
+        dataChannelMap.put(dataChannelPair.first, dataChannelPair.second);
+    }
+
+    void removeDataChannelByValueTag(@Nullable final String valueTag) {
+        if (valueTag == null) {
+            return;
+        }
+        dataChannelMap.remove(valueTag);
+    }
+
+    @Nullable
+    DataChannel getDataChannelByValueTag(@Nullable final String valueTag) {
+        if (valueTag == null) {
+            return null;
+        }
+        return dataChannelMap.get(valueTag);
+    }
 
     /**
      * このリポジトリの中身を完全に空にします。

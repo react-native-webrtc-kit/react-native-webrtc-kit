@@ -628,6 +628,7 @@ final class WebRTCConverter {
         json.putInt("id", dataChannel.id());
         json.putString("label", dataChannel.label());
         json.putString("readyState", dataChannelStateStringValue(dataChannel.state()));
+        json.putDouble("bufferedamount", dataChannel.bufferedAmount());
         json.putString("valueTag", valueTag);
         return json;
     }
@@ -638,6 +639,27 @@ final class WebRTCConverter {
     @NonNull
     static DataChannel.Init dataChannelInit(@Nullable final ReadableMap json) {
         final DataChannel.Init init = new DataChannel.Init();
+        final Boolean negotiated = json.getBoolean("negotiated");
+        init.negotiated = negotiated;
+        if (json.hasKey("id")) {
+            init.id = json.getInt("id");
+        }
+        if (json.hasKey("ordered")) {
+            init.ordered = json.getBoolean("ordered");
+        }
+        // XXX(kdxu): android では `maxPacketLifeTime` が未定義。代わりに `maxRetransmitTimeMs` に代入する
+        if (json.hasKey("maxPacketLifeTime")) {
+            init.maxRetransmitTimeMs = json.getInt("maxPacketLifeTime");
+        }
+        if (json.hasKey("maxRetransmits")) {
+            init.maxRetransmits = json.getInt("maxRetransmits");
+        }
+        if (json.hasKey("protocol")) {
+            init.protocol = json.getString("protocol");
+        }
+        if (json.hasKey("negotiated")) {
+            init.negotiated = json.getBoolean("negotiated");
+        }
         // TODO(kdxu): JSON をパースして DataChannel.Init のプロパティとして代入する処理を書く
         return init;
     }

@@ -85,30 +85,36 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   /**
    * DataChannel の id を表します。
    * デフォルトは -1 です。
+   * DataChannel の作成時にのみ指定可能です。
    */
   id: number = -1;
   /**
    * DataChannel のラベルを表します。
+   * DataChannel の作成時にのみ指定可能です。
    */
   label: string;
   /**
    * DataChannel の maxPacketLifeTime を表します。
    * デフォルトは null です。
+   * DataChannel の作成時にのみ指定可能です。
    */
   maxPacketLifeTime: number | null;
   /**
    * DataChannel の maxRetransmits を表します。
    * デフォルトは null です。
+   * DataChannel の作成時にのみ指定可能です。
    */
   maxRetransmits: number | null;
   /**
    * DataChannel の negotiated フラグです。
    * デフォルトは false です。
+   * DataChannel の作成時にのみ指定可能です。
    */
   negotiated: boolean = false;
   /**
    * DataChannel の ordered フラグです。
    * デフォルトは false です。
+   * DataChannel の作成時にのみ指定可能です。
    */
   ordered: boolean = false;
   /**
@@ -122,6 +128,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   /**
    * DataChannel の user-defined に指定した protocol を表します。
    * デフォルトは `''` です。
+   * DataChannel の作成時にのみ指定可能です。
    */
   protocol: string = '';
 

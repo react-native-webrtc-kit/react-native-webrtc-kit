@@ -704,12 +704,14 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
             throw new IllegalStateException("createDataChannel failed");
         }
         // observer を登録する
+        final String dataChannelValueTag = createNewValueTag();
         final WebRTCDataChannelObserver observer = new WebRTCDataChannelObserver(reactContext);
-
-        final Pair<String, DataChannel> dataChannelPair = new Pair<>(valueTag, dataChannel);
+        final Pair<String, DataChannel> dataChannelPair = new Pair<>(dataChannelValueTag, dataChannel);
         observer.dataChannelPair = dataChannelPair;
+        dataChannel.registerObserver(observer);
         repository.addDataChannel(dataChannelPair);
-        promise.resolve(dataChannelJsonValue(dataChannel, valueTag));
+        // TODO(kdxu): DataChannel.Init の値も JSON value に取り込むようにする
+        promise.resolve(dataChannelJsonValue(dataChannel, dataChannelValueTag));
     }
 
     /**
