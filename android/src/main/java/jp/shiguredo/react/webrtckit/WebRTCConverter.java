@@ -1,5 +1,7 @@
 package jp.shiguredo.react.webrtckit;
 
+import android.util.Base64;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -22,7 +24,10 @@ import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
 import org.webrtc.SessionDescription;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -621,10 +626,9 @@ final class WebRTCConverter {
         final WritableMap json = Arguments.createMap();
         // TODO(kdxu) dataChannel => WritableMap の処理をきちんと書く
         json.putInt("id", dataChannel.id());
+        json.putString("label", dataChannel.label());
         json.putString("readyState", dataChannelStateStringValue(dataChannel.state()));
-        if (valueTag != null) {
-            json.putString("valueTag", valueTag);
-        }
+        json.putString("valueTag", valueTag);
         return json;
     }
     //endregion
@@ -644,15 +648,30 @@ final class WebRTCConverter {
 
     @NonNull
     static DataChannel.Buffer dataChannelBuffer(@NonNull final ReadableMap json) {
-        final DataChannel.Buffer buffer = new DataChannel.Buffer(byteBuffer, binary);
-        // TODO(kdxu): JSON をパースして DataChannel.Buffer　を初期化する処理を書く
+        final Boolean isBinary = json.getBoolean("binary");
+        if (isBinary == null) {
+            throw new IllegalArgumentException("invalid dataChannelBuffer");
+        }
+        final String data = json.getString("data");
+        if (data == null) {
+            throw new IllegalArgumentException("invalid dataChannelBuffer");
+        }
+        byte[] byteArray;
+
+        if (isBinary == true) {
+            byteArray = data.getBytes(Charset.forName("UTF-8"));
+        } else {
+            byteArray = Base64.decode(data, Base64.NO_WRAP);
+        }
+        final ByteBuffer byteBuffer = ByteBuffer.wrap(byteArray);
+        final DataChannel.Buffer buffer = new DataChannel.Buffer(byteBuffer, isBinary);
         return buffer;
     }
 
 
     // region DataChannel.State
 
-    @Nonnull
+    @NonNull
     static String dataChannelStateStringValue(@NonNull final DataChannel.State dataChannelState) {
         switch (dataChannelState) {
             case CONNECTING:

@@ -47,6 +47,7 @@ import java.util.UUID;
 
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.dataChannelBuffer;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.dataChannelInit;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.dataChannelJsonValue;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.iceCandidate;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.mediaConstraints;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.mediaStreamTrackJsonValue;
@@ -687,10 +688,10 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     * peerConnectionAddICECandidate(valueTag: ValueTag, String label, DataChannel.Init init): Promise<RTCDataChannel>
+     * peerConnectionCreateDataChannel(String label, DataChannel.Init init, String valueTag): Promise<RTCDataChannel>
      */
     @ReactMethod
-    public void peerConnectionCreateDataChannel(@NonNull String valueTag, @NonNull  String label, @Nullable ReadableMap initJson, @NonNull Promise promise) {
+    public void peerConnectionCreateDataChannel(@NonNull String label, @Nullable ReadableMap initJson, @NonNull String valueTag, @NonNull Promise promise) {
         Log.d(getName(), "peerConnectionCreateDataChannel()");
         final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
         if (peerConnection == null) {
@@ -708,7 +709,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         final Pair<String, DataChannel> dataChannelPair = new Pair<>(valueTag, dataChannel);
         observer.dataChannelPair = dataChannelPair;
         repository.addDataChannel(dataChannelPair);
-        promise.resolve(dataChannel);
+        promise.resolve(dataChannelJsonValue(dataChannel, valueTag));
     }
 
     /**
@@ -727,8 +728,21 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         promise.resolve(null);
     }
 
+    // WebRTCDataChannelObserver から呼び出すため　close は同期メソッドも用意する
+    public void dataChannelCloseSync(@NonNull String valueTag) {
+        Log.d(getName(), "dataChannelCloseSync() - valueTag=" + valueTag);
+        final DataChannel dataChannel = repository.getDataChannelByValueTag(valueTag);
+        if (dataChannel == null) {
+            return;
+        }
+        repository.removeDataChannelByValueTag(valueTag);
+        dataChannel.close();
+    }
+    /**
+     * dataChannelSend(buffer: ReadableMap, valueTag: ValueTag): Promise<void>
+     */
     @ReactMethod
-    public  void dataChannelSend(@NonNull String valueTag, @NonNull ReadableMap sendBufferJson, @NonNull Promise promise) {
+    public  void dataChannelSend(@NonNull ReadableMap sendBufferJson, @NonNull String valueTag, @NonNull Promise promise) {
         Log.d(getName(), "dataChannelClose() - valueTag=" + valueTag);
         final DataChannel dataChannel = repository.getDataChannelByValueTag(valueTag);
         if (dataChannel == null) {

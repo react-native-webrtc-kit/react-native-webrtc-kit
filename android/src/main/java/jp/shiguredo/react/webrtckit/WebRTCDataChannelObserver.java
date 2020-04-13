@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.queue.ReactQueueConfiguration;
@@ -50,13 +51,13 @@ final class WebRTCDataChannelObserver implements DataChannel.Observer {
 
     private void closeAndFinish() {
         if (dataChannelPair != null) {
-            Log.d("WebRTCModule", "DataChannel closeAndFinish()[" + peerConnectionPair.first + "]");
+            Log.d("WebRTCModule", "DataChannel closeAndFinish()[" + dataChannelPair.first + "]");
             final WebRTCModule module = getModule();
             final ReactQueueConfiguration queueConfiguration = module.getReactContext().getCatalystInstance().getReactQueueConfiguration();
             final String valueTag = dataChannelPair.first;
             dataChannelPair = null;
             queueConfiguration.getNativeModulesQueueThread().runOnQueue(() -> {
-                module.dataChannelClose(valueTag);
+                module.dataChannelCloseSync(valueTag);
             });
         }
     }
@@ -69,8 +70,12 @@ final class WebRTCDataChannelObserver implements DataChannel.Observer {
         final WritableMap params = Arguments.createMap();
         params.putString("valueTag", dataChannelPair.first);
         final DataChannel dataChannel = dataChannelPair.second;
-        Log.d("DataChannelObserver", "onStateChange()[" + dataChannelPair.first + "] - newReadyState=" + dataChannel.state());
-
+        final DataChannel.State state = dataChannel.state();
+        Log.d("DataChannelObserver", "onStateChange()[" + dataChannelPair.first + "] - newReadyState=" + state);
+        // state が closed な場合 finish する
+        if (state == DataChannel.State.CLOSED) {
+            closeAndFinish();
+        }
         params.putString("readyState", dataChannelStateStringValue(dataChannel.state()));
         sendDeviceEvent("dataChannelStateChanged", params);
     }
