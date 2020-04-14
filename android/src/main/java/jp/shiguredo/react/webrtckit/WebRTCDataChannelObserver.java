@@ -57,7 +57,7 @@ final class WebRTCDataChannelObserver implements DataChannel.Observer {
             final String valueTag = dataChannelPair.first;
             dataChannelPair = null;
             queueConfiguration.getNativeModulesQueueThread().runOnQueue(() -> {
-                module.dataChannelCloseSync(valueTag);
+                module.dataChannelClose(valueTag);
             });
         }
     }

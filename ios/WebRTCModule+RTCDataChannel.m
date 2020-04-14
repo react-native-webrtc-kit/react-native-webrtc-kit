@@ -67,18 +67,18 @@ RCT_EXPORT_METHOD(dataChannelSend:(nonnull RTCDataBuffer*) buffer
     resolve(nil);
 }
 
-// MARK: -close:message:valueTag:resolver:rejecter
+// XXX(kdxu): PeerConnection.close() と統一性をもたせるためclose メソッドは同期メソッドにする
+// MARK: -close:message:valueTag
 RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject)
 {
     RTCDataChannel *channel = [self dataChannelForKey:valueTag];
     if (!channel) {
-        reject(@"NotFoundError", @"datachannel is not found", nil);
         return;
     }
     [channel closeAndFinish];
-    resolve(nil);
+    return;
 }
 
 #pragma mark - RTCDataChannelDelegate

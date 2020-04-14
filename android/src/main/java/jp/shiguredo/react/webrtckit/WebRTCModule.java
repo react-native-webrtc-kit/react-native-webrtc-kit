@@ -715,31 +715,20 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     * dataChannelClose(valueTag: ValueTag): Promise<void>
+     * dataChannelClose(valueTag: ValueTag)
+     * XXX(kdxu): PeerConnection.close() と統一性をもたせるため、こちらは同期メソッドとする
      */
     @ReactMethod
-    public void dataChannelClose(@NonNull String valueTag, @NonNull Promise promise) {
+    public void dataChannelClose(@NonNull String valueTag) {
         Log.d(getName(), "dataChannelClose() - valueTag=" + valueTag);
         final DataChannel dataChannel = repository.getDataChannelByValueTag(valueTag);
         if (dataChannel == null) {
-            promise.reject("NotFoundError", "dataChannel is not found");
             return;
         }
         repository.removeDataChannelByValueTag(valueTag);
         dataChannel.close();
-        promise.resolve(null);
     }
 
-    // WebRTCDataChannelObserver から呼び出すため　close は同期メソッドも用意する
-    public void dataChannelCloseSync(@NonNull String valueTag) {
-        Log.d(getName(), "dataChannelCloseSync() - valueTag=" + valueTag);
-        final DataChannel dataChannel = repository.getDataChannelByValueTag(valueTag);
-        if (dataChannel == null) {
-            return;
-        }
-        repository.removeDataChannelByValueTag(valueTag);
-        dataChannel.close();
-    }
     /**
      * dataChannelSend(buffer: ReadableMap, valueTag: ValueTag): Promise<void>
      */

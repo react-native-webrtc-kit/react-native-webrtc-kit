@@ -70,7 +70,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   }
 
   /** @private */
-  static nativeCloseDataChannel(valueTag: ValueTag): Promise<void> {
+  static nativeCloseDataChannel(valueTag: ValueTag): void {
     return WebRTCModule.dataChannelClose(valueTag)
   }
 
@@ -190,10 +190,10 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   }
 
   /**
-   * RTCDataChannel を閉じます。
-   * @return {Promise<void>} 結果を表す Promise
+   * RTCDataChannel の接続を閉じます。
    */
-  close(): Promise<void> {
+  close(): void {
+    // PeerConnection.close() と統一性をもたせるため、こちらは同期メソッドとする
     return RTCDataChannel.nativeCloseDataChannel(this._valueTag);
   }
 
