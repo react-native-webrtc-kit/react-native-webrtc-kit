@@ -11,6 +11,9 @@
 
 ## develop
 
+- [CHANGE]  サポートする React Native の最低バージョンを 0.61.5 に更新
+    - @enm10k
+
 ## 2020.2.0
 
 - [CHANGE] システム要件を変更する
