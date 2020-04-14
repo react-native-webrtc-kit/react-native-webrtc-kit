@@ -69,9 +69,7 @@ RCT_EXPORT_METHOD(dataChannelSend:(nonnull RTCDataBuffer*) buffer
 
 // XXX(kdxu): PeerConnection.close() と統一性をもたせるためclose メソッドは同期メソッドにする
 // MARK: -close:message:valueTag
-RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag
-                  resolver:(nonnull RCTPromiseResolveBlock)resolve
-                  rejecter:(nonnull RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag)
 {
     RTCDataChannel *channel = [self dataChannelForKey:valueTag];
     if (!channel) {
