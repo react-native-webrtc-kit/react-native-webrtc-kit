@@ -94,41 +94,47 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
    */
   label: string;
   /**
-   * DataChannel の maxPacketLifeTime を表します。
-   * デフォルトは null です。
-   * DataChannel の作成時にのみ指定可能です。
-   */
-  maxPacketLifeTime: number | null;
-  /**
-   * DataChannel の maxRetransmits を表します。
-   * デフォルトは null です。
-   * DataChannel の作成時にのみ指定可能です。
-   */
-  maxRetransmits: number | null;
-  /**
-   * DataChannel の negotiated フラグです。
-   * デフォルトは false です。
-   * DataChannel の作成時にのみ指定可能です。
-   */
-  negotiated: boolean = false;
-  /**
-   * DataChannel の ordered フラグです。
-   * デフォルトは false です。
-   * DataChannel の作成時にのみ指定可能です。
-   */
-  ordered: boolean = false;
-  /**
    * DataChannel の現在の接続状態を表します。
-   */
+  */
   readyState: RTCDataChannelState = 'connecting';
   /**
    * DataChannel の現在の bufferedAmount を表します。
    */
   bufferedAmount: number = 0;
   /**
+   * DataChannel の maxPacketLifeTime を表します。
+   * デフォルトは null です。
+   * DataChannel の作成時にのみ指定可能です。
+   * Android ではこのプロパティの取得は未対応です。
+   */
+  maxPacketLifeTime: number | null;
+  /**
+   * DataChannel の maxRetransmits を表します。
+   * デフォルトは null です。
+   * DataChannel の作成時にのみ指定可能です。
+   * Android ではこのプロパティの取得は未対応です。
+   */
+  maxRetransmits: number | null;
+  /**
+   * DataChannel の negotiated フラグです。
+   * デフォルトは false です。
+   * DataChannel の作成時にのみ指定可能です。
+   * Android ではこのプロパティの取得は未対応です。
+   */
+  negotiated: boolean = false;
+  /**
+   * DataChannel の ordered フラグです。
+   * デフォルトは false です。
+   * DataChannel の作成時にのみ指定可能です。
+   * Android ではこのプロパティの取得は未対応です。
+   */
+  ordered: boolean = false;
+
+  /**
    * DataChannel の user-defined に指定した protocol を表します。
    * デフォルトは `''` です。
    * DataChannel の作成時にのみ指定可能です。
+   * Android ではこのプロパティの取得は未対応です。
    */
   protocol: string = '';
 
@@ -154,13 +160,18 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     this._valueTag = info.valueTag;
     this.label = info.label;
     this.id = info.id;
-    this.maxPacketLifeTime = info.maxPacketLifeTime;
-    this.maxRetransmits = info.maxRetransmits;
-    this.negotiated = nativeBoolean(info.negotiated);
-    this.ordered = nativeBoolean(info.ordered);
     this.readyState = info.readyState;
-    this.protocol = info.protocol;
     this.bufferedAmount = info.bufferedAmount;
+
+    // これ以下の値は libwebrtc Android の RTCDataChannel クラスのプロパティが存在しない
+    // cf: https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/sdk/android/api/org/webrtc/DataChannel.java
+    // 特に remote 側 (datachannel の初期化を行わない側) は、以下の値を取るすべがない。
+    // なので存在チェックを行い、あれば値を代入する
+    if (info.maxPacketLifeTime) this.maxPacketLifeTime = info.maxPacketLifeTime;
+    if (info.maxRetransmits) this.maxRetransmits = info.maxRetransmits;
+    if (info.negotiated) this.negotiated = nativeBoolean(info.negotiated);
+    if (info.ordered) this.ordered = nativeBoolean(info.ordered);
+    if (info.protocol) this.protocol = info.protocol;
     this._registerEventsFromNative();
   }
 
