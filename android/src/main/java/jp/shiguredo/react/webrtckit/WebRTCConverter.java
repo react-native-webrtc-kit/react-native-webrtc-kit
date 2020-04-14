@@ -622,9 +622,8 @@ final class WebRTCConverter {
     //region DataChannel
 
     @NonNull
-    static WritableMap dataChannelJsonValue(@NonNull final DataChannel dataChannel, @NonNull String valueTag) {
+    static WritableMap dataChannelJsonValue(@NonNull final DataChannel dataChannel, @NonNull final String valueTag) {
         final WritableMap json = Arguments.createMap();
-        // TODO(kdxu) dataChannel => WritableMap の処理をきちんと書く
         json.putInt("id", dataChannel.id());
         json.putString("label", dataChannel.label());
         json.putString("readyState", dataChannelStateStringValue(dataChannel.state()));
@@ -639,28 +638,27 @@ final class WebRTCConverter {
     @NonNull
     static DataChannel.Init dataChannelInit(@Nullable final ReadableMap json) {
         final DataChannel.Init init = new DataChannel.Init();
-        final Boolean negotiated = json.getBoolean("negotiated");
-        init.negotiated = negotiated;
-        if (json.hasKey("id")) {
-            init.id = json.getInt("id");
+        if (json != null) {
+            if (json.hasKey("id")) {
+                init.id = json.getInt("id");
+            }
+            if (json.hasKey("ordered")) {
+                init.ordered = json.getBoolean("ordered");
+            }
+            // XXX(kdxu): android では `maxPacketLifeTime` が未定義。代わりに `maxRetransmitTimeMs` に代入する
+            if (json.hasKey("maxPacketLifeTime")) {
+                init.maxRetransmitTimeMs = json.getInt("maxPacketLifeTime");
+            }
+            if (json.hasKey("maxRetransmits")) {
+                init.maxRetransmits = json.getInt("maxRetransmits");
+            }
+            if (json.hasKey("protocol")) {
+                init.protocol = json.getString("protocol");
+            }
+            if (json.hasKey("negotiated")) {
+                init.negotiated = json.getBoolean("negotiated");
+            }
         }
-        if (json.hasKey("ordered")) {
-            init.ordered = json.getBoolean("ordered");
-        }
-        // XXX(kdxu): android では `maxPacketLifeTime` が未定義。代わりに `maxRetransmitTimeMs` に代入する
-        if (json.hasKey("maxPacketLifeTime")) {
-            init.maxRetransmitTimeMs = json.getInt("maxPacketLifeTime");
-        }
-        if (json.hasKey("maxRetransmits")) {
-            init.maxRetransmits = json.getInt("maxRetransmits");
-        }
-        if (json.hasKey("protocol")) {
-            init.protocol = json.getString("protocol");
-        }
-        if (json.hasKey("negotiated")) {
-            init.negotiated = json.getBoolean("negotiated");
-        }
-        // TODO(kdxu): JSON をパースして DataChannel.Init のプロパティとして代入する処理を書く
         return init;
     }
 
@@ -670,20 +668,24 @@ final class WebRTCConverter {
 
     @NonNull
     static DataChannel.Buffer dataChannelBuffer(@NonNull final ReadableMap json) {
-        final Boolean isBinary = json.getBoolean("binary");
-        if (isBinary == null) {
+        if (!json.hasKey("binary")) {
             throw new IllegalArgumentException("invalid dataChannelBuffer");
         }
+        if (!json.hasKey("data")) {
+            throw new IllegalArgumentException("invalid dataChannelBuffer");
+        }
+        final Boolean isBinary = json.getBoolean("binary");
         final String data = json.getString("data");
         if (data == null) {
             throw new IllegalArgumentException("invalid dataChannelBuffer");
         }
         byte[] byteArray;
-
-        if (isBinary == true) {
-            byteArray = data.getBytes(Charset.forName("UTF-8"));
-        } else {
+        // バイナリデータの場合、base64 で decode してバイト列にして送る
+        if (isBinary) {
             byteArray = Base64.decode(data, Base64.NO_WRAP);
+        } else {
+            // そうでない場合 UTF-8 バイト列を取得する
+            byteArray = data.getBytes(Charset.forName("UTF-8"));
         }
         final ByteBuffer byteBuffer = ByteBuffer.wrap(byteArray);
         final DataChannel.Buffer buffer = new DataChannel.Buffer(byteBuffer, isBinary);

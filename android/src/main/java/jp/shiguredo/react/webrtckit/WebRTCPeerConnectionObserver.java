@@ -20,6 +20,7 @@ import org.webrtc.RtpReceiver;
 import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
 
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.dataChannelJsonValue;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.peerConnectionStateStringValue;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.iceConnectionStateStringValue;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.iceGatheringStateStringValue;
@@ -250,13 +251,13 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
     public void onDataChannel(DataChannel dataChannel) {
         if (peerConnectionPair == null) return;
         Log.d("WebRTCModule", "onDataChannel()[" + peerConnectionPair.first + "]");
+        final WebRTCModule module = getModule();
         final WritableMap params = Arguments.createMap();
         params.putString("valueTag", peerConnectionPair.first);
-        final WebRTCModule module = getModule();
-        final String valueTag = module.createNewValueTag();
-        params.putString("valueTag", valueTag);
+        final String dataChannelValueTag = module.createNewValueTag();
+        params.putMap("channel", dataChannelJsonValue(dataChannel, dataChannelValueTag));
         final WebRTCDataChannelObserver observer = new WebRTCDataChannelObserver(reactContext);
-        final Pair<String, DataChannel> dataChannelPair = new Pair<>(valueTag, dataChannel);
+        final Pair<String, DataChannel> dataChannelPair = new Pair<>(dataChannelValueTag, dataChannel);
         observer.dataChannelPair = dataChannelPair;
         dataChannel.registerObserver(observer);
         module.repository.addDataChannel(dataChannelPair);

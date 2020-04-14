@@ -2,6 +2,8 @@ package jp.shiguredo.react.webrtckit;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+
+import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 
@@ -39,6 +41,8 @@ import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 import org.webrtc.DataChannel;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -698,7 +702,6 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
             promise.reject("NotFoundError", "peer connection is not found");
             return;
         }
-        // TODO(kdxu): init が null の場合もこれで大丈夫か？
         final DataChannel dataChannel = peerConnection.createDataChannel(label, dataChannelInit(initJson));
         if (dataChannel == null) {
             throw new IllegalStateException("createDataChannel failed");
@@ -710,7 +713,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         observer.dataChannelPair = dataChannelPair;
         dataChannel.registerObserver(observer);
         repository.addDataChannel(dataChannelPair);
-        // TODO(kdxu): DataChannel.Init の値も JSON value に取り込むようにする
+        Log.d(getName(), "peerConnectionCreateDataChannel()" + dataChannelJsonValue(dataChannel, dataChannelValueTag));
         promise.resolve(dataChannelJsonValue(dataChannel, dataChannelValueTag));
     }
 
@@ -733,15 +736,16 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      * dataChannelSend(buffer: ReadableMap, valueTag: ValueTag): Promise<void>
      */
     @ReactMethod
-    public  void dataChannelSend(@NonNull ReadableMap sendBufferJson, @NonNull String valueTag, @NonNull Promise promise) {
-        Log.d(getName(), "dataChannelClose() - valueTag=" + valueTag);
+    public void dataChannelSend(@NonNull ReadableMap sendBufferJson, @NonNull String valueTag, @NonNull Promise promise) {
+        Log.d(getName(), "dataChannelSend() - valueTag=" + valueTag + " sendBufferJson=" + sendBufferJson);
         final DataChannel dataChannel = repository.getDataChannelByValueTag(valueTag);
         if (dataChannel == null) {
             promise.reject("NotFoundError", "dataChannel is not found");
             return;
         }
-        dataChannel.send(dataChannelBuffer(sendBufferJson));
-
+        final DataChannel.Buffer buffer = dataChannelBuffer(sendBufferJson);
+        dataChannel.send(buffer);
+        promise.resolve(null);
     }
 
     //endregion
