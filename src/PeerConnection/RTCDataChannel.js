@@ -1,6 +1,6 @@
 // @flow
 
-import { DeviceEventEmitter } from 'react-native';
+import { DeviceEventEmitter, Platform } from 'react-native';
 import { NativeModules } from 'react-native';
 import RTCDataChannelEventTarget from "./RTCDataChannelEventTarget";
 import { RTCEvent, RTCDataChannelMessageEvent } from '../Event/RTCEvents';
@@ -77,68 +77,133 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   // XXX(kdxu): 現在 Chrome / Safari は binaryType = 'blob' をサポートしていない
   // RNKit での対応も保留する
 
+  private _binaryType: string = 'arraybuffer';
   /**
    * 送信できるデータのbinaryType を表します。
    * 現在は `'arraybuffer'` のみ対応しています。
    */
-  binaryType: string = 'arraybuffer';
+  get binaryType() {
+    return this._binaryType;
+  }
+  set binaryType(type: string) {
+    if (type !== 'arraybuffer') {
+      logger.warn('現在 binaryType は arraybuffer のみ指定可能です');
+      return;
+    }
+    this._binaryType = this.binaryType;
+  }
+
+  private readonly _id: number = -1;
   /**
    * DataChannel の id を表します。
    * デフォルトは -1 です。
    * DataChannel の作成時にのみ指定可能です。
    */
-  id: number = -1;
+  get id() {
+    return this._id;
+  }
+
+  private readonly _label: string;
   /**
    * DataChannel のラベルを表します。
    * DataChannel の作成時にのみ指定可能です。
    */
-  label: string;
+  get label() {
+    return this._label;
+  }
+
+  private _readyState: RTCDataChannelState = 'connecting';
   /**
    * DataChannel の現在の接続状態を表します。
   */
-  readyState: RTCDataChannelState = 'connecting';
+  get readyState() {
+    return this._readyState;
+  }
+
+  private _bufferedAmount: number = 0;
   /**
    * DataChannel の現在の bufferedAmount を表します。
    */
-  bufferedAmount: number = 0;
+  get bufferedAmount() {
+    return this._bufferedAmount;
+  }
+
+  private readonly _maxPacketLifeTime: number | null;
   /**
    * DataChannel の maxPacketLifeTime を表します。
    * デフォルトは null です。
    * DataChannel の作成時にのみ指定可能です。
    * Android ではこのプロパティの取得は未対応です。
    */
-  maxPacketLifeTime: number | null;
+  get maxPacketLifeTime() {
+    if (Platform.OS === 'android') {
+      logger.warn("android での maxPacketLifeTime プロパティの取得は未対応です")
+      return null;
+    }
+    return this._maxPacketLifeTime;
+  }
+
+  private readonly _maxRetransmits: number | null;
   /**
    * DataChannel の maxRetransmits を表します。
    * デフォルトは null です。
    * DataChannel の作成時にのみ指定可能です。
    * Android ではこのプロパティの取得は未対応です。
    */
-  maxRetransmits: number | null;
+  get maxRetransmits() {
+    if (Platform.OS === 'android') {
+      logger.warn("android での maxRetransmits プロパティの取得は未対応です")
+      return null;
+    }
+    return this._maxRetransmits;
+  }
+
+  private readonly _negotiated: boolean = false;
   /**
    * DataChannel の negotiated フラグです。
    * デフォルトは false です。
    * DataChannel の作成時にのみ指定可能です。
    * Android ではこのプロパティの取得は未対応です。
    */
-  negotiated: boolean = false;
+  get negotiated() {
+    if (Platform.OS === 'android') {
+      logger.warn("android での negotiated プロパティの取得は未対応です")
+      return false;
+    }
+    return this._negotiated;
+  }
+
+  private readonly _ordered: boolean = false;
   /**
    * DataChannel の ordered フラグです。
    * デフォルトは false です。
    * DataChannel の作成時にのみ指定可能です。
    * Android ではこのプロパティの取得は未対応です。
    */
-  ordered: boolean = false;
+  get ordered() {
+    if (Platform.OS === 'android') {
+      logger.warn("android での ordered プロパティの取得は未対応です")
+      return false;
+    }
+    return this._ordered;
+  }
 
+  private readonly _protocol: string = '';
   /**
    * DataChannel の user-defined に指定した protocol を表します。
    * デフォルトは `''` です。
    * DataChannel の作成時にのみ指定可能です。
    * Android ではこのプロパティの取得は未対応です。
    */
-  protocol: string = '';
+  get protocol() {
+    if (Platform.OS === 'android') {
+      logger.warn("android での protocol プロパティの取得は未対応です")
+      return false;
+    }
+    return this._protocol;
+  }
 
-  _valueTag: ValueTag;
+  private readonly _valueTag: ValueTag;
 
   // XXX(kdxu): libwebrtc objc で bufferedAmountLowThreshold に関連するプロパティは存在しない
   // RNKit での実装も保留となる
@@ -158,20 +223,21 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   constructor(info: Object) {
     super();
     this._valueTag = info.valueTag;
-    this.label = info.label;
-    this.id = info.id;
-    this.readyState = info.readyState;
-    this.bufferedAmount = info.bufferedAmount;
+    this._label = info.label;
+    this._id = info.id;
+    this._readyState = info.readyState;
+    this._bufferedAmount = info.bufferedAmount;
 
     // これ以下の値は libwebrtc Android の RTCDataChannel クラスのプロパティが存在しない
     // cf: https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/sdk/android/api/org/webrtc/DataChannel.java
     // 特に remote 側 (datachannel の初期化を行わない側) は、以下の値を取るすべがない。
-    // なので存在チェックを行い、あれば値を代入する
-    if (info.maxPacketLifeTime) this.maxPacketLifeTime = info.maxPacketLifeTime;
-    if (info.maxRetransmits) this.maxRetransmits = info.maxRetransmits;
-    if (info.negotiated) this.negotiated = nativeBoolean(info.negotiated);
-    if (info.ordered) this.ordered = nativeBoolean(info.ordered);
-    if (info.protocol) this.protocol = info.protocol;
+    // よって、指定した値がない場合のデフォルト値を別途指定している
+    this._maxPacketLifeTime = info.maxPacketLifeTime || null;
+    this._maxRetransmits = info.maxRetransmits || null;
+    this._protocol = info.protocol || "";
+    // 指定した値がない場合、negotiated と property は必ず `false` になるはず
+    this._negotiated = nativeBoolean(info.negotiated);
+    this._ordered = nativeBoolean(info.ordered);
     this._registerEventsFromNative();
   }
 
@@ -226,7 +292,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
         if (ev.valueTag !== this._valueTag) {
           return;
         }
-        this.readyState = ev.readyState;
+        this._readyState = ev.readyState;
         switch (ev.readyState) {
           case 'connecting':
             // connecting は initial state なので、onstatechange でここに来ることは無いはず
@@ -271,7 +337,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
           return;
         }
         if (ev.bufferedAmount) {
-          this.bufferedAmount = ev.bufferedAmount;
+          this._bufferedAmount = ev.bufferedAmount;
         }
       }),
     ]
