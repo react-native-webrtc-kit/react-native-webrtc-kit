@@ -627,7 +627,7 @@ final class WebRTCConverter {
         json.putInt("id", dataChannel.id());
         json.putString("label", dataChannel.label());
         json.putString("readyState", dataChannelStateStringValue(dataChannel.state()));
-        json.putDouble("bufferedamount", dataChannel.bufferedAmount());
+        json.putDouble("bufferedAmount", dataChannel.bufferedAmount());
         json.putString("valueTag", valueTag);
         return json;
     }
