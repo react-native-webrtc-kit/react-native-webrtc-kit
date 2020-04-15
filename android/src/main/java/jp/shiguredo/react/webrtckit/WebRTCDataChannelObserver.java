@@ -87,7 +87,7 @@ final class WebRTCDataChannelObserver implements DataChannel.Observer {
         final DataChannel dataChannel = dataChannelPair.second;
         Log.d("DataChannelObserver", "onBufferedAmountChange()[" + dataChannelPair.first + "] - newBufferedAmount=" + dataChannel.bufferedAmount());
         params.putDouble("bufferedAmount", dataChannel.bufferedAmount());
-        sendDeviceEvent("dataChannelOnBufferedAmount", params);
+        sendDeviceEvent("dataChannelOnChangeBufferedAmount", params);
     }
 
     @Override
