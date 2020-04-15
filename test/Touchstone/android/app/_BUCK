@@ -1,4 +1,3 @@
-  
 # To learn about Buck see [Docs](https://buckbuild.com/).
 # To run your application with Buck:
 # - install Buck
@@ -53,5 +52,4 @@ android_binary(
     deps = [
         ":app-code",
     ],
-
 )
