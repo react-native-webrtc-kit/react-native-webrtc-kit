@@ -22,16 +22,22 @@ type RTCDataBuffer = {
 
 /**
  * RTCDataChannelInit のクラスです。
- * - `id`: number
- * - `ordered`: boolean
- * - `maxPacketLifeTime`: number
- * - `maxRetransmits`: number
- * - `protocol`: string
- * - `negotiated`: boolean
- * 
+ * - `id`: number | undefined
+ * - `ordered`: boolean | undefined
+ * - `maxPacketLifeTime`: number | undefined
+ * - `maxRetransmits`: number | undefined
+ * - `protocol`: string | undefined
+ * - `negotiated`: boolean | undefined
+ 
  * @typedef {Object} RTCDataChannelInit
+ * @property {number|undefined} id データチャネルの固有 ID を表します。
+ * @property {boolean|undefined} ordered メッセージの送信順序を保証するかどうかのフラグを表します。
+ * @property {number|undefined} maxPacketLifeTime メッセージの送信に成功するまで再送を繰り返す時間（ミリ秒）を表します。
+ * @property {number|undefined} maxRetransmits メッセージの最大再送信回数を示す数値を表します。
+ * @property {string|undefined} protocol 利用する subprotocol を表します。
+ * @property {boolean|undefined} negotiated 利用側のアプリケーションがこのデータチャネルをネゴシエーションしたかどうかのフラグを表します。
  */
-type RTCDataChannelInit = {
+export type RTCDataChannelInit = {
   id?: number;
   ordered?: boolean;
   maxPacketLifeTime?: number;
@@ -60,6 +66,7 @@ export type RTCDataChannelState =
 
 /**
  * DataChannel 接続を表すオブジェクトです。
+ * @member {number} foo
  */
 export default class RTCDataChannel extends RTCDataChannelEventTarget {
 
@@ -71,17 +78,23 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
 
   /** @private */
   static nativeCloseDataChannel(valueTag: ValueTag): void {
-    return WebRTCModule.dataChannelClose(valueTag)
+    return WebRTCModule.dataChannelClose(valueTag);
   }
 
-  private _binaryType: string = 'arraybuffer';
+  _binaryType: string = 'arraybuffer';
   /**
    * 送信できるデータのbinaryType を表します。
    * 現在は `'arraybuffer'` のみ対応しています。
+   * @type {string}
    */
   get binaryType() {
     return this._binaryType;
   }
+  /**
+   * 送信できるデータのbinaryType を表します。
+   * 現在は `'arraybuffer'` のみ対応しています。
+   * @type {string}
+   */
   set binaryType(type: string) {
     // XXX(kdxu): 現在 Chrome / Safari は binaryType = 'blob' をサポートしていない
     // RNKit での対応も保留する
@@ -92,47 +105,53 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     this._binaryType = this.binaryType;
   }
 
-  private readonly _id: number = -1;
+  _id: number = -1;
   /**
    * DataChannel の id を表します。
    * デフォルトは -1 です。
    * DataChannel の作成時にのみ指定可能です。
+   * @type {number}
    */
   get id() {
     return this._id;
   }
 
-  private readonly _label: string;
+  _label: string;
   /**
    * DataChannel のラベルを表します。
    * DataChannel の作成時にのみ指定可能です。
+   * @type {string}
    */
   get label() {
     return this._label;
   }
 
-  private _readyState: RTCDataChannelState = 'connecting';
+  _readyState: RTCDataChannelState = 'connecting';
   /**
    * DataChannel の現在の接続状態を表します。
-  */
+   * @type {RTCDataChannelState}
+   */
   get readyState() {
     return this._readyState;
   }
 
-  private _bufferedAmount: number = 0;
+  _bufferedAmount: number = 0;
   /**
    * DataChannel の現在の bufferedAmount を表します。
+   * @type {number}
    */
   get bufferedAmount() {
     return this._bufferedAmount;
   }
 
-  private readonly _maxPacketLifeTime: number | null;
+  _maxPacketLifeTime: number | null;
   /**
    * DataChannel の maxPacketLifeTime を表します。
    * デフォルトは null です。
    * DataChannel の作成時にのみ指定可能です。
    * Android ではこのプロパティの取得は未対応です。
+   * 
+   * @type {number|null}
    */
   get maxPacketLifeTime() {
     if (Platform.OS === 'android') {
@@ -142,12 +161,14 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     return this._maxPacketLifeTime;
   }
 
-  private readonly _maxRetransmits: number | null;
+  _maxRetransmits: number | null;
   /**
    * DataChannel の maxRetransmits を表します。
    * デフォルトは null です。
    * DataChannel の作成時にのみ指定可能です。
    * Android ではこのプロパティの取得は未対応です。
+   * 
+   * @type {number|null}
    */
   get maxRetransmits() {
     if (Platform.OS === 'android') {
@@ -157,12 +178,13 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     return this._maxRetransmits;
   }
 
-  private readonly _negotiated: boolean = false;
+  _negotiated: boolean = false;
   /**
    * DataChannel の negotiated フラグです。
    * デフォルトは false です。
    * DataChannel の作成時にのみ指定可能です。
    * Android ではこのプロパティの取得は未対応です。
+   * @type {boolean}
    */
   get negotiated() {
     if (Platform.OS === 'android') {
@@ -172,12 +194,13 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     return this._negotiated;
   }
 
-  private readonly _ordered: boolean = false;
+  _ordered: boolean = false;
   /**
    * DataChannel の ordered フラグです。
    * デフォルトは false です。
    * DataChannel の作成時にのみ指定可能です。
    * Android ではこのプロパティの取得は未対応です。
+   * @type {boolean}
    */
   get ordered() {
     if (Platform.OS === 'android') {
@@ -187,12 +210,13 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     return this._ordered;
   }
 
-  private readonly _protocol: string = '';
+  _protocol: string = '';
   /**
    * DataChannel の user-defined に指定した protocol を表します。
    * デフォルトは `''` です。
    * DataChannel の作成時にのみ指定可能です。
    * Android ではこのプロパティの取得は未対応です。
+   * @type {string}
    */
   get protocol() {
     if (Platform.OS === 'android') {
@@ -202,7 +226,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     return this._protocol;
   }
 
-  private readonly _valueTag: ValueTag;
+  _valueTag: ValueTag;
 
   // XXX(kdxu): libwebrtc objc で bufferedAmountLowThreshold に関連するプロパティは存在しない
   // RNKit での実装も保留となる
@@ -214,10 +238,10 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   /**
    * RTCDataChannel のオブジェクトを生成します。
    * ユーザはここから直接 RTCDataChannel インスタンスを作成することはありません。
-   * @listens {onopen} `RTCEvent`: `readyState` が `open` になると送信されます。
-   * @listens {onclosing} `RTCEvent`: `readyState` が `close` になると送信されます。
-   * @listens {onclose} `RTCEvent`: `readyState` が `close` になると送信されます。
-   * @listens {onmessage} `RTCDataChannelMessageEvent`: リモートからデータを受信すると送信されます。
+   * @listens {open} `RTCEvent`: `readyState` が `open` になると送信されます。
+   * @listens {closing} `RTCEvent`: `readyState` が `close` になると送信されます。
+   * @listens {close} `RTCEvent`: `readyState` が `close` になると送信されます。
+   * @listens {message} `RTCDataChannelMessageEvent`: リモートからデータを受信すると送信されます。
    */
   constructor(info: Object) {
     super();
@@ -242,11 +266,11 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
 
   /**
    * RTCDataChannel でデータを送信します。
-   * @param {string | ArrayBuffer | ArrayBufferView} data 送信するデータ
+   * @param {string|ArrayBuffer|ArrayBufferView} data 送信するデータ
    * @return {Promise<void>} 結果を表す Promise
    */
   send(data: string | ArrayBuffer | ArrayBufferView): Promise<void> {
-    // XXX(kdxu): Chrome, Safari でサポートされていない Blob については実装を保留する
+    // XXX(kdxu): Chrome, Safari でサポートされていない Blob については実装を行わない
     if (typeof data === 'string') {
       // string の場合は特に変換処理をせずに native にわたす
       return RTCDataChannel.nativeSendDataChannel(this._valueTag, { data: data, binary: false });

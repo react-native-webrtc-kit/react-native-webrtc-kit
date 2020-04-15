@@ -17,6 +17,7 @@ import RTCRtpTransceiver from './RTCRtpTransceiver';
 import logger from '../Util/RTCLogger';
 import RTCMediaConstraints from './RTCMediaConstraints';
 import RTCDataChannel from './RTCDataChannel';
+import type { RTCDataChannelInit } from './RTCDataChannel';
 import WebRTC from '../WebRTC';
 
 /** @private */
@@ -454,9 +455,11 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   * DataChannel を作成します。
   *
   *  @param {string} label DataChannel の label
-  *  @param {RTCDataChannelInit | null} options DataChannel で指定するオプション
+  *  @param {RTCDataChannelInit|null} options DataChannel で指定するオプション
   *  @return {Promise<RTCDataChannel>} 結果を表す Promise。作成した DataChannel を返す
-  * */
+  * 
+  *  @since 2020.x.x (TODO(kdxu): リリース時に since タグを変更する)
+  */
   createDataChannel(label: string, options: RTCDataChannelInit | null = null): Promise<RTCDataChannel> {
     logger.log(`# PeerConnection[${this._valueTag}]: create data channel`)
     return RTCPeerConnection.nativeCreateDataChannel(
