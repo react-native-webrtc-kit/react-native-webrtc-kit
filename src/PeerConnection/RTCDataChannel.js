@@ -74,9 +74,6 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     return WebRTCModule.dataChannelClose(valueTag)
   }
 
-  // XXX(kdxu): 現在 Chrome / Safari は binaryType = 'blob' をサポートしていない
-  // RNKit での対応も保留する
-
   private _binaryType: string = 'arraybuffer';
   /**
    * 送信できるデータのbinaryType を表します。
@@ -86,6 +83,8 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     return this._binaryType;
   }
   set binaryType(type: string) {
+    // XXX(kdxu): 現在 Chrome / Safari は binaryType = 'blob' をサポートしていない
+    // RNKit での対応も保留する
     if (type !== 'arraybuffer') {
       logger.warn('現在 binaryType は arraybuffer のみ指定可能です');
       return;
