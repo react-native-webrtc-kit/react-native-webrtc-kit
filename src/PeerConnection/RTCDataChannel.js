@@ -99,7 +99,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     // XXX(kdxu): 現在 Chrome / Safari は binaryType = 'blob' をサポートしていない
     // RNKit での対応も保留する
     if (type !== 'arraybuffer') {
-      logger.warn('現在 binaryType は arraybuffer のみ指定可能です');
+      logger.error('現在 binaryType は arraybuffer のみ指定可能です');
       return;
     }
     this._binaryType = this.binaryType;
@@ -155,7 +155,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
    */
   get maxPacketLifeTime() {
     if (Platform.OS === 'android') {
-      logger.warn("android での maxPacketLifeTime プロパティの取得は未対応です")
+      logger.error("android での maxPacketLifeTime プロパティの取得は未対応です")
       return null;
     }
     return this._maxPacketLifeTime;
@@ -172,7 +172,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
    */
   get maxRetransmits() {
     if (Platform.OS === 'android') {
-      logger.warn("android での maxRetransmits プロパティの取得は未対応です")
+      logger.error("android での maxRetransmits プロパティの取得は未対応です")
       return null;
     }
     return this._maxRetransmits;
@@ -188,7 +188,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
    */
   get negotiated() {
     if (Platform.OS === 'android') {
-      logger.warn("android での negotiated プロパティの取得は未対応です")
+      logger.error("android での negotiated プロパティの取得は未対応です")
       return false;
     }
     return this._negotiated;
@@ -204,7 +204,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
    */
   get ordered() {
     if (Platform.OS === 'android') {
-      logger.warn("android での ordered プロパティの取得は未対応です")
+      logger.error("android での ordered プロパティの取得は未対応です")
       return false;
     }
     return this._ordered;
@@ -220,7 +220,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
    */
   get protocol() {
     if (Platform.OS === 'android') {
-      logger.warn("android での protocol プロパティの取得は未対応です")
+      logger.error("android での protocol プロパティの取得は未対応です")
       return false;
     }
     return this._protocol;
@@ -334,7 +334,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
             break;
           default:
             // 予測していない state type が来た場合警告を出す
-            logger.warn('# event: dataChannelStateChanged, invalid state=>', ev.readyState);
+            logger.error('# event: dataChannelStateChanged, invalid state=>', ev.readyState);
         }
       }),
 
