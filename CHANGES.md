@@ -13,6 +13,8 @@
 
 - [ADD] Android の onRemoveTrack に対応
     - @enm10k
+- [CHANGE] CircleCI の設定を削除する
+    - @kdxu
 - [CHANGE]  サポートする React Native の最低バージョンを 0.61.5 に更新
     - @enm10k
 
