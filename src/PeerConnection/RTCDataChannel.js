@@ -281,9 +281,12 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
       // ArrayBufferView が渡された場合は buffer, byteoffset, bytelength から Uint8Array を構築
       byteArray = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
     }
-    if (data instanceof ArrayBuffer) {
+    else if (data instanceof ArrayBuffer) {
       // ArrayBuffer が渡された場合、そのまま byteArray に変換する
       byteArray = new Uint8Array(data);
+    } else {
+      // ArrayBuffer | ArrayByfferView どちらでも無い場合は例外を投げる
+      throw new Error("invalid data type, data must be either string, ArrayBuffer or ArrayBufferView");
     }
     // バイナリデータは一旦 base64 エンコードしてネイティブレイヤーに渡す
     return RTCDataChannel.nativeSendDataChannel(this._valueTag, { data: Base64.fromByteArray(byteArray), binary: true });
@@ -294,7 +297,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
    */
   close(): void {
     // PeerConnection.close() と統一性をもたせるため、こちらは同期メソッドとする
-    return RTCDataChannel.nativeCloseDataChannel(this._valueTag);
+    RTCDataChannel.nativeCloseDataChannel(this._valueTag);
   }
 
   /**
@@ -355,7 +358,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
       // bufferedAmount が変更された際に発火する
       // bufferedAmount の数値は更新するが、イベントとしてユーザには通知を行わない
       DeviceEventEmitter.addListener('dataChannelOnChangeBufferedAmount', ev => {
-        logger.log("# event: dataChannelOnChangeBufferedAmount =>", ev.data);
+        logger.log("# event: dataChannelOnChangeBufferedAmount =>", ev.bufferedAmount);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
