@@ -24,7 +24,6 @@ import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
 import org.webrtc.SessionDescription;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -627,7 +626,9 @@ final class WebRTCConverter {
         json.putInt("id", dataChannel.id());
         json.putString("label", dataChannel.label());
         json.putString("readyState", dataChannelStateStringValue(dataChannel.state()));
-        json.putDouble("bufferedAmount", dataChannel.bufferedAmount());
+        final long bufferedAmount = dataChannel.bufferedAmount();
+        // XXX(kdxu): putLong()が存在しない。putIntでは桁落ちする危険性があるが、暫定的に intValue に変換することで対応する
+        json.putInt("bufferedAmount", (int) bufferedAmount);
         json.putString("valueTag", valueTag);
         return json;
     }

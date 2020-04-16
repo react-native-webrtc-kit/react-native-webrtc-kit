@@ -86,7 +86,9 @@ final class WebRTCDataChannelObserver implements DataChannel.Observer {
         params.putString("valueTag", dataChannelPair.first);
         final DataChannel dataChannel = dataChannelPair.second;
         Log.d("DataChannelObserver", "onBufferedAmountChange()[" + dataChannelPair.first + "] - newBufferedAmount=" + dataChannel.bufferedAmount());
-        params.putDouble("bufferedAmount", dataChannel.bufferedAmount());
+        final long bufferedAmount = dataChannel.bufferedAmount();
+        // XXX(kdxu): putLong()が存在しない。putIntでは桁落ちする危険性があるが、暫定的に intValue に変換することで対応する
+        params.putInt("bufferedAmount", (int) bufferedAmount);
         sendDeviceEvent("dataChannelOnChangeBufferedAmount", params);
     }
 
