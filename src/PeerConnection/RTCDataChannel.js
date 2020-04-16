@@ -221,7 +221,7 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
   get protocol() {
     if (Platform.OS === 'android') {
       logger.error("android での protocol プロパティの取得は未対応です")
-      return false;
+      return '';
     }
     return this._protocol;
   }
