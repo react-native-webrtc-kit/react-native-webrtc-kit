@@ -239,8 +239,8 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
    * RTCDataChannel のオブジェクトを生成します。
    * ユーザはここから直接 RTCDataChannel インスタンスを作成することはありません。
    * @listens {open} `RTCEvent`: `readyState` が `open` になると送信されます。
-   * @listens {closing} `RTCEvent`: `readyState` が `close` になると送信されます。
-   * @listens {close} `RTCEvent`: `readyState` が `close` になると送信されます。
+   * @listens {closing} `RTCEvent`: `readyState` が `closing` になると送信されます。
+   * @listens {close} `RTCEvent`: `readyState` が `closed` になると送信されます。
    * @listens {message} `RTCDataChannelMessageEvent`: リモートからデータを受信すると送信されます。
    */
   constructor(info: Object) {
