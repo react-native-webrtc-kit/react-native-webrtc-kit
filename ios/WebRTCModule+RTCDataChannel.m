@@ -121,7 +121,8 @@ RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag)
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelOnChangeBufferedAmount"
                                                     body: @{@"id": [[NSNumber alloc] initWithInt: channel.channelId],
                                                             @"valueTag": channel.valueTag,
-                                                            @"bufferedAmount": [[NSNumber alloc] initWithUnsignedLongLong: amount]}];
+                                                            @"bufferedAmount": [[NSNumber alloc] initWithUnsignedLongLong: channel.bufferedAmount]
+                                                    }];
 }
 
 
