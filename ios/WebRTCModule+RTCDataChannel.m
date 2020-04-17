@@ -106,7 +106,7 @@ RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag)
 
 }
 
-- (void) dataChannel:(RTCDataChannel *)channel didChangeBufferedAmount:(uint64_t)amount {
+- (void) dataChannel:(RTCDataChannel *)channel didChangeBufferedAmount:(uint64_t)previousAmount {
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"dataChannelOnChangeBufferedAmount"
                                                     body: @{@"id": [[NSNumber alloc] initWithInt: channel.channelId],
                                                             @"valueTag": channel.valueTag,
