@@ -323,10 +323,10 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     this._nativeEventListeners = [
 
       DeviceEventEmitter.addListener('dataChannelStateChanged', ev => {
-        logger.log("# event: dataChannelStateChanged =>", ev.readyState);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
+        logger.log("# event: dataChannelStateChanged =>", ev.readyState);
         this._readyState = ev.readyState;
         switch (ev.readyState) {
           case 'connecting':
@@ -351,10 +351,10 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
       }),
 
       DeviceEventEmitter.addListener('dataChannelOnMessage', ev => {
-        logger.log("# event: dataChannelOnMessage =>", ev.data);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
+        logger.log("# event: dataChannelOnMessage =>", ev.data);
         if (ev.binary === true) {
           // バイナリデータの場合、ネイティブレイヤーで base64 encode されたものが来ているはずなので
           // base64 decode を行って受け取る
@@ -367,10 +367,10 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
       // bufferedAmount が変更された際に発火する
       // bufferedAmount の数値は更新するが、イベントとしてユーザには通知を行わない
       DeviceEventEmitter.addListener('dataChannelOnChangeBufferedAmount', ev => {
-        logger.log("# event: dataChannelOnChangeBufferedAmount =>", ev.bufferedAmount);
         if (ev.valueTag !== this._valueTag) {
           return;
         }
+        logger.log("# event: dataChannelOnChangeBufferedAmount =>", ev.bufferedAmount);
         // bufferedAmount を更新する
         if (ev.bufferedAmount) {
           this._bufferedAmount = ev.bufferedAmount;
