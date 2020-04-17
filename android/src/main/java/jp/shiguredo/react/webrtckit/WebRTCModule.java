@@ -728,7 +728,10 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         if (dataChannel == null) {
             return;
         }
-        repository.removeDataChannelByValueTag(valueTag);
+        // dataChannel の state が open でないときは実行しない
+        if (dataChannel.state() != DataChannel.State.OPEN) {
+          return;
+        }
         dataChannel.close();
     }
 

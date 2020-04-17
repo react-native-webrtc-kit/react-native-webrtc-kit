@@ -48,18 +48,18 @@ final class WebRTCDataChannelObserver implements DataChannel.Observer {
     }
 
 
-    private void closeAndFinish() {
+    private void finish() {
         if (dataChannelPair != null) {
-            Log.d("WebRTCModule", "DataChannel closeAndFinish()[" + dataChannelPair.first + "]");
+            Log.d("WebRTCModule", "DataChannel finish()[" + dataChannelPair.first + "]");
             final WebRTCModule module = getModule();
-            final ReactQueueConfiguration queueConfiguration = module.getReactContext().getCatalystInstance().getReactQueueConfiguration();
             final String valueTag = dataChannelPair.first;
+            // dataChannelPair を null にする
             dataChannelPair = null;
-            queueConfiguration.getNativeModulesQueueThread().runOnQueue(() -> {
-                module.dataChannelClose(valueTag);
-            });
+            // モジュールの管理下から dataChannel を外す
+            module.repository.removeDataChannelByValueTag(valueTag);
         }
     }
+}
 
     //region DataChannel.Observer
 
@@ -71,9 +71,9 @@ final class WebRTCDataChannelObserver implements DataChannel.Observer {
         final DataChannel dataChannel = dataChannelPair.second;
         final DataChannel.State state = dataChannel.state();
         Log.d("DataChannelObserver", "onStateChange()[" + dataChannelPair.first + "] - newReadyState=" + state);
-        // state が closed な場合 finish する
+        // state が closed な場合 finish してモジュールの管理下から dataChannel を除く
         if (state == DataChannel.State.CLOSED) {
-            closeAndFinish();
+            finish();
         }
         params.putString("readyState", dataChannelStateStringValue(dataChannel.state()));
         sendDeviceEvent("dataChannelStateChanged", params);

@@ -32,21 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 
-- (void)closeAndFinish
-{
-    if (self.readyState != RTCDataChannelStateOpen)
-        return;
-    [self close];
-    [self finish];
-}
-
-- (void)finish
-{
-    // モジュールの管理から外す
-    [SharedModule removeDataChannelForKey: self.valueTag];
-}
-
-
 @end
 
 @implementation WebRTCModule (RTCDataChannel)
@@ -75,7 +60,11 @@ RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag)
     if (!channel) {
         return;
     }
-    [channel closeAndFinish];
+    // open でない場合閉じさせない
+    if (channel.readyState != RTCDataChannelStateOpen) {
+      return;
+    }
+    [channel close];
     return;
 }
 
@@ -90,7 +79,7 @@ RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag)
                                                     body: @{@"id": [[NSNumber alloc] initWithInt: channel.channelId],
                                                             @"valueTag": channel.valueTag,
                                                             @"readyState": [WebRTCUtils stringForDataChannelState:channel.readyState]}];
-    // data channel が閉じられている場合は dict から該当の channel を取り除く
+    // data channel が閉じられた場合はモジュールの管理から該当の dataChannel を外す
     if(channel.readyState == RTCDataChannelStateClosed) {
         [self removeDataChannelForKey:channel.valueTag];
     }
