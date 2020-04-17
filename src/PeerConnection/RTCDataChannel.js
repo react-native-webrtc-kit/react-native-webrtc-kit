@@ -144,6 +144,13 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     return this._bufferedAmount;
   }
 
+  /**
+   * DataChannel の bufferedAmount に対するしきい値です。
+   * bufferedAmount がこの値以下になったとき、`onbufferedamountlow` イベントが発火します。
+   * デフォルト値は 0 です。
+   */
+  bufferedAmountLowThreshold: number = 0;
+
   _maxPacketLifeTime: number | null;
   /**
    * DataChannel の maxPacketLifeTime を表します。
@@ -242,9 +249,11 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
    * @listens {closing} `RTCEvent`: `readyState` が `closing` になると送信されます。
    * @listens {close} `RTCEvent`: `readyState` が `closed` になると送信されます。
    * @listens {message} `RTCDataChannelMessageEvent`: リモートからデータを受信すると送信されます。
+   * @listens {bufferedamountlow} `RTCEvent`: bufferedAmount が bufferedAmountLowThreshold で指定した値以下になると送信されます。
    */
   constructor(info: Object) {
     super();
+    this.bufferedAmountLowThreshold = 0;
     this._valueTag = info.valueTag;
     this._label = info.label;
     this._id = info.id;
@@ -362,8 +371,13 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
         if (ev.valueTag !== this._valueTag) {
           return;
         }
+        // bufferedAmount を更新する
         if (ev.bufferedAmount) {
           this._bufferedAmount = ev.bufferedAmount;
+        }
+        // bufferedAmount が bufferedAmountLowThreshold 以下になった場合、 bufferedamountlow イベントを発火する 
+        if (this._bufferedAmount <= this.bufferedAmountLowThreshold) {
+          this.dispatchEvent(new RTCEvent('bufferedamountlow'));
         }
       }),
     ]

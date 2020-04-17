@@ -12,8 +12,7 @@ export const DATA_CHANNEL_EVENTS = [
     'message',
     'close',
     'closing',
-    // XXX(kdxu): objc では onbufferedamountlow に関連する delegate は実装されていないので実装を保留する
-    // 'onbufferedamountlow',
+    'bufferedamountlow'
     //  XXX(kdxu): objc では error 時に発火する delegate は実装されていない (Android は未調査)
     // cf: https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/sdk/objc/api/peerconnection/RTCDataChannel.h#39
     // 'error',
