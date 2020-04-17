@@ -13,11 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)json;
 
-/**
- * 通常の close を含む React Native 向けの終了処理を行う
- */
-- (void)closeAndFinish;
-
 @end
 
 @interface WebRTCModule (RTCDataChannel) <RTCDataChannelDelegate>

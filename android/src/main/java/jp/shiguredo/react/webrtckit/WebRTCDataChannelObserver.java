@@ -12,7 +12,6 @@ import java.nio.charset.Charset;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.queue.ReactQueueConfiguration;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import org.webrtc.DataChannel;
@@ -59,7 +58,6 @@ final class WebRTCDataChannelObserver implements DataChannel.Observer {
             module.repository.removeDataChannelByValueTag(valueTag);
         }
     }
-}
 
     //region DataChannel.Observer
 
