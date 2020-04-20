@@ -102,8 +102,6 @@ final class WebRTCRepository {
 
     final DualKeyMap<RtpSender> senders = new DualKeyMap<>();
 
-    // endregion
-
     /**
      * Key is id, Value is associated stream ids.
      */
@@ -230,6 +228,8 @@ final class WebRTCRepository {
         }
         return dataChannelMap.get(valueTag);
     }
+
+    //endregion
 
     /**
      * このリポジトリの中身を完全に空にします。
