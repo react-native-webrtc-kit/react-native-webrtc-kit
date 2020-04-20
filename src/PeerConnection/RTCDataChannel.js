@@ -144,6 +144,11 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
     return this._bufferedAmount;
   }
 
+  // XXX(kdxu): libwebrtc objc/android で bufferedAmountLowThreshold に関連するプロパティおよび
+  // `onbufferedamountlow` に相当するイベントは存在しないが、`bufferedAmount` を管理することでJS 側で実装を実現している
+  // cf: https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/sdk/objc/api/peerconnection/RTCDataChannel.mm#
+  // `bufferedAmount` が `bufferedAmountLowThreshold` 以下の値になったとき、 `onbufferedamountlow` イベントを発火する
+
   /**
    * DataChannel の bufferedAmount に対するしきい値です。
    * bufferedAmount がこの値以下になったとき、`onbufferedamountlow` イベントが発火します。
@@ -235,10 +240,6 @@ export default class RTCDataChannel extends RTCDataChannelEventTarget {
 
   _valueTag: ValueTag;
 
-  // XXX(kdxu): libwebrtc objc で bufferedAmountLowThreshold に関連するプロパティは存在しない
-  // RNKit での実装も保留となる
-  // cf: https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/sdk/objc/api/peerconnection/RTCDataChannel.mm#
-  // bufferedAmountLowThreshold: number = 0;
   _nativeEventListeners: Array<any> = [];
 
 
