@@ -22,6 +22,7 @@ type RTCDataBuffer = {
 
 /**
  * RTCDataChannelInit のクラスです。
+ * `maxPacketLifeTime` と `maxRetransmits` を両方同時に指定することはできません。
  * - `id`: number | undefined
  * - `ordered`: boolean | undefined
  * - `maxPacketLifeTime`: number | undefined
@@ -44,9 +45,9 @@ export type RTCDataChannelInit = {
   maxRetransmits?: number;
   protocol?: string;
   negotiated?: boolean;
-  // maxRetransmitTime は duplicated。代わりに maxPacketLifeTime を用いる
+  // maxRetransmitTimeMs は duplicated。代わりに maxPacketLifeTime を用いる
   // cf: https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/sdk/objc/api/peerconnection/RTCDataChannel.h#78
-  // maxRetransmitTime: number;
+  // maxRetransmitTimeMs: number;
 }
 
 /**

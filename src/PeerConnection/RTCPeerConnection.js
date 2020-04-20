@@ -461,7 +461,11 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   *  @since 2020.x.x (TODO(kdxu): リリース時に since タグを変更する)
   */
   createDataChannel(label: string, options: RTCDataChannelInit | null = null): Promise<RTCDataChannel> {
-    logger.log(`# PeerConnection[${this._valueTag}]: create data channel`)
+    logger.log(`# PeerConnection[${this._valueTag}]: create data channel`);
+    // maxPacketLifeTime と maxRetransmits を両方指定された場合はエラーを投げる
+    if (options && options.maxPacketLifeTime && options.maxRetransmits) {
+      throw new Error("maxRetransmits and maxPacketLifeTime should not be both set.");
+    }
     return RTCPeerConnection.nativeCreateDataChannel(
       this._valueTag,
       label,
