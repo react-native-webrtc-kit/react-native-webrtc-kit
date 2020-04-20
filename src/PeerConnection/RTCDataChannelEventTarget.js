@@ -13,7 +13,7 @@ export const DATA_CHANNEL_EVENTS = [
     'close',
     'closing',
     'bufferedamountlow'
-    //  XXX(kdxu): objc では error 時に発火する delegate は実装されていない (Android は未調査)
+    //  XXX(kdxu): objc/android では error 時に発火する delegate は実装されていない
     // cf: https://chromium.googlesource.com/external/webrtc/+/refs/heads/master/sdk/objc/api/peerconnection/RTCDataChannel.h#39
     // 'error',
 ];
