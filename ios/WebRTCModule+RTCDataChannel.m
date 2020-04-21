@@ -101,7 +101,9 @@ RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag)
                                                     body:@{@"id": [[NSNumber alloc] initWithInt: channel.channelId],
                                                            @"valueTag": channel.valueTag,
                                                            @"binary": @(buffer.isBinary),
-                                                           @"data": data
+                                                           // data は base64 encoding に失敗した場合 nil が返ってくる可能性がある
+                                                           // 辞書リテラルで nil を代入すると落ちるので nil の場合をチェックしてその場合は NSNull を代入するようにする
+                                                           @"data": (data ? data : [NSNull null])
                                                     }];
 
 }
