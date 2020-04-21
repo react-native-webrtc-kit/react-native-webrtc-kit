@@ -23,20 +23,14 @@ type RTCDataBuffer = {
 /**
  * RTCDataChannelInit のクラスです。
  * `maxPacketLifeTime` と `maxRetransmits` を両方同時に指定することはできません。
- * - `id`: number | undefined
- * - `ordered`: boolean | undefined
- * - `maxPacketLifeTime`: number | undefined
- * - `maxRetransmits`: number | undefined
- * - `protocol`: string | undefined
- * - `negotiated`: boolean | undefined
- 
+ *
  * @typedef {Object} RTCDataChannelInit
- * @property {number|undefined} id データチャネルの固有 ID を表します。
- * @property {boolean|undefined} ordered メッセージの送信順序を保証するかどうかのフラグを表します。
- * @property {number|undefined} maxPacketLifeTime メッセージの送信に成功するまで再送を繰り返す時間（ミリ秒）を表します。
- * @property {number|undefined} maxRetransmits メッセージの最大再送信回数を示す数値を表します。
- * @property {string|undefined} protocol 利用する subprotocol を表します。
- * @property {boolean|undefined} negotiated 利用側のアプリケーションがこのデータチャネルをネゴシエーションしたかどうかのフラグを表します。
+ * @property {number} [id] データチャネルの固有 ID を表します。
+ * @property {boolean} [ordered] メッセージの送信順序を保証するかどうかのフラグを表します。
+ * @property {number} [maxPacketLifeTime] メッセージの送信に成功するまで再送を繰り返す時間（ミリ秒）を表します。
+ * @property {number} [maxRetransmits] メッセージの最大再送信回数を示す数値を表します。
+ * @property {string} [protocol] 利用する subprotocol を表します。
+ * @property {boolean} [negotiated] 利用側のアプリケーションがこのデータチャネルをネゴシエーションしたかどうかのフラグを表します。
  */
 export type RTCDataChannelInit = {
   id?: number;
