@@ -622,6 +622,7 @@ RCT_EXPORT_METHOD(peerConnectionCreateDataChannel: (NSString *)label
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject)
 {
+
   // valueTag に相当する peer Connection を見つける
   RTCPeerConnection *peerConnection = [self peerConnectionForKey: valueTag];
   if (!peerConnection) {
@@ -629,8 +630,14 @@ RCT_EXPORT_METHOD(peerConnectionCreateDataChannel: (NSString *)label
     reject(@"NotFoundError", @"peer connection is not found", nil);
     return;
   }
+  RTCDataChannelConfiguration *config = [[RTCDataChannelConfiguration alloc] init];
+  // options が nil でなければ config に代入して利用する
+  // nil の場合は config の初期値が適用される
+  if (options) {
+    config = options;
+  }
   // DataChannel を Peer Connection に追加する
-  RTCDataChannel *dataChannel = [peerConnection dataChannelForLabel:label configuration:options];
+  RTCDataChannel *dataChannel = [peerConnection dataChannelForLabel:label configuration:config];
   [self dataChannelInit:dataChannel];
   resolve([dataChannel json]);
 }
