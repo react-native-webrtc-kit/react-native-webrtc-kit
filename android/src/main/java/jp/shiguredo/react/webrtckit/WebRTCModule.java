@@ -704,7 +704,8 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         }
         final DataChannel dataChannel = peerConnection.createDataChannel(label, dataChannelInit(initJson));
         if (dataChannel == null) {
-            throw new IllegalStateException("createDataChannel failed");
+            promise.reject("FatalError", "createDataChannel failed");
+            return;
         }
         // observer を登録する
         final String dataChannelValueTag = createNewValueTag();
