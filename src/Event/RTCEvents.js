@@ -131,7 +131,7 @@ export class RTCDataChannelMessageEvent {
      */
     type: string;
     /**
-     * 送信するデータ
+     * 受信するデータ
      */
     data: string | ArrayBuffer | null;
     /**
