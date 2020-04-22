@@ -11,6 +11,8 @@
 
 ## develop
 
+- [ADD] DataChannel に対応する
+    - @kdxu
 - [ADD] Android の onRemoveTrack に対応
     - @enm10k
 - [CHANGE] CircleCI の設定を削除する
