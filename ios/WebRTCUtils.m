@@ -58,6 +58,20 @@
     return nil;
 }
 
++ (NSString *)stringForDataChannelState:(RTCDataChannelState)state {
+    switch (state) {
+        case RTCDataChannelStateConnecting:
+            return @"connecting";
+        case RTCDataChannelStateOpen:
+            return @"open";
+        case RTCDataChannelStateClosing:
+            return @"closing";
+        case RTCDataChannelStateClosed:
+            return @"closed";
+    }
+    return nil;
+}
+
 + (NSDictionary<NSString *, NSString *> *)parseJavaScriptConstraints:(NSDictionary *)src
 {
     NSMutableDictionary<NSString *, NSString *> *result = [NSMutableDictionary dictionary];

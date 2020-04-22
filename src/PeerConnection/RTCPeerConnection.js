@@ -6,7 +6,7 @@ import { NativeModules } from 'react-native';
 import * as RTCUtil from '../Util/RTCUtil';
 import RTCMediaStream from '../MediaStream/RTCMediaStream';
 import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
-import { RTCEvent, RTCMediaStreamTrackEvent, RTCIceCandidateEvent } from '../Event/RTCEvents';
+import { RTCEvent, RTCMediaStreamTrackEvent, RTCIceCandidateEvent, RTCDataChannelEvent } from '../Event/RTCEvents';
 import RTCIceCandidate from './RTCIceCandidate';
 import RTCPeerConnectionEventTarget from './RTCPeerConnectionEventTarget';
 import RTCSessionDescription from './RTCSessionDescription';
@@ -16,6 +16,8 @@ import RTCRtpReceiver from './RTCRtpReceiver';
 import RTCRtpTransceiver from './RTCRtpTransceiver';
 import logger from '../Util/RTCLogger';
 import RTCMediaConstraints from './RTCMediaConstraints';
+import RTCDataChannel from './RTCDataChannel';
+import type { RTCDataChannelInit } from './RTCDataChannel';
 import WebRTC from '../WebRTC';
 
 /** @private */
@@ -184,6 +186,11 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
     return WebRTCModule.peerConnectionSetRemoteDescription(sdp.toJSON(), valueTag);
   }
 
+  /** @private */
+  static nativeCreateDataChannel(valueTag: ValueTag, label: string, options: RTCDataChannelInit | null): Promise<Object> {
+    return WebRTCModule.peerConnectionCreateDataChannel(label, options, valueTag);
+  }
+
   /**
    * クライアントとの総合的な接続状態を表します。
    */
@@ -255,6 +262,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * @listens {negotiationneeded} `RTCEvent`: ネゴシエーションが必要になったときに送信されます。
    * @listens {signalingstatechange} `RTCEvent`: `signalingState` が変更されると送信されます。
    * @listens {track} `RTCEvent`: RTCPeerConnection にトラックが追加・削除されると送信されます。
+   * @listens {datachannel} `RTCDataChannelEvent`: RTCPeerConnection に DataChannel がリモートから追加されると送信されます。
    * @listens {addstream} このイベントは廃止されました。
    * @listens {removestream} このイベントは廃止されました。
    */
@@ -443,6 +451,31 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
       });
   }
 
+  /**
+  * DataChannel を作成します。
+  *
+  *  @param {string} label DataChannel の label
+  *  @param {RTCDataChannelInit|null} options DataChannel で指定するオプション
+  *  @return {Promise<RTCDataChannel>} 結果を表す Promise。作成した DataChannel を返す
+  * 
+  *  @since 2020.x.x (TODO(kdxu): リリース時に since タグを変更する)
+  */
+  createDataChannel(label: string, options: RTCDataChannelInit | null = null): Promise<RTCDataChannel> {
+    logger.log(`# PeerConnection[${this._valueTag}]: create data channel`);
+    // maxPacketLifeTime と maxRetransmits を両方指定された場合はエラーを投げる
+    if (options && options.maxPacketLifeTime && options.maxRetransmits) {
+      throw new Error("maxRetransmits and maxPacketLifeTime should not be both set.");
+    }
+    return RTCPeerConnection.nativeCreateDataChannel(
+      this._valueTag,
+      label,
+      options
+    ).then((info) => {
+      logger.log(`# PeerConnection[${this._valueTag}]: createDataChannel finished: channel => `, info);
+      return new RTCDataChannel(info);
+    })
+  }
+
   _registerEventsFromNative(): void {
     logger.log(`# PeerConnection[${this._valueTag}]: register events from native`);
     this._nativeEventListeners = [
@@ -541,7 +574,16 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
           this.dispatchEvent(new RTCIceCandidateEvent('icecandidate'));
         }
         this.dispatchEvent(new RTCEvent('icegatheringstatechange'));
-      })
+      }),
+
+      DeviceEventEmitter.addListener('peerConnectionOnDataChannel', ev => {
+        if (ev.valueTag !== this._valueTag) {
+          return;
+        }
+        logger.log(`# PeerConnection[${this._valueTag}]: event: peerConnectionOnDataChannel`);
+        const channel = new RTCDataChannel(ev.channel);
+        this.dispatchEvent(new RTCDataChannelEvent('datachannel', channel));
+      }),
     ]
   }
 

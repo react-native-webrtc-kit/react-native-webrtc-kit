@@ -195,6 +195,50 @@ NS_ASSUME_NONNULL_BEGIN
     return consts;
 }
 
++ (nullable RTCDataChannelConfiguration *)RTCDataChannelConfiguration:(nullable id)json {
+    RTCDataChannelConfiguration *config = [[RTCDataChannelConfiguration alloc] init];
+    if (json[@"ordered"]) {
+        config.isOrdered = [RCTConvert BOOL:json[@"ordered"]];
+    }
+    if (json[@"negotiated"]) {
+        config.isOrdered = [RCTConvert BOOL:json[@"negotiated"]];
+    }
+    NSNumber *channelId = Nullable(json[@"id"]);
+    if (channelId) {
+        config.channelId = [channelId intValue];
+    }
+    NSNumber *maxRetransmits = Nullable(json[@"maxRetransmits"]);
+    if (channelId) {
+        config.maxRetransmits = [maxRetransmits intValue];
+    }
+    NSNumber *maxPacketLifeTime = Nullable(json[@"maxPacketLifeTime"]);
+    if (maxPacketLifeTime) {
+        config.maxPacketLifeTime = [maxPacketLifeTime intValue];
+    }
+    NSString *protocol = Nullable(json[@"protocol"]);
+    if (protocol) {
+        config.protocol = protocol;
+    }
+    return config;
+}
+
++ (nullable RTCDataBuffer *)RTCDataBuffer:(nullable id)json {
+    NSLog(@"RTCDataBuffer");
+    AssertNonNull(@"data", NSString, json[@"data"]);
+    AssertNonNull(@"binary", NSNumber, json[@"binary"]);
+    BOOL isBinary = [RCTConvert BOOL:json[@"binary"]];
+    NSData *data;
+    if (isBinary) {
+        // バイナリデータの場合 Base64 Encoded した NS Data  に変換
+        data = [[NSData alloc] initWithBase64EncodedString:json[@"data"] options:0];
+    } else {
+        // それ以外の場合は UTF8 String Encoding で NSData に変換
+        data = [json[@"data"] dataUsingEncoding:NSUTF8StringEncoding];
+    }
+    RTCDataBuffer *buffer = [[RTCDataBuffer alloc] initWithData:data isBinary:isBinary];
+    return buffer;
+}
+
 @end
 
 NS_ASSUME_NONNULL_END

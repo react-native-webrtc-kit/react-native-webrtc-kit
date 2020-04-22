@@ -1,5 +1,6 @@
 #import <objc/runtime.h>
 
+#import "WebRTCModule+RTCDataChannel.h"
 #import "WebRTCModule+RTCMediaStream.h"
 #import "WebRTCModule+RTCPeerConnection.h"
 #import "WebRTCModule+getUserMedia.h"
@@ -353,6 +354,13 @@ static void *peerConnectionValueTagKey = "peerConnectionValueTag";
     return nil;
 }
 
+- (void) dataChannelInit:(RTCDataChannel *)channel {
+    // 新たに valueTag を紐付ける
+    channel.valueTag = [self createNewValueTag];
+    channel.delegate = self;
+    [self addDataChannel:channel forKey:channel.valueTag];
+}
+
 #pragma mark - React Native Exports
 
 /**
@@ -606,6 +614,34 @@ RCT_EXPORT_METHOD(rtpEncodingParametersSetMinBitrate:(nonnull NSNumber *)bitrate
     }
 }
 
+// MARK: -peerConnectionCreateDataChannel:label:config:valueTag:resolver:rejecter
+
+RCT_EXPORT_METHOD(peerConnectionCreateDataChannel: (NSString *)label
+                  options:(nullable RTCDataChannelConfiguration *)options
+                  valueTag: (NSString *) valueTag
+                  resolver:(nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject)
+{
+
+  // valueTag に相当する peer Connection を見つける
+  RTCPeerConnection *peerConnection = [self peerConnectionForKey: valueTag];
+  if (!peerConnection) {
+    // peer connection がなければ reject する
+    reject(@"NotFoundError", @"peer connection is not found", nil);
+    return;
+  }
+  RTCDataChannelConfiguration *config = [[RTCDataChannelConfiguration alloc] init];
+  // options が nil でなければ config に代入して利用する
+  // nil の場合は config の初期値が適用される
+  if (options) {
+    config = options;
+  }
+  // DataChannel を Peer Connection に追加する
+  RTCDataChannel *dataChannel = [peerConnection dataChannelForLabel:label configuration:config];
+  [self dataChannelInit:dataChannel];
+  resolve([dataChannel json]);
+}
+
 #pragma mark - RTCPeerConnectionDelegate
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
@@ -720,7 +756,10 @@ didStartReceivingOnTransceiver:(RTCRtpTransceiver *)transceiver
 }
 
 - (void)peerConnection:(RTCPeerConnection*)peerConnection didOpenDataChannel:(RTCDataChannel*)dataChannel {
-    // DataChannel は現在対応しない
+    [self dataChannelInit:dataChannel];
+    [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionOnDataChannel"
+                                                        body:@{@"valueTag": peerConnection.valueTag,
+                                                               @"channel": [dataChannel json]}];
 }
 
 // MARK: Deprecated

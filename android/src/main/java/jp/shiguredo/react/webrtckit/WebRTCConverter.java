@@ -1,6 +1,9 @@
 package jp.shiguredo.react.webrtckit;
 
+import android.util.Base64;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
@@ -10,6 +13,7 @@ import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
+import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStreamTrack;
@@ -21,9 +25,12 @@ import org.webrtc.RtpTransceiver;
 import org.webrtc.SessionDescription;
 
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 
 import static jp.shiguredo.react.webrtckit.Readables.array;
 import static jp.shiguredo.react.webrtckit.Readables.booleans;
@@ -611,6 +618,101 @@ final class WebRTCConverter {
 
     //endregion
 
+    //region DataChannel
+
+    @NonNull
+    static WritableMap dataChannelJsonValue(@NonNull final DataChannel dataChannel, @NonNull final String valueTag) {
+        final WritableMap json = Arguments.createMap();
+        json.putInt("id", dataChannel.id());
+        json.putString("label", dataChannel.label());
+        json.putString("readyState", dataChannelStateStringValue(dataChannel.state()));
+        final long bufferedAmount = dataChannel.bufferedAmount();
+        // XXX(kdxu): putLong()が存在しない。putIntでは桁落ちする危険性があるが、暫定的に intValue に変換することで対応する
+        json.putInt("bufferedAmount", (int) bufferedAmount);
+        json.putString("valueTag", valueTag);
+        return json;
+    }
+    //endregion
+
+    //region DataChannel.Init
+
+    @NonNull
+    static DataChannel.Init dataChannelInit(@Nullable final ReadableMap json) {
+        final DataChannel.Init init = new DataChannel.Init();
+        if (json != null) {
+            if (json.hasKey("id")) {
+                init.id = json.getInt("id");
+            }
+            if (json.hasKey("ordered")) {
+                init.ordered = json.getBoolean("ordered");
+            }
+            // XXX(kdxu): android では `maxPacketLifeTime` が未定義。代わりに `maxRetransmitTimeMs` に代入する
+            if (json.hasKey("maxPacketLifeTime")) {
+                init.maxRetransmitTimeMs = json.getInt("maxPacketLifeTime");
+            }
+            if (json.hasKey("maxRetransmits")) {
+                init.maxRetransmits = json.getInt("maxRetransmits");
+            }
+            if (json.hasKey("protocol")) {
+                init.protocol = json.getString("protocol");
+            }
+            if (json.hasKey("negotiated")) {
+                init.negotiated = json.getBoolean("negotiated");
+            }
+        }
+        return init;
+    }
+
+    //endregion
+
+    //region DataChannel.Buffer
+
+    @NonNull
+    static DataChannel.Buffer dataChannelBuffer(@NonNull final ReadableMap json) {
+        if (!json.hasKey("binary")) {
+            throw new IllegalArgumentException("invalid dataChannelBuffer");
+        }
+        if (!json.hasKey("data")) {
+            throw new IllegalArgumentException("invalid dataChannelBuffer");
+        }
+        final Boolean isBinary = json.getBoolean("binary");
+        final String data = json.getString("data");
+        if (data == null) {
+            throw new IllegalArgumentException("invalid dataChannelBuffer");
+        }
+        byte[] byteArray;
+        // バイナリデータの場合、base64 で decode してバイト列にして送る
+        if (isBinary) {
+            byteArray = Base64.decode(data, Base64.NO_WRAP);
+        } else {
+            // そうでない場合 UTF-8 バイト列を取得する
+            byteArray = data.getBytes(Charset.forName("UTF-8"));
+        }
+        final ByteBuffer byteBuffer = ByteBuffer.wrap(byteArray);
+        final DataChannel.Buffer buffer = new DataChannel.Buffer(byteBuffer, isBinary);
+        return buffer;
+    }
+
+
+    // region DataChannel.State
+
+    @NonNull
+    static String dataChannelStateStringValue(@NonNull final DataChannel.State dataChannelState) {
+        switch (dataChannelState) {
+            case CONNECTING:
+                return "connecting";
+            case OPEN:
+                return "open";
+            case CLOSING:
+                return "closing";
+            case CLOSED:
+                return "closed";
+            default:
+                throw new IllegalArgumentException("invalid dataChannelState");
+        }
+    }
+
+    // endregion
 
     @NonNull
     static List<String> toStringList(@NonNull final ReadableArray arrayJson) {
@@ -624,5 +726,4 @@ final class WebRTCConverter {
         }
         return result;
     }
-
 }
