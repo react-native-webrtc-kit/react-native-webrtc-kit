@@ -2,6 +2,8 @@ package jp.shiguredo.react.webrtckit;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+
+import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 
@@ -37,13 +39,19 @@ import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
+import org.webrtc.DataChannel;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.dataChannelBuffer;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.dataChannelInit;
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.dataChannelJsonValue;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.iceCandidate;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.mediaConstraints;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.mediaStreamTrackJsonValue;
@@ -681,6 +689,67 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         final RtpParameters.Encoding encodingParams = repository.getRtpEncodingParametersByValueTag(ownerValueTag, ssrc);
         if (encodingParams == null) return;
         encodingParams.minBitrateBps = bitrate;
+    }
+
+    /**
+     * peerConnectionCreateDataChannel(String label, DataChannel.Init init, String valueTag): Promise<RTCDataChannel>
+     */
+    @ReactMethod
+    public void peerConnectionCreateDataChannel(@NonNull String label, @Nullable ReadableMap initJson, @NonNull String valueTag, @NonNull Promise promise) {
+        Log.d(getName(), "peerConnectionCreateDataChannel()");
+        final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
+        if (peerConnection == null) {
+            promise.reject("NotFoundError", "peer connection is not found");
+            return;
+        }
+        final DataChannel dataChannel = peerConnection.createDataChannel(label, dataChannelInit(initJson));
+        if (dataChannel == null) {
+            promise.reject("FatalError", "createDataChannel failed");
+            return;
+        }
+        // observer を登録する
+        final String dataChannelValueTag = createNewValueTag();
+        final WebRTCDataChannelObserver observer = new WebRTCDataChannelObserver(reactContext);
+        final Pair<String, DataChannel> dataChannelPair = new Pair<>(dataChannelValueTag, dataChannel);
+        observer.dataChannelPair = dataChannelPair;
+        dataChannel.registerObserver(observer);
+        repository.addDataChannel(dataChannelPair);
+        Log.d(getName(), "peerConnectionCreateDataChannel()" + dataChannelJsonValue(dataChannel, dataChannelValueTag));
+        promise.resolve(dataChannelJsonValue(dataChannel, dataChannelValueTag));
+    }
+
+    /**
+     * dataChannelClose(valueTag: ValueTag)
+     * XXX(kdxu): PeerConnection.close() と統一性をもたせるため、こちらは同期メソッドとする
+     */
+    @ReactMethod
+    public void dataChannelClose(@NonNull String valueTag) {
+        Log.d(getName(), "dataChannelClose() - valueTag=" + valueTag);
+        final DataChannel dataChannel = repository.getDataChannelByValueTag(valueTag);
+        if (dataChannel == null) {
+            return;
+        }
+        // dataChannel の state が open でないときは実行しない
+        if (dataChannel.state() != DataChannel.State.OPEN) {
+          return;
+        }
+        dataChannel.close();
+    }
+
+    /**
+     * dataChannelSend(buffer: ReadableMap, valueTag: ValueTag): Promise<void>
+     */
+    @ReactMethod
+    public void dataChannelSend(@NonNull ReadableMap sendBufferJson, @NonNull String valueTag, @NonNull Promise promise) {
+        Log.d(getName(), "dataChannelSend() - valueTag=" + valueTag + " sendBufferJson=" + sendBufferJson);
+        final DataChannel dataChannel = repository.getDataChannelByValueTag(valueTag);
+        if (dataChannel == null) {
+            promise.reject("NotFoundError", "dataChannel is not found");
+            return;
+        }
+        final DataChannel.Buffer buffer = dataChannelBuffer(sendBufferJson);
+        dataChannel.send(buffer);
+        promise.resolve(null);
     }
 
     //endregion
