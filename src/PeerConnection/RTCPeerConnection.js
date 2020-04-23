@@ -522,6 +522,16 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
         this.dispatchEvent(new RTCEvent('signalingstatechange'));
       }),
 
+      // NOTE: 3 つの Listener から、 type = 'track' の RTCMediaStreamTrackEvent が dispatchEvent されますが、
+      //       それぞれ以下のユースケースを想定しています。
+      //
+      //       - peerConnectionAddedReceiver    ... receiver のトラック追加
+      //       - peerConnectionRemovedReceiver  ... receiver のトラック削除
+      //       - peerConnectionStartTransceiver ... sender のトラック追加
+      //
+      //       peerConnectionStartTransceiver からも、 transciever を通して receiver にアクセスできますが、
+      //       libwebrtc のソースコードを確認する限り、 peerConnectionStartTransceiver と同時に peerConnectionAddedReceiver も呼ばれるため、
+      //       receiver のトラック追加時に peerConnectionStartTransceiver の transciever をチェックする必要はありません。
       DeviceEventEmitter.addListener('peerConnectionAddedReceiver', ev => {
         if (ev.valueTag !== this._valueTag) {
           return;
