@@ -1,4 +1,5 @@
 #import "WebRTCModule.h"
+#import "WebRTCModule+RTCDataChannel.h"
 #import "WebRTCModule+RTCPeerConnection.h"
 #import "WebRTCModule+getUserMedia.h"
 
@@ -24,6 +25,7 @@ static WebRTCModule *sharedModule;
 @property (nonatomic) NSMutableDictionary<NSString*, RTCRtpSender *> *senderDict;
 @property (nonatomic) NSMutableDictionary<NSString*, RTCRtpReceiver *> *receiverDict;
 @property (nonatomic) NSMutableDictionary<NSString*, RTCRtpTransceiver *> *transceiverDict;
+@property (nonatomic) NSMutableDictionary<NSString*, RTCDataChannel *> *dataChannelDict;
 
 @end
 
@@ -60,6 +62,7 @@ static WebRTCModule *sharedModule;
         self.senderDict = [NSMutableDictionary dictionary];
         self.receiverDict = [NSMutableDictionary dictionary];
         self.transceiverDict = [NSMutableDictionary dictionary];
+        self.dataChannelDict = [NSMutableDictionary dictionary];
         self.portOverride = AVAudioSessionPortOverrideNone;
         dispatch_queue_attr_t attributes =
         dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL,
@@ -264,6 +267,30 @@ static WebRTCModule *sharedModule;
     });
 }
 
+- (nullable RTCDataChannel *)dataChannelForKey:(NSString *)key
+{
+    return self.dataChannelDict[key];
+}
+
+- (void)addDataChannel:(RTCDataChannel *)channel
+           forKey:(NSString *)key
+{
+    NSAssert(key != nil, @"key must not be nil");
+    dispatch_sync(self.lock, ^{
+        NSLog(@"key = %@", [key description]);
+        self.dataChannelDict[key] = channel;
+    });
+}
+
+- (void)removeDataChannelForKey:(NSString *)key
+{
+    NSAssert(key != nil, @"key must not be nil");
+    dispatch_sync(self.lock, ^{
+        [self.dataChannelDict removeObjectForKey: key];
+    });
+}
+
+
 #pragma mark - React Native Exports
 
 RCT_EXPORT_MODULE();
@@ -296,6 +323,7 @@ RCT_EXPORT_METHOD(finishLoading) {
         [self.senderDict removeAllObjects];
         [self.receiverDict removeAllObjects];
         [self.transceiverDict removeAllObjects];
+        [self.dataChannelDict removeAllObjects];
     });
 }
 

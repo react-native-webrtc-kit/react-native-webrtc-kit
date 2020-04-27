@@ -20,6 +20,7 @@ import org.webrtc.RtpReceiver;
 import org.webrtc.RtpSender;
 import org.webrtc.RtpTransceiver;
 
+import static jp.shiguredo.react.webrtckit.WebRTCConverter.dataChannelJsonValue;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.peerConnectionStateStringValue;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.iceConnectionStateStringValue;
 import static jp.shiguredo.react.webrtckit.WebRTCConverter.iceGatheringStateStringValue;
@@ -212,12 +213,22 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
         sendDeviceEvent("peerConnectionAddedReceiver", params);
     }
 
-    // TODO: rtpReceiverがremoveされたタイミングで呼び出されるobserverが現状存在しないため未実装になっている
-    //       別口で調べてみたところ以下のコメントを見つけた
-    //       > (shino): Unified plan に onRemoveTrack が来たらこっち = void onTrack(RtpTransceiver transceiver) で対応する。
-    //       > 今は SDP semantics に関わらず onAddStream/onRemoveStream でシグナリングに通知している
-    //       現在libwebrtcのAndroid側実装にonRemoveTrackが存在しないため上記の様なワークアラウンドをするしかないようだが、
-    //       Streamに複数Trackが追加されている場合、onRemoveStreamを経由しないため、やはりすべてのケースには対応できない
+    // NOTE: libwebrtc の Android 側実装は onRemoveTrack に対応していないため、 https://github.com/shiguredo/shiguredo-webrtc-build でパッチを当てて対応しています。
+    //       上記のパッチが当たっていない AAR でもビルドを成功させるために、この API には意図的に @Override アノテーションを付与していません。
+    public void onRemoveTrack(RtpReceiver receiver) {
+        if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onRemoveTrack()[" + peerConnectionPair.first + "] - receiver=" + receiver);
+        final WebRTCModule module = getModule();
+        final MediaStreamTrack track = receiver.track();
+        if (track != null) {
+            module.repository.tracks.removeById(track.id());
+        }
+
+        final WritableMap params = Arguments.createMap();
+        params.putString("valueTag", peerConnectionPair.first);
+        params.putMap("receiver", rtpReceiverJsonValue(receiver, module.repository));
+        sendDeviceEvent("peerConnectionRemovedReceiver", params);
+    }
 
     @Override
     public void onTrack(RtpTransceiver transceiver) {
@@ -248,7 +259,19 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
 
     @Override
     public void onDataChannel(DataChannel dataChannel) {
-        // DataChannel は現在対応しない
+        if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "onDataChannel()[" + peerConnectionPair.first + "]");
+        final WebRTCModule module = getModule();
+        final WritableMap params = Arguments.createMap();
+        params.putString("valueTag", peerConnectionPair.first);
+        final String dataChannelValueTag = module.createNewValueTag();
+        params.putMap("channel", dataChannelJsonValue(dataChannel, dataChannelValueTag));
+        final WebRTCDataChannelObserver observer = new WebRTCDataChannelObserver(reactContext);
+        final Pair<String, DataChannel> dataChannelPair = new Pair<>(dataChannelValueTag, dataChannel);
+        observer.dataChannelPair = dataChannelPair;
+        dataChannel.registerObserver(observer);
+        module.repository.addDataChannel(dataChannelPair);
+        sendDeviceEvent("peerConnectionOnDataChannel", params);
     }
 
     @Override

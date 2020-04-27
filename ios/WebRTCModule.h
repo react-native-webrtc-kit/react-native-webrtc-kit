@@ -27,13 +27,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface WebRTCModule : NSObject <RCTBridgeModule>
 
-@property (nonatomic) RTCPeerConnectionFactory *peerConnectionFactory;
-@property (nonatomic, readonly) NSArray <RTCPeerConnection *> *peerConnections;
-@property (nonatomic, readonly) NSArray <RTCMediaStream *> *streams;
-@property (nonatomic, readonly) NSArray <RTCMediaStreamTrack *> *tracks;
-@property (nonatomic, readonly) NSArray <RTCRtpSender *> *senders;
-@property (nonatomic, readonly) NSArray <RTCRtpReceiver *> *receivers;
-@property (nonatomic, readonly) NSArray <RTCRtpTransceiver *> *transceivers;
+@property(nonatomic) RTCPeerConnectionFactory *peerConnectionFactory;
+@property(nonatomic, readonly) NSArray<RTCPeerConnection *> *peerConnections;
+@property(nonatomic, readonly) NSArray<RTCMediaStream *> *streams;
+@property(nonatomic, readonly) NSArray<RTCMediaStreamTrack *> *tracks;
+@property(nonatomic, readonly) NSArray<RTCRtpSender *> *senders;
+@property(nonatomic, readonly) NSArray<RTCRtpReceiver *> *receivers;
+@property(nonatomic, readonly) NSArray<RTCRtpTransceiver *> *transceivers;
+// DataChannel のリストは JS の RTCPeerConnection のプロパティとして保持することはないので、以下の実装は行わない
+// @property (nonatomic, readonly) NSArray <RTCDataChannel *> *dataChannels;
 
 @property(nonatomic, assign) AVAudioSessionPortOverride portOverride;
 
@@ -70,6 +72,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addTransceiver:(RTCRtpTransceiver *)transceiver
                 forKey:(NSString *)key;
 - (void)removeTransceiverForKey:(NSString *)key;
+
+- (nullable RTCDataChannel *)dataChannelForKey:(NSString *)key;
+- (void)addDataChannel:(RTCDataChannel *)channel
+                forKey:(NSString *)key;
+- (void)removeDataChannelForKey:(NSString *)key;
 
 @end
 

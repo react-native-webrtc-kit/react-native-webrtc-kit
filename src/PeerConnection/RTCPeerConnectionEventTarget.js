@@ -17,6 +17,7 @@ export const PEER_CONNECTION_EVENTS = [
   'peeridentity',
   'signalingstatechange',
   'track',
+  'datachannel'
 ];
 
 /**
