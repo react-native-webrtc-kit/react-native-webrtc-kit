@@ -9,7 +9,7 @@
 - FIX
     - バグ修正
 
-## develop
+## 2020.3.0
 
 - [ADD] DataChannel に対応する
     - @kdxu
