@@ -709,7 +709,7 @@ didChangeConnectionState:(RTCPeerConnectionState)newState
     }
 
     [self.bridge.eventDispatcher
-     sendDeviceEventWithName: @"peerConnectionRemoveReceiver"
+     sendDeviceEventWithName: @"peerConnectionRemovedReceiver"
      body:@{@"valueTag": peerConnection.valueTag,
             @"receiver": [rtpReceiver json]}];
 }

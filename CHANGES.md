@@ -9,6 +9,11 @@
 - FIX
     - バグ修正
 
+## develop
+
+- [FIX] iOS でトラック削除時のイベント名を typo していたので修正する
+    - @enm10k
+
 ## 2020.3.0
 
 - [ADD] DataChannel に対応する
