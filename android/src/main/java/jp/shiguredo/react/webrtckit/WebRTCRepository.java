@@ -26,9 +26,6 @@ import static jp.shiguredo.react.webrtckit.WebRTCConverter.rtpTransceiverDump;
 
 /**
  * WebRTCモジュールが使用するすべてのWebRTC関連のオブジェクト (PeerConnection, MediaStream, MediaStreamTrack等) を管理するリポジトリです。
- *
- * XXX: 現状一切同期処理を行っていないので、複数スレッドから同時に触られると壊れる可能性が高いです。
- *      同期ロックが必要になった場合追加してください。
  */
 final class WebRTCRepository {
 
@@ -38,7 +35,7 @@ final class WebRTCRepository {
     /**
      * Key is valueTag, Value is PeerConnection.
      */
-    private final Map<String, PeerConnection> peerConnectionMap = new HashMap<>();
+    private final Map<String, PeerConnection> peerConnectionMap = Collections.synchronizedMap(new HashMap<>());
 
     void addPeerConnection(@NonNull final Pair<String, PeerConnection> peerConnectionPair) {
         peerConnectionMap.put(peerConnectionPair.first, peerConnectionPair.second);
@@ -86,7 +83,7 @@ final class WebRTCRepository {
     /**
      * Key is id, Value is aspectRatio.
      */
-    private final Map<String, Double> trackAspectRatioMap = new HashMap<>();
+    private final Map<String, Double> trackAspectRatioMap = Collections.synchronizedMap(new HashMap<>());
 
     void setVideoTrackAspectRatio(@NonNull final VideoTrack videoTrack, double aspectRatio) {
         if (!tracks.containsId(videoTrack.id())) {
@@ -105,7 +102,7 @@ final class WebRTCRepository {
     /**
      * Key is id, Value is associated stream ids.
      */
-    private final Map<String, List<String>> senderStreamIdsMap = new HashMap<>();
+    private final Map<String, List<String>> senderStreamIdsMap = Collections.synchronizedMap(new HashMap<>());
 
     @Nullable
     List<String> getStreamIdsForSender(@NonNull final RtpSender sender) {
@@ -141,7 +138,7 @@ final class WebRTCRepository {
     /**
      * Key is id, Value is associated stream ids.
      */
-    private final Map<String, List<String>> receiverStreamIdsMap = new HashMap<>();
+    private final Map<String, List<String>> receiverStreamIdsMap = Collections.synchronizedMap(new HashMap<>());
 
     @Nullable
     List<String> getStreamIdsForReceiver(@NonNull final RtpReceiver receiver) {
@@ -208,7 +205,7 @@ final class WebRTCRepository {
 
     //region Data Channel
 
-    private final Map<String, DataChannel> dataChannelMap = new HashMap<>();
+    private final Map<String, DataChannel> dataChannelMap = Collections.synchronizedMap(new HashMap<>());
 
     void addDataChannel(@NonNull final Pair<String, DataChannel> dataChannelPair) {
         dataChannelMap.put(dataChannelPair.first, dataChannelPair.second);
@@ -256,11 +253,11 @@ final class WebRTCRepository {
 
     static final class DualKeyMap<V> {
         @NonNull
-        private final Map<String, V> idMap = new HashMap<>();
+        private final Map<String, V> idMap = Collections.synchronizedMap(new HashMap<>());
         @NonNull
-        private final Map<String, String> idToValueTag = new HashMap<>();
+        private final Map<String, String> idToValueTag = Collections.synchronizedMap(new HashMap<>());
         @NonNull
-        private final Map<String, String> valueTagToId = new HashMap<>();
+        private final Map<String, String> valueTagToId = Collections.synchronizedMap(new HashMap<>());
 
         void add(@NonNull final String id, @NonNull final String valueTag, @NonNull final V value) {
             // すでに同一のIDで同一のインスタンスが登録されている場合は上書きしないで無視します
