@@ -53,7 +53,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ### Android アプリケーションの開発
 
-- Android 5 以降 (シミュレーターは不可)
+- Android 5 以降
 - Android Studio 3.5.1 以降
 
 また、以下の機能について、Android は未対応です。
@@ -69,7 +69,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 - iOS: ビルドした `WebRTC.framework` を `ios/Pods/WebRTC/WebRTC.framework` と入れ替えます。
     - https://github.com/shiguredo/shiguredo-webrtc-ios
-- Android: ビルドした `libwebrtc.aar` を `android/libs/` 下に配置し、`android/build.gradle` の dependencies に以下のように編集します。
+- Android: ビルドした `libwebrtc.aar` を `android/libs/` 下に配置し、`android/build.gradle` の dependencies を以下のように編集します。
     - https://github.com/shiguredo/shiguredo-webrtc-android
     - トラックの削除イベント検知機能 (onRemoveTrack) を利用するには、 "com.github.shiguredo:shiguredo-webrtc-android:79.5.1" 以降の WebRTC ライブラリを利用する必要があるので、留意してください。
 
