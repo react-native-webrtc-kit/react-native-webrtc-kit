@@ -59,7 +59,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ## WebRTC ライブラリについて
 
-本ライブラリは WebRTC M79 に対応しています。
+本ライブラリは WebRTC M83 に対応しています。
 
 本ライブラリが利用する WebRTC ライブラリは、デフォルトの設定では弊社がビルドしたバイナリを指定しています。
 このバイナリは弊社製品用の設定でビルドしてあるので、他のバイナリを使いたい場合は次の方法で入れ替えてください。
@@ -73,7 +73,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 ```
  dependencies {
      implementation 'com.facebook.react:react-native:+'
-     // api "com.github.shiguredo:shiguredo-webrtc-android:79.5.0"
+     // api "com.github.shiguredo:shiguredo-webrtc-android:83.4103.12.2"
      implementation "androidx.annotation:annotation:1.1.0"
      api fileTree(dir: 'libs')
  }
