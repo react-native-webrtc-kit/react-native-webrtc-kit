@@ -1,6 +1,6 @@
 # React Native WebRTC Kit
 
-[![GitHub tag](https://img.shields.io/github/tag/shiguredo/react-native-webrtc-kit.svg)](https://github.com/shiguredo/react-native-webrtc-kit)
+[![GitHub tag](https://img.shields.io/github/tag/react-native-webrtc-kit/react-native-webrtc-kit.svg)](https://github.com/shiguredo/react-native-webrtc-kit)
 [![npm version](https://badge.fury.io/js/react-native-webrtc-kit.svg)](https://badge.fury.io/js/react-native-webrtc-kit)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -32,7 +32,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ## サンプルコード
 
-サンプルコードは https://github.com/shiguredo/react-native-webrtc-kit-samples にあります。
+サンプルコードは https://github.com/react-native-webrtc-kit/react-native-webrtc-kit-samples にあります。
 
 ## ドキュメント
 
