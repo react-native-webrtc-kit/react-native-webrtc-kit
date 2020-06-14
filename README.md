@@ -23,10 +23,7 @@ In other languages, we won't be able to deal with them. Thank you for your under
 
 https://discord.gg/HqfAgEs
 
-React Native WebRTC Kit に関する質問・要望・バグなどの報告やプルリクエストは Discord へお願いします。
-
-ソースコードに関する Issue とプルリクエストに関しては、基本的にバグ修正のみ対応します。
-機能の追加や変更を要望する Issue とプルリクエストには対応しません。機能の追加や変更を行いたい場合は、本ライブラリをフォークしてご利用ください。
+React Native WebRTC Kit に関する質問・要望・バグなどの報告やプルリクエストを送る場合はまずは Discord へお願いします。
 
 React Native WebRTC Kit に対する有償のサポートについては現在提供しておりません。
 
