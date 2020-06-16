@@ -3,7 +3,6 @@
 import { DeviceEventEmitter } from 'react-native';
 import { NativeModules } from 'react-native';
 
-import * as RTCUtil from '../Util/RTCUtil';
 import RTCMediaStream from '../MediaStream/RTCMediaStream';
 import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
 import { RTCEvent, RTCMediaStreamTrackEvent, RTCIceCandidateEvent, RTCDataChannelEvent } from '../Event/RTCEvents';
@@ -18,34 +17,33 @@ import logger from '../Util/RTCLogger';
 import RTCMediaConstraints from './RTCMediaConstraints';
 import RTCDataChannel from './RTCDataChannel';
 import type { RTCDataChannelInit } from './RTCDataChannel';
-import WebRTC from '../WebRTC';
 
 /** @private */
 const { WebRTCModule } = NativeModules;
 
 /**
  * @package
- * 
+ *
  * ネイティブレイヤーのオブジェクトに関連付けられたユニークな文字列です。
  * JavaScript からネイティブのオブジェクトを操作するために使われます。
  * 例えばタグが `foo` であれば、
  * ネイティブレイヤーのオブジェクトのうち、タグが `foo` である
  * オブジェクトを指定して操作できます。
- * 
+ *
  * @typedef {string} ValueTag
  */
 export type ValueTag = string;
 
 /**
  * RTCPeerConnection の接続状態です。
- * 
+ *
  * - `'new'`
  * - `'connecting'`
  * - `'connected'`
  * - `'disconnected'`
  * - `'failed'`
  * - `'closed'`
- * 
+ *
  * @typedef {string} RTCPeerConnectionState
  */
 export type RTCPeerConnectionState =
@@ -58,13 +56,13 @@ export type RTCPeerConnectionState =
 
 /**
  * RTCPeerConnection のシグナリング接続の状態です。
- * 
+ *
  * - `'stable'`
  * - `'have-local-offer'`
  * - `'have-remote-offer'`
  * - `'have-local-pranswer'`
  * - `'have-remote-pranswer'`
- * 
+ *
  * @typedef {string} RTCSignalingState
  */
 export type RTCSignalingState =
@@ -76,11 +74,11 @@ export type RTCSignalingState =
 
 /**
  * RTCPeerConnection の ICE ギャザリングの状態です。
- * 
+ *
  * - `'new'`
  * - `'gathering'`
  * - `'complete'`
- * 
+ *
  * @typedef {string} RTCIceGatheringState
  */
 export type RTCIceGatheringState =
@@ -90,7 +88,7 @@ export type RTCIceGatheringState =
 
 /**
  * RTCPeerConnection の ICE 接続の状態です。
- * 
+ *
  * - `'new'`
  * - `'checking'`
  * - `'connected'`
@@ -98,7 +96,7 @@ export type RTCIceGatheringState =
  * - `'failed'`
  * - `'disconnected'`
  * - `'closed'`
- * 
+ *
  * @typedef {string} RTCIceConnectionState
  */
 export type RTCIceConnectionState =
@@ -224,7 +222,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   /**
    * センダーのリスト。
    * リストの並びは順不同です。
-   * 
+   *
    * @since 1.1.0
    */
   senders: Array<RTCRtpSender> = [];
@@ -232,7 +230,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   /**
    * レシーバーのリスト。
    * リストの並びは順不同です。
-   * 
+   *
    * @since 1.1.0
    */
   receivers: Array<RTCRtpReceiver> = [];
@@ -240,7 +238,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   /**
    * トランシーバーのリスト。
    * リストの並びは順不同です。
-   * 
+   *
    * @since 1.1.0
    */
   transceivers: Array<RTCRtpTransceiver> = [];
@@ -251,10 +249,10 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * オブジェクトを生成し、リモートのピアまたはサーバーに接続します。
-   * 
+   *
    * @param {RTCConfiguration|null} [configuration=null] 設定
    * @param {RTCMediaConstraints|null} [constraints=null] メディアに関する制約
-  * 
+  *
    * @listens {connectionstatechange} `RTCEvent`: `connectionState` が変更されると送信されます。
    * @listens {icecandidate} `RTCIceCandidateEvent`: ICE Candidate が生成されると送信されます。
    * @listens {iceconnectionstatechange} `RTCEvent`: `iceConnectionState` が変更されると送信されます。
@@ -300,7 +298,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * Answer SDP を生成します。
-   * 
+   *
    * @param {RTCMediaConstraints} constraints 制約
    * @return {Promise<RTCSessionDescription>} 生成結果を示す Promise
    */
@@ -312,7 +310,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * Offer SDP を生成します。
-   * 
+   *
    * @param {RTCMediaConstraints} constraints 制約
    * @return {Promise<RTCSessionDescription>} 生成結果を示す Promise
    */
@@ -324,7 +322,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * ICE candidate を追加します。
-   * 
+   *
    * @param {RTCIceCandidate} candidate ICE candidate
    * @return {Promise<Void>} 結果を示す Promise
    */
@@ -334,7 +332,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * @deprecated ストリームの操作は廃止されました。 senders を使用してください。
-   * 
+   *
    * @version 1.1.0
    */
   getLocalStreams(): Array<RTCMediaStream> {
@@ -343,7 +341,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * @deprecated ストリームの操作は廃止されました。 receivers を使用してください。
-   * 
+   *
    * @version 1.1.0
    */
   getRemoteStreams(): Array<RTCMediaStream> {
@@ -352,7 +350,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * @deprecated ストリームの操作は廃止されました。 addTrack() を使用してください。
-   * 
+   *
    * @version 1.1.0
    */
   addStream(stream: RTCMediaStream): void {
@@ -361,7 +359,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * @deprecated ストリームの操作は廃止されました。 addTrack() を使用してください。
-   * 
+   *
    * @version 1.1.0
    */
   addLocalStream(stream: RTCMediaStream): void {
@@ -370,7 +368,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * @deprecated ストリームの操作は廃止されました。 removeTrack() を使用してください。
-   * 
+   *
    * @version 1.1.0
    */
   removeLocalStream(stream: RTCMediaStream): void {
@@ -379,15 +377,14 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * 指定したストリームにトラックを追加します。
-   * 
+   *
    * @param {RTCMediaStreamTrack} track 追加するトラック
    * @param {Array<String>} streamIds トラックを追加するストリーム ID
    * @return {Promise<RTCRtpSender>} 結果を表す Promise 。追加されたトラックを返す
-   * 
+   *
    * @since 1.1.0
    */
   addTrack(track: RTCMediaStreamTrack, streamIds: Array<String>): Promise<RTCRtpSender> {
-    var streamValueTags = [];
     return RTCPeerConnection.nativeAddTrack(this._valueTag, track._valueTag, streamIds)
       .then((info) => {
         logger.log(`# PeerConnection[${this._valueTag}]: addTrack finished: sender => `, info);
@@ -399,9 +396,9 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * 送信用のトラックを取り除きます。
-   * 
+   *
    * @param {RTCRtpSender} sender 取り除くトラック
-   * 
+   *
    * @since 1.1.0
    */
   removeTrack(sender: RTCRtpSender): Promise<void> {
@@ -412,7 +409,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * 設定を反映します。
-   * 
+   *
    * @param {RTCConfiguration} configuration 設定
    */
   setConfiguration(configuration: RTCConfiguration): void {
@@ -422,7 +419,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * ローカルの SDP を設定します。
-   * 
+   *
    * @param {RTCSessionDescription} sessionDescription 設定する SDP
    * @return {Promise<void>} セットした結果を示す Promise
    */
@@ -437,7 +434,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
 
   /**
    * リモートの SDP を設定します。
-   * 
+   *
    * @param {RTCSessionDescription} sessionDescription 設定する SDP
    * @return {Promise<void>} セットした結果を示す Promise
    */
@@ -457,7 +454,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   *  @param {string} label DataChannel の label
   *  @param {RTCDataChannelInit|null} options DataChannel で指定するオプション
   *  @return {Promise<RTCDataChannel>} 結果を表す Promise。作成した DataChannel を返す
-  * 
+  *
   *  @since 2020.3.0
   */
   createDataChannel(label: string, options: RTCDataChannelInit | null = null): Promise<RTCDataChannel> {

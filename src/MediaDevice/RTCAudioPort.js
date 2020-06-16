@@ -1,3 +1,5 @@
+// @flow
+
 import { NativeModules, Platform } from 'react-native';
 import logger from '../Util/RTCLogger';
 
@@ -10,7 +12,7 @@ const { WebRTCModule } = NativeModules;
  * - `'speaker'` - スピーカー
  * - `'unknown'` - 不明
  * @typedef {string} RTCAudioPort
- * 
+ *
  * @since 2.1.0
  */
 export type RTCAudioPort =
@@ -30,9 +32,9 @@ function nativeSetAudioPort(port: RTCAudioPort): Promise<void> {
 
 /**
  * 音声の出力元を取得します。(iOS のみ)
- * 
+ *
  * @return {Promise<RTCAudioPort>}
- * 
+ *
  * @since 2.1.0
  */
 export function getAudioPort(): Promise<RTCAudioPort> {
@@ -47,10 +49,10 @@ export function getAudioPort(): Promise<RTCAudioPort> {
 
 /**
  * 音声の出力先を指定します。(iOS のみ)
- * 
+ *
  * @param {RTCAudioPort} port 音声の出力先
  * @returns {void}
- * 
+ *
  * @since 2.1.0
  */
 export function setAudioPort(port: RTCAudioPort): Promise<void> {
