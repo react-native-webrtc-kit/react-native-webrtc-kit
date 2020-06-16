@@ -9,6 +9,13 @@
 - FIX
     - バグ修正
 
+## develop
+
+- [UPDATE] unused import や flow の宣言、コメントのスペースを整理する
+    - @kdxu
+- [UPDATE] 利用していない `mergedMediaConstraints` 関数を削除する
+    - @kdxu
+
 ## 2020.3.1
 
 - [FIX] iOS でトラック削除時のイベント名を typo していたので修正する
