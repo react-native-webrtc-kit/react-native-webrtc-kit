@@ -385,7 +385,6 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * @since 1.1.0
    */
   addTrack(track: RTCMediaStreamTrack, streamIds: Array<String>): Promise<RTCRtpSender> {
-    var streamValueTags = [];
     return RTCPeerConnection.nativeAddTrack(this._valueTag, track._valueTag, streamIds)
       .then((info) => {
         logger.log(`# PeerConnection[${this._valueTag}]: addTrack finished: sender => `, info);
