@@ -15,6 +15,8 @@
     - @kdxu
 - [UPDATE] 利用していない `mergedMediaConstraints` 関数を削除する
     - @kdxu
+- [CHANGE] WebRTC M83 に対応する
+    - @enm10k
 
 ## 2020.3.1
 

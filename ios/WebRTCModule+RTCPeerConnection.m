@@ -209,6 +209,8 @@ static const char *streamIdsKey = "streamIds";
             return @"recvonly";
         case RTCRtpTransceiverDirectionInactive:
             return @"inactive";
+        case RTCRtpTransceiverDirectionStopped:
+            return @"stopped";
     }
 }
 
