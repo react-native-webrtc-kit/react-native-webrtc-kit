@@ -9,7 +9,7 @@
 - FIX
     - バグ修正
 
-## develop
+## 2020.4.0
 
 - [UPDATE] unused import や flow の宣言、コメントのスペースを整理する
     - @kdxu
