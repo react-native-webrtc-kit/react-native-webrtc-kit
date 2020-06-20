@@ -1,15 +1,11 @@
 // @flow
 
-import { NativeModules } from 'react-native';
-import EventTarget from 'event-target-shim';
-
 import RTCMediaStreamEventTarget from './RTCMediaStreamEventTarget';
 import RTCMediaStreamTrack from './RTCMediaStreamTrack';
-import type { ValueTag } from '../PeerConnection/RTCPeerConnection';
 
 /**
  * @deprecated ストリームの操作は廃止されました。
- * 
+ *
  * @version 1.1.0
  */
 export default class RTCMediaStream extends RTCMediaStreamEventTarget {

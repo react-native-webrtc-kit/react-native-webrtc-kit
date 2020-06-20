@@ -1,7 +1,6 @@
 // @flow
 
 import {
-  NativeModules,
   requireNativeComponent,
   ViewPropTypes
 } from 'react-native';
@@ -11,17 +10,17 @@ import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
 
 import type { ValueTag } from '../PeerConnection/RTCPeerConnection';
 
-/** 
+/**
  * 映像のサイズ調整方法です。
  * CSS の `object-fit` に近い動作の設定です。
- * 
+ *
  * - `'fill'` -
  *   アスペクト比を無視してビュー全体を埋めます。
- *   
+ *
  * - `'contain'` -
  *   アスペクト比を維持しつつ、ビュー全体の中に映像が収まるようにします。
  *   映像とビューのサイズが異なる場合は、映像の両側に空白が入ります。
- * 
+ *
  * - `'cover'` -
  *   アスペクト比を維持しつつ、ビュー全体を埋めます。
  *
@@ -59,7 +58,7 @@ export default WebRTCVideoView;
 
 /**
  * ストリームから出力される映像を描画します (音声も同時に再生されます) 。
- * 
+ *
  * NOTE: このクラス定義は ESDoc で RTCVideoView の説明を記述するために用意してあります。
  * RTCVideoView は React ネイティブコンポーネントとして実装されており、
  * このクラスのインスタンスは本ライブラリ中では使われません。
@@ -73,14 +72,14 @@ export class RTCVideoView extends React.Component<Props> {
 
   /**
    * @deprecated track を使用してください。
-   * 
+   *
    * @version 1.1.0
    */
   streamValueTag: ValueTag;
 
   /**
    * 描画する映像トラック
-   * 
+   *
    * @since 1.1.0
    */
   track: RTCMediaStreamTrack | null;

@@ -1,6 +1,6 @@
 # React Native WebRTC Kit
 
-[![GitHub tag](https://img.shields.io/github/tag/shiguredo/react-native-webrtc-kit.svg)](https://github.com/shiguredo/react-native-webrtc-kit)
+[![GitHub tag](https://img.shields.io/github/tag/react-native-webrtc-kit/react-native-webrtc-kit.svg)](https://github.com/shiguredo/react-native-webrtc-kit)
 [![npm version](https://badge.fury.io/js/react-native-webrtc-kit.svg)](https://badge.fury.io/js/react-native-webrtc-kit)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -23,16 +23,13 @@ In other languages, we won't be able to deal with them. Thank you for your under
 
 https://discord.gg/HqfAgEs
 
-React Native WebRTC Kit に関する質問・要望・バグなどの報告やプルリクエストは Discord へお願いします。
-
-ソースコードに関する Issue とプルリクエストに関しては、基本的にバグ修正のみ対応します。
-機能の追加や変更を要望する Issue とプルリクエストには対応しません。機能の追加や変更を行いたい場合は、本ライブラリをフォークしてご利用ください。
+React Native WebRTC Kit に関する質問・要望・バグなどの報告やプルリクエストを送る場合はまずは Discord へお願いします。
 
 React Native WebRTC Kit に対する有償のサポートについては現在提供しておりません。
 
 ## サンプルコード
 
-サンプルコードは https://github.com/shiguredo/react-native-webrtc-kit-samples にあります。
+サンプルコードは https://github.com/react-native-webrtc-kit/react-native-webrtc-kit-samples にあります。
 
 ## ドキュメント
 
@@ -53,7 +50,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ### Android アプリケーションの開発
 
-- Android 5 以降 (シミュレーターは不可)
+- Android 5 以降
 - Android Studio 3.5.1 以降
 
 また、以下の機能について、Android は未対応です。
@@ -62,21 +59,21 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 
 ## WebRTC ライブラリについて
 
-本ライブラリは WebRTC M79 に対応しています。
+本ライブラリは WebRTC M83 に対応しています。
 
 本ライブラリが利用する WebRTC ライブラリは、デフォルトの設定では弊社がビルドしたバイナリを指定しています。
 このバイナリは弊社製品用の設定でビルドしてあるので、他のバイナリを使いたい場合は次の方法で入れ替えてください。
 
 - iOS: ビルドした `WebRTC.framework` を `ios/Pods/WebRTC/WebRTC.framework` と入れ替えます。
     - https://github.com/shiguredo/shiguredo-webrtc-ios
-- Android: ビルドした `libwebrtc.aar` を `android/libs/` 下に配置し、`android/build.gradle` の dependencies に以下のように編集します。
+- Android: ビルドした `libwebrtc.aar` を `android/libs/` 下に配置し、`android/build.gradle` の dependencies を以下のように編集します。
     - https://github.com/shiguredo/shiguredo-webrtc-android
     - トラックの削除イベント検知機能 (onRemoveTrack) を利用するには、 "com.github.shiguredo:shiguredo-webrtc-android:79.5.1" 以降の WebRTC ライブラリを利用する必要があるので、留意してください。
 
 ```
  dependencies {
      implementation 'com.facebook.react:react-native:+'
-     // api "com.github.shiguredo:shiguredo-webrtc-android:79.5.0"
+     // api "com.github.shiguredo:shiguredo-webrtc-android:83.4103.12.2"
      implementation "androidx.annotation:annotation:1.1.0"
      api fileTree(dir: 'libs')
  }

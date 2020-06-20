@@ -1,7 +1,5 @@
 // @flow
 
-import { NativeModules } from 'react-native';
-
 /**
  * ICE candidate を表すオブジェクトです。
  */

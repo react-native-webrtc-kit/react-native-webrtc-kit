@@ -1,6 +1,5 @@
 // @flow
 
-import RTCMediaStream from '../MediaStream/RTCMediaStream';
 import RTCMediaStreamTrack from '../MediaStream/RTCMediaStreamTrack';
 import RTCIceCandidate from '../PeerConnection/RTCIceCandidate';
 import RTCRtpReceiver from '../PeerConnection/RTCRtpReceiver';
@@ -48,14 +47,14 @@ export class RTCMediaStreamTrackEvent {
 
     /**
      * レシーバー
-     * 
+     *
      * @since 1.1.0
      */
     receiver: RTCRtpReceiver | null;
 
     /**
      * トランシーバー
-     * 
+     *
      * @since 1.1.0
      */
     transceiver: RTCRtpTransceiver | null;
