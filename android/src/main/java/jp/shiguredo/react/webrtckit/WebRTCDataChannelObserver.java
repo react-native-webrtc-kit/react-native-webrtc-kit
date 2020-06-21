@@ -48,15 +48,14 @@ final class WebRTCDataChannelObserver implements DataChannel.Observer {
 
 
     private void finish() {
-        if (dataChannelPair != null) {
-            Log.d("WebRTCModule", "DataChannel finish()[" + dataChannelPair.first + "]");
-            final WebRTCModule module = getModule();
-            final String valueTag = dataChannelPair.first;
-            // dataChannelPair を null にする
-            dataChannelPair = null;
-            // モジュールの管理下から dataChannel を外す
-            module.repository.removeDataChannelByValueTag(valueTag);
-        }
+        if (dataChannelPair == null) return;
+        Log.d("WebRTCModule", "DataChannel finish()[" + dataChannelPair.first + "]");
+        final WebRTCModule module = getModule();
+        final String valueTag = dataChannelPair.first;
+        // dataChannelPair を null にする
+        dataChannelPair = null;
+        // モジュールの管理下から dataChannel を外す
+        module.repository.removeDataChannelByValueTag(valueTag);
     }
 
     //region DataChannel.Observer
