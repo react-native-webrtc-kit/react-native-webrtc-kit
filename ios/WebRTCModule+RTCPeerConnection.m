@@ -33,12 +33,15 @@ static const char *streamIdsKey = "streamIds";
     for (RTCRtpEncodingParameters *enc in self.encodings) {
         NSMutableDictionary *json = [[NSMutableDictionary alloc] init];
         json[@"active"] = [[NSNumber alloc] initWithBool: enc.isActive];
-        if (enc.maxBitrateBps)
+        if (enc.maxBitrateBps) {
             json[@"maxBitrate"] = enc.maxBitrateBps;
-        if (enc.minBitrateBps)
+        }
+        if (enc.minBitrateBps) {
             json[@"minBitrate"] = enc.minBitrateBps;
-        if (enc.ssrc)
+        }
+        if (enc.ssrc) {
             json[@"ssrc"] = enc.ssrc;
+        }
         [encodings addObject: json];
     }
     
@@ -49,10 +52,12 @@ static const char *streamIdsKey = "streamIds";
         json[@"mimeType"] = [NSString stringWithFormat: @"%@/%@",
                              codec.kind, codec.name];
         json[@"parameters"] = codec.parameters;
-        if (codec.clockRate)
+        if (codec.clockRate) {
             json[@"clockRate"] = codec.clockRate;
-        if (codec.numChannels)
+        }
+        if (codec.numChannels) {
             json[@"channels"] = codec.numChannels;
+        }
         [codecs addObject: json];
     }
     
@@ -106,10 +111,12 @@ static const char *streamIdsKey = "streamIds";
     json[@"id"] = self.senderId;
     json[@"parameters"] = [self.parameters json];
     json[@"streamIds"] = self.streamIds;
-    if (self.valueTag)
+    if (self.valueTag) {
         json[@"valueTag"] = self.valueTag;
-    if (track)
+    }
+    if (track) {
         json[@"track"] = [track json];
+    }
     return json;
 }
 
@@ -193,8 +200,9 @@ static const char *streamIdsKey = "streamIds";
        @"sender": [self.sender json],
        @"receiver": [self.receiver json],
        @"stopped": [NSNumber numberWithBool: self.isStopped]}];
-    if (self.valueTag)
+    if (self.valueTag) {
         json[@"valueTag"] = self.valueTag;
+    }
     return json;
 }
 
@@ -209,21 +217,23 @@ static const char *streamIdsKey = "streamIds";
             return @"recvonly";
         case RTCRtpTransceiverDirectionInactive:
             return @"inactive";
-        case RTCRtpTransceiverDirectionStopped:
-            return @"stopped";
     }
 }
 
 + (RTCRtpTransceiverDirection)directionFromString:(NSString *)string
 {
-    if ([string isEqualToString: @"sendrecv"])
+    if ([string isEqualToString: @"sendrecv"]) {
         return RTCRtpTransceiverDirectionSendRecv;
-    else if ([string isEqualToString: @"sendonly"])
+    }
+    else if ([string isEqualToString: @"sendonly"]) {
         return RTCRtpTransceiverDirectionSendOnly;
-    else if ([string isEqualToString: @"recvonly"])
+    }
+    else if ([string isEqualToString: @"recvonly"]) {
         return RTCRtpTransceiverDirectionRecvOnly;
-    else if ([string isEqualToString: @"inactive"])
+    }
+    else if ([string isEqualToString: @"inactive"]) {
         return RTCRtpTransceiverDirectionInactive;
+    }
     else {
         NSAssert(NO, @"invalid direction %@", string);
         return RTCRtpTransceiverDirectionSendRecv;
@@ -313,8 +323,9 @@ static void *peerConnectionValueTagKey = "peerConnectionValueTag";
 
 - (void)closeAndFinish
 {
-    if (self.connectionState != RTCPeerConnectionStateConnected)
+    if (self.connectionState != RTCPeerConnectionStateConnected) {
         return;
+    }
     [self close];
     [self finish];
 }
@@ -333,13 +344,15 @@ static void *peerConnectionValueTagKey = "peerConnectionValueTag";
 {
     for (RTCRtpSender *sender in self.senders) {
         NSLog(@"# rtpParametersForValueTag: sender %@", [sender description]);
-        if ([sender.valueTag isEqualToString: valueTag])
+        if ([sender.valueTag isEqualToString: valueTag]) {
             return sender.parameters;
+        }
     }
     for (RTCRtpReceiver *receiver in self.receivers) {
         NSLog(@"# rtpParametersForValueTag: receiver %@", [receiver description]);
-        if ([receiver.valueTag isEqualToString: valueTag])
+        if ([receiver.valueTag isEqualToString: valueTag]) {
             return receiver.parameters;
+        }
     }
     return nil;
 }
@@ -347,11 +360,13 @@ static void *peerConnectionValueTagKey = "peerConnectionValueTag";
 - (nullable RTCRtpEncodingParameters *)rtpEncodingParametersForValueTag:(nonnull NSString *)valueTag ssrc:(nullable NSNumber *)ssrc
 {
     RTCRtpParameters *params = [self rtpParametersForValueTag: valueTag];
-    if (!params)
+    if (!params) {
         return nil;
+    }
     for (RTCRtpEncodingParameters *encParams in params.encodings) {
-        if ([encParams.ssrc isEqualToNumber: ssrc])
+        if ([encParams.ssrc isEqualToNumber: ssrc]) {
             return encParams;
+        }
     }
     return nil;
 }
@@ -592,10 +607,12 @@ RCT_EXPORT_METHOD(rtpEncodingParametersSetMaxBitrate:(nonnull NSNumber *)bitrate
     [self rtpEncodingParametersForValueTag: ownerValueTag
                                       ssrc: ssrc];
     if (params && [params.ssrc isEqualToNumber: ssrc]) {
-        if ([bitrate intValue] >= 0)
+        if ([bitrate intValue] >= 0) {
             params.maxBitrateBps = bitrate;
-        else
+        }
+        else {
             params.maxBitrateBps = nil;
+        }
     }
 }
 
@@ -609,10 +626,12 @@ RCT_EXPORT_METHOD(rtpEncodingParametersSetMinBitrate:(nonnull NSNumber *)bitrate
     [self rtpEncodingParametersForValueTag: ownerValueTag
                                       ssrc: ssrc];
     if (params && [params.ssrc isEqualToNumber: ssrc]) {
-        if ([bitrate intValue] >= 0)
+        if ([bitrate intValue] >= 0) {
             params.minBitrateBps = bitrate;
-        else
+        }
+        else {
             params.minBitrateBps = nil;
+        }
     }
 }
 
@@ -649,8 +668,9 @@ RCT_EXPORT_METHOD(peerConnectionCreateDataChannel: (NSString *)label
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
 didChangeConnectionState:(RTCPeerConnectionState)newState
 {
-    if (newState == RTCPeerConnectionStateClosed)
+    if (newState == RTCPeerConnectionStateClosed) {
         [peerConnection finish];
+    }
     
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"peerConnectionConnectionStateChanged"
                                                     body:@{@"valueTag": peerConnection.valueTag,

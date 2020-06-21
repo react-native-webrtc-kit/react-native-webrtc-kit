@@ -98,8 +98,9 @@ RCT_EXPORT_METHOD(trackSetEnabled:(nonnull NSNumber *)isEnabled
                   valueTag:(nonnull NSString *)valueTag)
 {
     RTCMediaStreamTrack *track = [self trackForKey: valueTag];
-    if (track)
+    if (track) {
         track.isEnabled = [isEnabled boolValue];
+    }
 }
 
 // MARK: -trackSetAspectRatio:trackId:valueTag:

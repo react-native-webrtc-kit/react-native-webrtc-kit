@@ -16,8 +16,9 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
 
 + (WebRTCCameraVideoCapturer *)shared
 {
-    if (!sharedCameraVideoCapturer)
+    if (!sharedCameraVideoCapturer) {
         sharedCameraVideoCapturer = [[WebRTCCameraVideoCapturer alloc] init];
+    }
     return sharedCameraVideoCapturer;
 }
 
@@ -42,8 +43,9 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
 + (nullable AVCaptureDevice *)captureDeviceForPosition:(AVCaptureDevicePosition)position
 {
     for (AVCaptureDevice *device in [WebRTCCameraVideoCapturer captureDevices]) {
-        if (device.position == position)
+        if (device.position == position) {
             return device;
+        }
     }
     return nil;
 }
@@ -71,10 +73,12 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
 {
     int maxFrameRate = 0;
     for (AVFrameRateRange *range in [format videoSupportedFrameRateRanges]) {
-        if (maxFrameRate < range.maxFrameRate)
+        if (maxFrameRate < range.maxFrameRate) {
             maxFrameRate = range.maxFrameRate;
-        if (range.minFrameRate <= frameRate && frameRate <= range.maxFrameRate)
+        }
+        if (range.minFrameRate <= frameRate && frameRate <= range.maxFrameRate) {
             return frameRate;
+        }
     }
     return maxFrameRate;
 }
@@ -110,9 +114,9 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
                      frameRate:(int)frameRate
              completionHandler:(nullable void (^)(NSError *))completionHandler;
 {
-    if (_isRunning)
+    if (_isRunning) {
         return;
-    
+    }
     _isRunning = YES;
     frameRate = [WebRTCCameraVideoCapturer suitableFrameRateForFormat: format
                                                             frameRate: frameRate];
@@ -131,9 +135,10 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
 {
     if (_isRunning) {
         [_nativeCapturer stopCaptureWithCompletionHandler: ^() {
-            if (completionHandler)
+            if (completionHandler) {
                 completionHandler();
-            _isRunning = NO;
+            }
+            self->_isRunning = NO;
         }];
     }
 }
@@ -142,9 +147,9 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
 
 - (void)capturer:(RTCVideoCapturer *)capturer didCaptureVideoFrame:(RTCVideoFrame *)frame
 {
-    if (!_isRunning)
+    if (!_isRunning) {
         return;
-
+    }
     // すべてのローカルストリームに対して映像フレームを渡し、
     // タグに対するストリームが存在しない場合はタグを消す。
     NSMutableArray *tagsToRemove = nil;
@@ -156,8 +161,9 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
             RTCVideoTrack *video = (RTCVideoTrack *)track;
             [video.source capturer: capturer didCaptureVideoFrame: frame];
         } else {
-            if (!tagsToRemove)
+            if (!tagsToRemove) {
                 tagsToRemove = [[NSMutableArray alloc] init];
+            }
             [tagsToRemove addObject: valueTag];
         }
     }
@@ -190,8 +196,9 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
     dispatch_sync(self.lock, ^{
         NSMutableArray *new = [[NSMutableArray alloc] init];
         for (NSString *old in _trackValueTags) {
-            if (![old isEqualToString: valueTag])
+            if (![old isEqualToString: valueTag]) {
                 [new addObject: valueTag];
+            }
         }
         _trackValueTags = new;
     });
@@ -211,12 +218,12 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
     // libwebrtc でカメラを起動すると自動的にマイクも起動される
     // そのため、音声のみ必要な場合でもカメラを起動する必要がある
     if (constraints.video) {
-        AVCaptureDevicePosition *position;
-        if ([constraints.video.facingMode isEqualToString: WebRTCFacingModeUser])
+        AVCaptureDevicePosition position;
+        if ([constraints.video.facingMode isEqualToString: WebRTCFacingModeUser]) {
             position = AVCaptureDevicePositionFront;
-        else
+        } else {
             position = AVCaptureDevicePositionBack;
-
+        }
         AVCaptureDevice *device = [WebRTCCameraVideoCapturer captureDeviceForPosition: position];
         if (!device) {
             reject(@"NotFoundError", @"video capturer is not found", nil);

@@ -80,7 +80,7 @@ RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag)
                                                             @"valueTag": channel.valueTag,
                                                             @"readyState": [WebRTCUtils stringForDataChannelState:channel.readyState]}];
     // data channel が閉じられた場合はモジュールの管理から該当の dataChannel を外す
-    if(channel.readyState == RTCDataChannelStateClosed) {
+    if (channel.readyState == RTCDataChannelStateClosed) {
         [self removeDataChannelForKey:channel.valueTag];
     }
 }

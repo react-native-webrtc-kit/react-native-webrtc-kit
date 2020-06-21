@@ -97,20 +97,23 @@ NS_ASSUME_NONNULL_BEGIN
         NSMutableArray<RTCIceServer *> *iceServers = [NSMutableArray new];
         for (id server in iceServersJson) {
             RTCIceServer *convert = [RCTConvert RTCIceServer: server];
-            if (convert == nil)
+            if (convert == nil) {
                 NonNullError(@"each RTCConfiguration.iceServers");
-            else
+            } else {
                 [iceServers addObject: convert];
+            }
         }
         config.iceServers = iceServers;
     }
     
     NSString *policy = Nullable(json[@"iceTransportPolicy"]);
     if (policy) {
-        if ([policy isEqualToString: @"relay"])
+        if ([policy isEqualToString: @"relay"]) {
             config.iceTransportPolicy = RTCIceTransportPolicyRelay;
-        else if ([policy isEqualToString: @"all"])
+        }
+        else if ([policy isEqualToString: @"all"]) {
             config.iceTransportPolicy = RTCIceTransportPolicyAll;
+        }
         else {
             InvalidValueError(@"RTCConfiguration.iceTransportPolicy", policy);
             return nil;
@@ -119,10 +122,12 @@ NS_ASSUME_NONNULL_BEGIN
     
     NSString *semantics = Nullable(json[@"sdpSemantics"]);
     if (semantics) {
-        if ([semantics isEqualToString: @"planb"])
+        if ([semantics isEqualToString: @"planb"]) {
             config.sdpSemantics = RTCSdpSemanticsPlanB;
-        else if ([semantics isEqualToString: @"unified"])
+        }
+        else if ([semantics isEqualToString: @"unified"]) {
             config.sdpSemantics = RTCSdpSemanticsUnifiedPlan;
+        }
         else {
             InvalidValueError(@"RTCConfiguration.sdpSemantics", semantics);
             return nil;
@@ -165,25 +170,26 @@ NS_ASSUME_NONNULL_BEGIN
         }
         
         NSNumber *width = videoConsts[@"width"];
-        if (width)
+        if (width) {
             consts.video.width = [width intValue];
-        
+        }
         NSNumber *height = videoConsts[@"height"];
         if (height) {
             consts.video.height = [height intValue];
         }
         
         NSNumber *frameRate = videoConsts[@"frameRate"];
-        if (frameRate)
+        if (frameRate) {
             consts.video.frameRate = [frameRate intValue];
-        
+        }
         NSNumber *aspectRatio = videoConsts[@"aspectRatio"];
-        if (aspectRatio)
+        if (aspectRatio) {
             consts.video.aspectRatio = (CGFloat)[aspectRatio doubleValue];
-        
+        }
         NSString *sourceId = videoConsts[@"sourceId"];
-        if (sourceId)
+        if (sourceId) {
             consts.video.sourceId = sourceId;
+        }
     }
     
     id audioConsts = Nullable(json[@"audio"]);
