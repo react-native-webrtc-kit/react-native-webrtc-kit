@@ -9,6 +9,20 @@
 - FIX
     - バグ修正
 
+## 2020.4.0
+
+- [UPDATE] unused import や flow の宣言、コメントのスペースを整理する
+    - @kdxu
+- [UPDATE] 利用していない `mergedMediaConstraints` 関数を削除する
+    - @kdxu
+- [CHANGE] WebRTC M83 に対応する
+    - @enm10k
+
+## 2020.3.1
+
+- [FIX] iOS でトラック削除時のイベント名を typo していたので修正する
+    - @enm10k
+
 ## 2020.3.0
 
 - [ADD] DataChannel に対応する
