@@ -36,10 +36,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shiguredo/react-native-webrtc-kit.git"
+    "url": "git+https://github.com/react-native-webrtc-kit/react-native-webrtc-kit.git"
   },
   "bugs": {
-    "url": "https://github.com/shiguredo/react-native-webrtc-kit/issues"
+    "url": "https://github.com/react-native-webrtc-kit/react-native-webrtc-kit/issues"
   },
-  "homepage": "https://github.com/shiguredo/react-native-webrtc-kit#readme"
+  "homepage": "https://github.com/react-native-webrtc-kit/react-native-webrtc-kit#readme"
 }
