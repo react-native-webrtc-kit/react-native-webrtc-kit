@@ -98,19 +98,15 @@ public class WebRTCVideoView extends ViewGroup {
     }
 
     private void attachVideoTrackWithRenderer() {
-        if (videoTrack != null
-                && !isVideoTrackRendererAdded) {
-            videoTrack.addSink(surfaceViewRenderer);
-            isVideoTrackRendererAdded = true;
-        }
+        if (videoTrack == null || isVideoTrackRendererAdded) return;
+        videoTrack.addSink(surfaceViewRenderer);
+        isVideoTrackRendererAdded = true;
     }
 
     private void detachVideoTrackWithRenderer() {
-        if (videoTrack != null
-                && isVideoTrackRendererAdded) {
-            videoTrack.removeSink(surfaceViewRenderer);
-            isVideoTrackRendererAdded = false;
-        }
+        if (videoTrack == null || isVideoTrackRendererAdded) return;
+        videoTrack.removeSink(surfaceViewRenderer);
+        isVideoTrackRendererAdded = false;
     }
 
 }
