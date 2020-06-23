@@ -9,6 +9,11 @@
 - FIX
     - バグ修正
 
+## develop
+
+- [UPDATE] コンストラクタで String と annotation しているものを string に統一する
+    - @kdxu
+
 ## 2020.4.0
 
 - [UPDATE] unused import や flow の宣言、コメントのスペースを整理する

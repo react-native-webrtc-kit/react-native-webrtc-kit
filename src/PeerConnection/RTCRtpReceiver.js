@@ -14,7 +14,7 @@ export default class RTCRtpReceiver {
   /**
    * レシーバー ID
    */
-  receiverId: String;
+  receiverId: string;
 
   /**
    * パラメーター
@@ -31,7 +31,7 @@ export default class RTCRtpReceiver {
    * 
    * @since 2.0.0
    */
-  streamIds: Array<String>;
+  streamIds: Array<string>;
 
   _valueTag: ValueTag;
 

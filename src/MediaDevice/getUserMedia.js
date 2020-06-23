@@ -32,12 +32,12 @@ export class RTCUserMedia {
   tracks: Array<RTCMediaStreamTrack>;
 
   /** トラックが属するストリーム ID */
-  streamId: String;
+  streamId: string;
 
   /**
    * @ignore
    */
-  constructor(tracks: Array<RTCMediaStreamTrack>, streamId: String) {
+  constructor(tracks: Array<RTCMediaStreamTrack>, streamId: string) {
     this.tracks = tracks;
     this.streamId = streamId;
   }
