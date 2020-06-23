@@ -26,7 +26,8 @@ do { \
     if (IsNull(json)) { \
         RCTLogError(@"%@: JSON value must not be null", propName); \
         return nil; \
-    } else if (![json isKindOfClass: NSClassFromString(@"" #className)]) { \
+    }
+    else if (![json isKindOfClass: NSClassFromString(@"" #className)]) { \
         RCTLogError(@"%@: JSON value '%@' of type %@ cannot be converted to %@", \
             propName, json, [json classForCoder], @"" #className); \
         return nil; \
@@ -99,7 +100,8 @@ NS_ASSUME_NONNULL_BEGIN
             RTCIceServer *convert = [RCTConvert RTCIceServer: server];
             if (convert == nil) {
                 NonNullError(@"each RTCConfiguration.iceServers");
-            } else {
+            }
+            else {
                 [iceServers addObject: convert];
             }
         }
@@ -237,7 +239,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (isBinary) {
         // バイナリデータの場合 Base64 Encoded した NS Data  に変換
         data = [[NSData alloc] initWithBase64EncodedString:json[@"data"] options:0];
-    } else {
+    }
+    else {
         // それ以外の場合は UTF8 String Encoding で NSData に変換
         data = [json[@"data"] dataUsingEncoding:NSUTF8StringEncoding];
     }

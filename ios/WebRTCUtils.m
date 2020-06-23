@@ -80,7 +80,8 @@
         NSString *value;
         if ([obj isKindOfClass:[NSNumber class]]) {
             value = [obj boolValue] ? @"true" : @"false";
-        } else {
+        }
+        else {
             value = [obj description];
         }
         result[[key description]] = value;

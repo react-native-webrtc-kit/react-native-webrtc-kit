@@ -92,7 +92,8 @@ RCT_EXPORT_METHOD(dataChannelClose:(nonnull NSString *) valueTag)
     if (buffer.isBinary) {
       // バイナリデータの場合は base64 で string に戻す
       data = [buffer.data base64EncodedStringWithOptions:0];
-    } else {
+    }
+    else {
        // バイナリデータでない場合、UTF-8 エンコーディングで string に戻す
       data = [[NSString alloc] initWithData:buffer.data
                                    encoding:NSUTF8StringEncoding];

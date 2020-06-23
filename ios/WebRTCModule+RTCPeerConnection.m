@@ -287,7 +287,8 @@ RCT_EXPORT_METHOD(transceiverCurrentDirection:(nonnull NSString *)valueTag
     id ret;
     if ([transceiver currentDirection: &dir]) {
         ret = [RTCRtpTransceiver directionDescription: dir];
-    } else {
+    }
+    else {
         ret = [NSNull null];
     }
     resolve(ret);
@@ -466,7 +467,8 @@ RCT_EXPORT_METHOD(peerConnectionRemoveTrack:(nonnull NSString *)senderValueTag
     [self removeSenderForKey: senderValueTag];
     if ([peerConnection removeTrack: sender]) {
         resolve(nil);
-    } else {
+    }
+    else {
         reject(@"RemoveTrackFailed", @"cannot remove track", nil);
     }
 }
@@ -487,7 +489,8 @@ RCT_EXPORT_METHOD(peerConnectionCreateOffer:(nonnull NSString *)valueTag
                       completionHandler:^(RTCSessionDescription *sdp, NSError *error) {
                           if (error) {
                               reject(@"CreateOfferFailed", error.userInfo[@"error"], error);
-                          } else {
+                          }
+                          else {
                               NSString *type = [RTCSessionDescription stringForType:sdp.type];
                               resolve(@{@"sdp": sdp.sdp, @"type": type});
                           }
@@ -509,7 +512,8 @@ RCT_EXPORT_METHOD(peerConnectionCreateAnswer:(nonnull NSString *)valueTag
                        completionHandler:^(RTCSessionDescription *sdp, NSError *error) {
                            if (error) {
                                reject(@"CreateAnswerFailed", error.userInfo[@"error"], error);
-                           } else {
+                            }
+                            else {
                                NSString *type = [RTCSessionDescription stringForType:sdp.type];
                                resolve(@{@"sdp": sdp.sdp, @"type": type});
                            }
@@ -531,7 +535,8 @@ RCT_EXPORT_METHOD(peerConnectionSetLocalDescription:(nonnull RTCSessionDescripti
                       completionHandler: ^(NSError *error) {
                           if (error) {
                               reject(@"SetLocalDescriptionFailed", error.localizedDescription, error);
-                          } else {
+                          }
+                          else {
                               resolve(nil);
                           }
                       }];

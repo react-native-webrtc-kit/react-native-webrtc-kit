@@ -352,11 +352,13 @@ RCT_EXPORT_METHOD(getAndResetMetrics:(nonnull RCTPromiseResolveBlock)resolve
 // MARK: -getAudioPort:resolver:rejecter:
 RCT_REMAP_METHOD(getAudioPort, resolver: (RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject){
-    if(self.portOverride == AVAudioSessionPortOverrideSpeaker){
+    if (self.portOverride == AVAudioSessionPortOverrideSpeaker) {
         resolve(@"speaker");
-    }else if(self.portOverride == AVAudioSessionPortOverrideNone){
+    }
+    else if (self.portOverride == AVAudioSessionPortOverrideNone) {
         resolve(@"none");
-    }else{
+    }
+    else {
         resolve(@"unknown");
     }
 }
@@ -377,7 +379,8 @@ RCT_EXPORT_METHOD(setAudioPort:(NSString *)port
                                      if ([session overrideOutputAudioPort:override error:&error]) {
                                          self.portOverride = override;
                                          resolve(nil);
-                                     } else {
+                                     }
+                                     else {
                                          RTCLogError(@"Error overriding output port: %@",
                                                      error.localizedDescription);
                                      }

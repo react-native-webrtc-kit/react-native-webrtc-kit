@@ -160,7 +160,8 @@ static WebRTCCameraVideoCapturer *sharedCameraVideoCapturer = nil;
             track.readyState == RTCMediaStreamTrackStateLive) {
             RTCVideoTrack *video = (RTCVideoTrack *)track;
             [video.source capturer: capturer didCaptureVideoFrame: frame];
-        } else {
+        }
+        else {
             if (!tagsToRemove) {
                 tagsToRemove = [[NSMutableArray alloc] init];
             }
@@ -221,7 +222,8 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
         AVCaptureDevicePosition position;
         if ([constraints.video.facingMode isEqualToString: WebRTCFacingModeUser]) {
             position = AVCaptureDevicePositionFront;
-        } else {
+        }
+        else {
             position = AVCaptureDevicePositionBack;
         }
         AVCaptureDevice *device = [WebRTCCameraVideoCapturer captureDeviceForPosition: position];
@@ -245,7 +247,8 @@ RCT_EXPORT_METHOD(getUserMedia:(WebRTCMediaStreamConstraints *)constraints
         [WebRTCCamera startCaptureWithDevice: device
                                       format: format
                                    frameRate: frameRate];
-    } else {
+    }
+    else {
         // 映像が不要の場合でも、マイクを起動するためにカメラを起動しておく
         // その場合は後々ストリームから映像トラックを外す
         [WebRTCCamera startCaptureWithAllDevices];
