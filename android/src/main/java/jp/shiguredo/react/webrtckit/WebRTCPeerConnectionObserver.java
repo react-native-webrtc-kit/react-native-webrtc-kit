@@ -65,16 +65,15 @@ final class WebRTCPeerConnectionObserver implements PeerConnection.Observer {
      * This behavior is even noted in the PeerConnection.close() documentation.
      */
     private void closeAndFinish() {
-        if (peerConnectionPair != null) {
-            Log.d("WebRTCModule", "closeAndFinish()[" + peerConnectionPair.first + "]");
-            final WebRTCModule module = getModule();
-            final ReactQueueConfiguration queueConfiguration = module.getReactContext().getCatalystInstance().getReactQueueConfiguration();
-            final String valueTag = peerConnectionPair.first;
-            peerConnectionPair = null;
-            queueConfiguration.getNativeModulesQueueThread().runOnQueue(() -> {
-                module.peerConnectionClose(valueTag);
-            });
-        }
+        if (peerConnectionPair == null) return;
+        Log.d("WebRTCModule", "closeAndFinish()[" + peerConnectionPair.first + "]");
+        final WebRTCModule module = getModule();
+        final ReactQueueConfiguration queueConfiguration = module.getReactContext().getCatalystInstance().getReactQueueConfiguration();
+        final String valueTag = peerConnectionPair.first;
+        peerConnectionPair = null;
+        queueConfiguration.getNativeModulesQueueThread().runOnQueue(() -> {
+            module.peerConnectionClose(valueTag);
+        });
     }
 
     //region PeerConnection.Observer
