@@ -93,6 +93,10 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
     - Android SDK Version
     - Android Build Tools Version
     - Android OS Version
+    
+## 開発について
+
+react-native-webrtc-kit-samples はオープンソースソフトウェアですが、開発についてはオープンではありません。  
 
 ## ライセンス
 
