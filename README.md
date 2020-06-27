@@ -96,7 +96,7 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
     
 ## 開発について
 
-react-native-webrtc-kit-samples はオープンソースソフトウェアですが、開発についてはオープンではありません。  
+React Native WebRTC Kit はオープンソースソフトウェアですが、開発についてはオープンではありません。  
 
 ## ライセンス
 
