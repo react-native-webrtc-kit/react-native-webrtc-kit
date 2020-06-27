@@ -25,7 +25,7 @@ https://discord.gg/HqfAgEs
 
 React Native WebRTC Kit に関する質問・要望・バグなどの報告やプルリクエストを送る場合はまずは Discord へお願いします。
 
-React Native WebRTC Kit に対する有償のサポートについては現在提供しておりません。
+React Native WebRTC Kit に対する有償のサポートについては提供しておりません。
 
 ## サンプルコード
 
@@ -97,6 +97,22 @@ React Native WebRTC Kit に対する有償のサポートについては現在�
 ## 開発について
 
 React Native WebRTC Kit はオープンソースソフトウェアですが、開発についてはオープンではありません。  
+
+## 継続的な更新
+
+- 最新の iOS や Android への対応
+- 最新の libwebrtc への対応
+
+## 今後の予定
+
+モバイルだけでなくデスクトップでも利用可能な仕組みを提供していきます。
+
+- [ ] [Insertable Streams API](https://www.chromestatus.com/feature/6321945865879552) への対応
+- [ ] [React Naitve for macOS](https://github.com/microsoft/react-native-macos) への対応
+    - [VideoToolbox](https://developer.apple.com/documentation/videotoolbox) への対応
+- [ ] [React Native for Windows](https://github.com/microsoft/react-native-windows) への対応
+    - [NVIDIA VIDEO CODEC SDK](https://developer.nvidia.com/nvidia-video-codec-sdk) への対応
+    - [Intel Media SDK](https://github.com/Intel-Media-SDK/MediaSDK) への対応
 
 ## ライセンス
 
