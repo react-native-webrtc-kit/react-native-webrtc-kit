@@ -23,12 +23,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable RTCMediaStreamTrack *)trackForTrackId:(NSString *)trackId
 {
     for (RTCMediaStreamTrack *track in self.videoTracks) {
-        if ([track.trackId isEqualToString: trackId])
+        if ([track.trackId isEqualToString: trackId]) {
             return track;
+        }
     }
     for (RTCMediaStreamTrack *track in self.audioTracks) {
-        if ([track.trackId isEqualToString: trackId])
+        if ([track.trackId isEqualToString: trackId]) {
             return track;
+        }
     }
     return nil;
 }
@@ -98,8 +100,9 @@ RCT_EXPORT_METHOD(trackSetEnabled:(nonnull NSNumber *)isEnabled
                   valueTag:(nonnull NSString *)valueTag)
 {
     RTCMediaStreamTrack *track = [self trackForKey: valueTag];
-    if (track)
+    if (track) {
         track.isEnabled = [isEnabled boolValue];
+    }
 }
 
 // MARK: -trackSetAspectRatio:trackId:valueTag:

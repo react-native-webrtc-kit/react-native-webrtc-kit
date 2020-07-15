@@ -22,11 +22,14 @@ RCT_CUSTOM_VIEW_PROPERTY(objectFit, NSString *, WebRTCVideoView) {
     UIViewContentMode contentMode;
     if ([s isEqualToString:@"fill"]) {
         contentMode = UIViewContentModeScaleToFill;
-    } else if ([s isEqualToString:@"cover"]) {
+    }
+    else if ([s isEqualToString:@"cover"]) {
         contentMode = UIViewContentModeScaleAspectFit;
-    } else if ([s isEqualToString:@"contain"]) {
+    }
+    else if ([s isEqualToString:@"contain"]) {
         contentMode = UIViewContentModeScaleAspectFill;
-    } else {
+    }
+    else {
         contentMode = UIViewContentModeScaleAspectFill;
     }
     view.contentMode = contentMode;
