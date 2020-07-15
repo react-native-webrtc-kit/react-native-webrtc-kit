@@ -11,6 +11,8 @@
 
 ## develop
 
+- [UPDATE] ObjC のコードの if に braces をつけるように統一し、いくつかの warning  を解消する
+    - @kdxu
 - [UPDATE] コンストラクタで String と annotation しているものを string に統一する
     - @kdxu
 
