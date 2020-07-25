@@ -11,6 +11,8 @@
 
 ## develop
 
+- [UPDATE] 利用していない `mergedMediaConstraints` 関数を削除する
+    - @kdxu
 - [UPDATE] ObjC のコードの if に braces をつけるように統一し、いくつかの warning  を解消する
     - @kdxu
 - [UPDATE] コンストラクタで String と annotation しているものを string に統一する
@@ -19,8 +21,6 @@
 ## 2020.4.0
 
 - [UPDATE] unused import や flow の宣言、コメントのスペースを整理する
-    - @kdxu
-- [UPDATE] 利用していない `mergedMediaConstraints` 関数を削除する
     - @kdxu
 - [CHANGE] WebRTC M83 に対応する
     - @enm10k
