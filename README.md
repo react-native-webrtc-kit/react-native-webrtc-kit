@@ -6,8 +6,10 @@
 
 React Native WebRTC Kit は、 React Native アプリケーションから WebRTC ネイティブライブラリを使うためのライブラリです。  
 本ライブラリを使うと、マルチプラットフォームに対応する WebRTC ネイティブアプリケーションを React Native で開発できます。  
-本ライブラリは WebRTC M83 に対応しています。
 
+## 対応 libwebrtc バージョン
+
+本ライブラリは WebRTC M83 に対応しています。
 
 ## Web API (ブラウザ) との互換性について
 
@@ -21,14 +23,6 @@ React Native WebRTC Kit は、 React Native アプリケーションから WebRT
 We check PRs or Issues only when written in JAPANESE.
 In other languages, we won't be able to deal with them. Thank you for your understanding.
 
-## Discord
-
-https://discord.gg/HqfAgEs
-
-React Native WebRTC Kit に関する質問・要望・バグなどの報告やプルリクエストを送る場合はまずは Discord へお願いします。
-
-React Native WebRTC Kit に対する有償のサポートについては提供しておりません。
-
 ## サンプルコード
 
 サンプルコードは https://github.com/react-native-webrtc-kit/react-native-webrtc-kit-samples にあります。
@@ -40,7 +34,7 @@ React Native WebRTC Kit に対する有償のサポートについては提供�
 ## システム要件
 
 - npm 6.11.3
-- yarn 1.17.3
+- yarn v1.22.4
     - 本ライブラリを使うアプリケーションのビルドと実行は yarn に依存しています。 npm を直接使う場合の動作は保証しません。
 - watchman 4.9.0
 
@@ -97,6 +91,12 @@ React Native WebRTC Kit に対する有償のサポートについては提供�
 ## 開発について
 
 React Native WebRTC Kit はオープンソースソフトウェアですが、開発についてはオープンではありません。  
+
+## Discord
+
+https://discord.gg/HqfAgEs
+
+React Native WebRTC Kit に関する質問・要望・バグなどの報告やプルリクエストを送る場合はまずは Discord へお願いします。
 
 ## 継続的な更新
 
