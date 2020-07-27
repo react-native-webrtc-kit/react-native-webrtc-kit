@@ -13,7 +13,9 @@ const { WebRTCModule } = NativeModules;
  */
 export default class WebRTC {
 
-  static finishLoading() {
-    WebRTCModule.finishLoading();
+  static setMicrophoneEnabled(newValue) {
+    (async () => {
+      WebRTCModule.setMicrophoneEnabled(newValue)
+    })()
   }
 }
