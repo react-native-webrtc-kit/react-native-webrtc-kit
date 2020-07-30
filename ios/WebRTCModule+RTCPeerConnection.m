@@ -402,7 +402,6 @@ RCT_EXPORT_METHOD(peerConnectionInit:(nonnull RTCConfiguration *)configuration
                                                        delegate: self];
     peerConnection.valueTag = valueTag;
     
-    
     BOOL microphoneEnabled = [[WebRTCModule shared] microphoneEnabled];
     BOOL microphoneInitialized = [[WebRTCModule shared] microphoneInitialized];
 
