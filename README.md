@@ -1,5 +1,6 @@
 # React Native WebRTC Kit
 
+[![libwebrtc](https://img.shields.io/badge/libwebrtc-m84.4147.11-blue.svg)](https://chromium.googlesource.com/external/webrtc/+/branch-heads/4147)
 [![GitHub tag](https://img.shields.io/github/tag/react-native-webrtc-kit/react-native-webrtc-kit.svg)](https://github.com/react-native-webrtc-kit/react-native-webrtc-kit)
 [![npm version](https://badge.fury.io/js/react-native-webrtc-kit.svg)](https://badge.fury.io/js/react-native-webrtc-kit)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -7,9 +8,9 @@
 React Native WebRTC Kit は、 React Native アプリケーションから WebRTC ネイティブライブラリを使うためのライブラリです。  
 本ライブラリを使うと、マルチプラットフォームに対応する WebRTC ネイティブアプリケーションを React Native で開発できます。  
 
-## 対応 libwebrtc バージョン
+## 利用 libwebrtc バージョン
 
-本ライブラリは WebRTC M84 に対応しています。
+本ライブラリは WebRTC M84 を利用しています。
 
 ## Web API (ブラウザ) との互換性について
 
