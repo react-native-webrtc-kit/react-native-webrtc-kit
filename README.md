@@ -9,7 +9,7 @@ React Native WebRTC Kit は、 React Native アプリケーションから WebRT
 
 ## 対応 libwebrtc バージョン
 
-本ライブラリは WebRTC M83 に対応しています。
+本ライブラリは WebRTC M84 に対応しています。
 
 ## Web API (ブラウザ) との互換性について
 
