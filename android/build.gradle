@@ -43,7 +43,7 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    api "com.github.shiguredo:shiguredo-webrtc-android:83.4103.12.2"
+    api "com.github.shiguredo:shiguredo-webrtc-android:84.4147.11.0"
     implementation "androidx.annotation:annotation:1.1.0"
 }
   
