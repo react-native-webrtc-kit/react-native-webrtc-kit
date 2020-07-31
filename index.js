@@ -37,10 +37,10 @@ export type { RTCSdpType } from './src/PeerConnection/RTCSessionDescription';
 export type { RTCUserMedia } from './src/MediaDevice/getUserMedia';
 export type { RTCAudioPort } from './src/MediaDevice/RTCAudioPort';
 
-// ネイティブモジュールに JS レイヤーのロードを知らせる。
-// デバッグモードでのリロード時に古い接続の終了処理を行う。
-// ネイティブ側で終了処理を行わないと、リロード前の接続が残ってしまう。
 import { NativeModules } from 'react-native';
 
 const { WebRTCModule } = NativeModules;
+// ネイティブモジュールに JS レイヤーのロードを知らせる。
+// デバッグモードでのリロード時に古い接続の終了処理を行う。
+// ネイティブ側で終了処理を行わないと、リロード前の接続が残ってしまう。
 WebRTCModule.finishLoading();
