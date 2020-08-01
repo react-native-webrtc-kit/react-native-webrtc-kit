@@ -64,6 +64,8 @@ static WebRTCModule *sharedModule;
         self.transceiverDict = [NSMutableDictionary dictionary];
         self.dataChannelDict = [NSMutableDictionary dictionary];
         self.portOverride = AVAudioSessionPortOverrideNone;
+        self.microphoneEnabled = YES;
+        self.microphoneInitialized = NO;
         dispatch_queue_attr_t attributes =
         dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL,
                                                 QOS_CLASS_USER_INITIATED, -1);
@@ -388,6 +390,13 @@ RCT_EXPORT_METHOD(setAudioPort:(NSString *)port
                                  }];
 }
 
+RCT_REMAP_METHOD(setMicrophoneEnabled, setMicrophoneEnabledWithResolver:(BOOL)newValue
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    self.microphoneEnabled = newValue;
+    resolve([NSNull null]);
+}
 
 @end
 

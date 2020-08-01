@@ -13,7 +13,11 @@ const { WebRTCModule } = NativeModules;
  */
 export default class WebRTC {
 
-  static finishLoading() {
-    WebRTCModule.finishLoading();
+  static async setMicrophoneEnabled(newValue) {
+    if (Platform.OS === 'ios') {
+      await WebRTCModule.setMicrophoneEnabled(newValue);
+    } else {
+      logger.warn("# setMicrophoneEnabled() is available only on iOS");
+    }
   }
 }

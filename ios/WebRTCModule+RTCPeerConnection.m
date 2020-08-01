@@ -553,6 +553,22 @@ RCT_EXPORT_METHOD(peerConnectionSetRemoteDescription:(nonnull RTCSessionDescript
         return;
     }
     
+    // マイクの初期化処理
+    BOOL microphoneEnabled = [[WebRTCModule shared] microphoneEnabled];
+    BOOL microphoneInitialized = [[WebRTCModule shared] microphoneInitialized];
+    if (microphoneEnabled && !microphoneInitialized) {
+        RTCAudioSessionConfiguration.webRTCConfiguration.category = AVAudioSessionCategoryPlayAndRecord;
+        RTCAudioSession *session = [RTCAudioSession sharedInstance];
+        [session initializeInput:^(NSError * _Nullable error) {
+            if (error != NULL) {
+                NSLog(@"failed to initialize audio input: %@", error);
+                return;
+            }
+            [WebRTCModule shared].microphoneInitialized = YES;
+            NSLog(@"audio input is initialized");
+        }];
+    }
+
     [peerConnection setRemoteDescription:sdp
                        completionHandler: ^(NSError *error) {
                            if (error) {
