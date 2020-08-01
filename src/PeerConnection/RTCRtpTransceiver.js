@@ -58,7 +58,7 @@ export default class RTCRtpTransceiver {
   /**
    * メディア ID
    */
-  mid: String;
+  mid: string;
 
   /**
    * センダー

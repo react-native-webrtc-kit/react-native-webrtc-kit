@@ -41,9 +41,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface WebRTCModule (getUserMedia)
-
-- (void)reloadGetUserMedia;
-
 @end
 
 NS_ASSUME_NONNULL_END

@@ -9,11 +9,22 @@
 - FIX
     - バグ修正
 
+## 2020.5.0
+
+- [CHANGES] WebRTC M84 に対応する
+    - @enm10k
+- [UPDATE] 利用していない `mergedMediaConstraints` 関数を削除する
+    - @kdxu
+- [UPDATE] ObjC のコードの if に braces をつけるように統一し、いくつかの warning  を解消する
+    - @kdxu
+- [UPDATE] コンストラクタで String と annotation しているものを string に統一する
+    - @kdxu
+- [ADD] iOS でマイクの使用/不使用を指定できる API を追加する
+    - @enm10k
+
 ## 2020.4.0
 
 - [UPDATE] unused import や flow の宣言、コメントのスペースを整理する
-    - @kdxu
-- [UPDATE] 利用していない `mergedMediaConstraints` 関数を削除する
     - @kdxu
 - [CHANGE] WebRTC M83 に対応する
     - @enm10k

@@ -16,7 +16,7 @@ export class RTCRtcpParameters {
   /**
    * CNAME (Canonical Name)
    */
-  cname: String;
+  cname: string;
 
   /**
    * サイズが減らされていれば `true`
@@ -46,7 +46,7 @@ export class RTCRtpHeaderExtensionParameters {
   /**
    * URI
    */
-  uri: String;
+  uri: string;
 
   /**
    * 拡張ヘッダーの ID
@@ -200,12 +200,12 @@ export class RTCRtpCodecParameters {
   /**
    * MIME タイプ
    */
-  mimeType: String;
+  mimeType: string;
 
   /**
    * クロックレート
    */
-  clockRate: String | null;
+  clockRate: string | null;
 
   /**
    * チャンネル数 (モノラルなら 1 、ステレオなら 2)
@@ -215,7 +215,7 @@ export class RTCRtpCodecParameters {
   /**
    * SDP の "a=fmtp" 行に含まれる "format specific parameters"
    */
-  parameters: Map<String, String> = new Map();
+  parameters: Map<string, string> = new Map();
 
   _owner: ValueTag;
 
@@ -243,7 +243,7 @@ export class RTCRtpParameters {
   /**
    * トランザクション ID
    */
-  transactionId: String;
+  transactionId: string;
 
   /**
    * RTCP 用のパラメーター

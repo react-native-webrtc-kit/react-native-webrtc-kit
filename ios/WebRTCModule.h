@@ -38,6 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
 // @property (nonatomic, readonly) NSArray <RTCDataChannel *> *dataChannels;
 
 @property(nonatomic, assign) AVAudioSessionPortOverride portOverride;
+@property(nonatomic) BOOL microphoneEnabled;
+@property(nonatomic) BOOL microphoneInitialized;
 
 + (WebRTCModule *)shared;
 

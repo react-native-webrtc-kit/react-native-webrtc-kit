@@ -27,9 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)json;
 
-+ (NSString *)directionDescription:(RTCRtpTransceiverDirection)direction;
-+ (RTCRtpTransceiverDirection)directionFromString:(NSString *)string;
-
 @end
 
 @interface RTCRtpTransceiver (ReactNativeWebRTCKit)

@@ -4,6 +4,10 @@ on:
       - master
       - develop
       - 'feature/*'
+    paths-ignore:
+      - '**.md'
+      - 'THANKS'
+      - 'LICENSE'
 jobs:
   test:
     name: iOS Test on node 11.x and macos-latest

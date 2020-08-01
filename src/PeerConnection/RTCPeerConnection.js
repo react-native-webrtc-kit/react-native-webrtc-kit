@@ -135,7 +135,7 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
   /** @private */
   static nativeAddTrack(valueTag: ValueTag,
     trackValueTag: ValueTag,
-    streamIds: Array<String>,
+    streamIds: Array<string>,
   ): Promise<Object> {
     return WebRTCModule.peerConnectionAddTrack(trackValueTag, streamIds, valueTag);
   }
@@ -379,12 +379,12 @@ export default class RTCPeerConnection extends RTCPeerConnectionEventTarget {
    * 指定したストリームにトラックを追加します。
    *
    * @param {RTCMediaStreamTrack} track 追加するトラック
-   * @param {Array<String>} streamIds トラックを追加するストリーム ID
+   * @param {Array<string>} streamIds トラックを追加するストリーム ID
    * @return {Promise<RTCRtpSender>} 結果を表す Promise 。追加されたトラックを返す
    *
    * @since 1.1.0
    */
-  addTrack(track: RTCMediaStreamTrack, streamIds: Array<String>): Promise<RTCRtpSender> {
+  addTrack(track: RTCMediaStreamTrack, streamIds: Array<string>): Promise<RTCRtpSender> {
     return RTCPeerConnection.nativeAddTrack(this._valueTag, track._valueTag, streamIds)
       .then((info) => {
         logger.log(`# PeerConnection[${this._valueTag}]: addTrack finished: sender => `, info);

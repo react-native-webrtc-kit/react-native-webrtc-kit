@@ -64,6 +64,8 @@ static WebRTCModule *sharedModule;
         self.transceiverDict = [NSMutableDictionary dictionary];
         self.dataChannelDict = [NSMutableDictionary dictionary];
         self.portOverride = AVAudioSessionPortOverrideNone;
+        self.microphoneEnabled = YES;
+        self.microphoneInitialized = NO;
         dispatch_queue_attr_t attributes =
         dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL,
                                                 QOS_CLASS_USER_INITIATED, -1);
@@ -352,11 +354,13 @@ RCT_EXPORT_METHOD(getAndResetMetrics:(nonnull RCTPromiseResolveBlock)resolve
 // MARK: -getAudioPort:resolver:rejecter:
 RCT_REMAP_METHOD(getAudioPort, resolver: (RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject){
-    if(self.portOverride == AVAudioSessionPortOverrideSpeaker){
+    if (self.portOverride == AVAudioSessionPortOverrideSpeaker) {
         resolve(@"speaker");
-    }else if(self.portOverride == AVAudioSessionPortOverrideNone){
+    }
+    else if (self.portOverride == AVAudioSessionPortOverrideNone) {
         resolve(@"none");
-    }else{
+    }
+    else {
         resolve(@"unknown");
     }
 }
@@ -377,7 +381,8 @@ RCT_EXPORT_METHOD(setAudioPort:(NSString *)port
                                      if ([session overrideOutputAudioPort:override error:&error]) {
                                          self.portOverride = override;
                                          resolve(nil);
-                                     } else {
+                                     }
+                                     else {
                                          RTCLogError(@"Error overriding output port: %@",
                                                      error.localizedDescription);
                                      }
@@ -385,6 +390,13 @@ RCT_EXPORT_METHOD(setAudioPort:(NSString *)port
                                  }];
 }
 
+RCT_REMAP_METHOD(setMicrophoneEnabled, setMicrophoneEnabledWithResolver:(BOOL)newValue
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    self.microphoneEnabled = newValue;
+    resolve([NSNull null]);
+}
 
 @end
 

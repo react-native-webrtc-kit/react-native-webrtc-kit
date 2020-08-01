@@ -14,7 +14,7 @@ export default class RTCRtpSender {
   /**
    * センダー ID
    */
-  id: String;
+  id: string;
 
   /**
    * パラメーター
@@ -31,7 +31,7 @@ export default class RTCRtpSender {
    * 
    * @since 2.0.0
    */
-  streamIds: Array<String>;
+  streamIds: Array<string>;
 
   _valueTag: ValueTag;
 

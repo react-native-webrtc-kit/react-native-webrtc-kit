@@ -57,7 +57,8 @@ NS_ASSUME_NONNULL_BEGIN
                 [self.videoTrack addRenderer:self];
                 self.isRendererAdded = YES;
             }
-        } else {
+        }
+        else {
             // ウィンドウから外れたらレンダラーも外す。
             // トラックにレンダラーが追加されたままだと、
             // バックグラウンドで描画しようとして UIView の警告が出る。
@@ -74,15 +75,18 @@ NS_ASSUME_NONNULL_BEGIN
     CGRect newFrame;
     if (width <= 0 || height <= 0) {
         newFrame = CGRectZero;
-    } else if (self.videoTrack.aspectRatio > 0) {
+    }
+    else if (self.videoTrack.aspectRatio > 0) {
         CGFloat ratio = self.videoTrack.aspectRatio;
         newFrame = self.bounds;
         newFrame.size.width = newFrame.size.height * ratio;
         newFrame.origin.x += (self.bounds.size.width - newFrame.size.width) / 2.0;
-    } else if (self.contentMode == UIViewContentModeScaleToFill) {
+    }
+    else if (self.contentMode == UIViewContentModeScaleToFill) {
         // objectFit: fill
         newFrame = self.bounds;
-    } else if (self.contentMode == UIViewContentModeScaleAspectFill) {
+    }
+    else if (self.contentMode == UIViewContentModeScaleAspectFill) {
         // objectFit: cover
         newFrame = self.bounds;
         if (newFrame.size.width != width || newFrame.size.height != height) {
@@ -94,7 +98,8 @@ NS_ASSUME_NONNULL_BEGIN
             newFrame.size.width = width;
             newFrame.size.height = height;
         }
-    } else {
+    }
+    else {
         // objectFit: contain
         newFrame = AVMakeRectWithAspectRatioInsideRect(CGSizeMake(width, height), self.bounds);
     }
