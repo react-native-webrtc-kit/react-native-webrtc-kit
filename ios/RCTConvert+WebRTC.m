@@ -26,7 +26,7 @@ do { \
     if (IsNull(json)) { \
         RCTLogError(@"%@: JSON value must not be null", propName); \
         return nil; \
-    }
+    } \
     else if (![json isKindOfClass: NSClassFromString(@"" #className)]) { \
         RCTLogError(@"%@: JSON value '%@' of type %@ cannot be converted to %@", \
             propName, json, [json classForCoder], @"" #className); \

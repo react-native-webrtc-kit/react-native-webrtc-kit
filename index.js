@@ -1,7 +1,6 @@
 // @flow
 
-import WebRTC from './src/WebRTC';
-
+export { default as WebRTC } from './src/WebRTC';
 export { RTCEvent } from './src/Event/RTCEvents';
 export { RTCMediaStreamTrackEvent } from './src/Event/RTCEvents';
 export { RTCIceCandidateEvent } from './src/Event/RTCEvents';
@@ -38,7 +37,11 @@ export type { RTCSdpType } from './src/PeerConnection/RTCSessionDescription';
 export type { RTCUserMedia } from './src/MediaDevice/getUserMedia';
 export type { RTCAudioPort } from './src/MediaDevice/RTCAudioPort';
 
+import { NativeModules } from 'react-native';
+
+/** @private */
+const { WebRTCModule } = NativeModules;
 // ネイティブモジュールに JS レイヤーのロードを知らせる。
 // デバッグモードでのリロード時に古い接続の終了処理を行う。
 // ネイティブ側で終了処理を行わないと、リロード前の接続が残ってしまう。
-WebRTC.finishLoading();
+WebRTCModule.finishLoading();
