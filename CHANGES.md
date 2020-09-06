@@ -9,6 +9,11 @@
 - FIX
     - バグ修正
 
+## develop
+
+- [CHANGE] WebRTC M86 に対応する
+    - @enm10k
+
 ## 2020.5.0
 
 - [CHANGES] WebRTC M84 に対応する
