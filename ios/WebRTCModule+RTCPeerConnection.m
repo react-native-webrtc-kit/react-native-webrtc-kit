@@ -729,7 +729,7 @@ RCT_EXPORT_METHOD(peerConnectionAddTransceiver: (NSString *)valueTag
     reject(@"NotFoundError", @"cannot add transceiver", nil);
     return;
   }
-  [self addTransceiver transceiver forKey: transceiver.valueTag];
+  [self addTransceiver: transceiver forKey: transceiver.valueTag];
   // JSON シリアライズして JS 側に返却
   resolve([transceiver json]);
 }
