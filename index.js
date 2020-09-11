@@ -39,6 +39,7 @@ export type { RTCAudioPort } from './src/MediaDevice/RTCAudioPort';
 
 import { NativeModules } from 'react-native';
 
+/** @private */
 const { WebRTCModule } = NativeModules;
 // ネイティブモジュールに JS レイヤーのロードを知らせる。
 // デバッグモードでのリロード時に古い接続の終了処理を行う。

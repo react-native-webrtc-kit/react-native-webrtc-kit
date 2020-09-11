@@ -269,7 +269,13 @@ RCT_EXPORT_METHOD(transceiverSetDirection:(nonnull NSString *)valueTag
     if (!transceiver) {
         reject(@"NotFoundError", @"transceiver is not found", nil);
     }
-    transceiver.direction = [RTCRtpTransceiver directionFromString: value];
+    
+    RTCRtpTransceiverDirection newDir = [RTCRtpTransceiver directionFromString: value];
+    NSError *error = nil;
+    [transceiver setDirection:newDir error:&error];
+    if (error != nil) {
+        reject(@"SetDirectionFailed", error.localizedDescription, error);
+    }
     resolve([NSNull null]);
 }
 
@@ -303,7 +309,7 @@ RCT_EXPORT_METHOD(transceiverStop:(nonnull NSString *)valueTag
     if (!transceiver) {
         reject(@"NotFoundError", @"transceiver is not found", nil);
     }
-    [transceiver stop];
+    [transceiver stopInternal];
     resolve([NSNull null]);
 }
 
