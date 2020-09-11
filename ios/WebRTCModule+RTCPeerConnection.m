@@ -692,6 +692,48 @@ RCT_EXPORT_METHOD(peerConnectionCreateDataChannel: (NSString *)label
   resolve([dataChannel json]);
 }
 
+// MARK: -peerConnectionAddTransceiver:valueTag:trackValueTag:resolver:rejecter
+
+RCT_EXPORT_METHOD(peerConnectionAddTransceiver: (NSString *)valueTag
+                  trackValueTag: (NSString *) trackValueTag
+                  init:(nullable RTCRtpTransceiverInit *)init
+                  resolver:(nonnull RCTPromiseResolveBlock)resolve
+                  rejecter:(nonnull RCTPromiseRejectBlock)reject)
+{
+
+  // valueTag に相当する peer Connection を見つける
+  RTCPeerConnection *peerConnection = [self peerConnectionForKey: valueTag];
+  if (!peerConnection) {
+    // peer connection がなければ reject する
+    reject(@"NotFoundError", @"peer connection is not found", nil);
+    return;
+  }
+  // trackValueTag に相当する peer Connection を見つける
+  RTCMediaStreamTrack *track = [self trackForKey: trackValueTag];
+  if (!track) {
+      // track がなければ reject する
+      reject(@"NotFoundError", @"track is not found", nil);
+      return;
+  }
+  RTCRtpTransceiverInit *initParams = [[RTCRtpTransceiverInit alloc] init];
+  // init が nil でなければ initParams に代入して利用する
+  // nil の場合は initParams の初期値が適用される
+  if (init) {
+    initParams = init;
+  }
+  // transceiver を追加する
+  RTCRtpTransceiver *transceiver = [peerConnection addTransceiverWithTrack: track init: initParams];
+  // WebRTC module の管理下に入れる
+  if (!transceiver) {
+    // transceiver を作成できなければ reject する
+    reject(@"NotFoundError", @"cannot add transceiver", nil);
+    return;
+  }
+  [self addTransceiver transceiver forKey: transceiver.valueTag];
+  // JSON シリアライズして JS 側に返却
+  resolve([transceiver json]);
+}
+
 #pragma mark - RTCPeerConnectionDelegate
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection

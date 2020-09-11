@@ -248,6 +248,12 @@ NS_ASSUME_NONNULL_BEGIN
     return buffer;
 }
 
++ (nullable RTCRtpTransceiverInit *)RTCRtpTransceiverInit:(nullable id)json {
+    RTCRtpTransceiverInit *init = [[RTCDataChannelConfiguration alloc] init];
+    // TODO(kdxu): JSON parser の実装
+    return init;
+}
+
 @end
 
 NS_ASSUME_NONNULL_END
