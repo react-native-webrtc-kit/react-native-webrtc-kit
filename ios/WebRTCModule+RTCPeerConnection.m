@@ -692,10 +692,10 @@ RCT_EXPORT_METHOD(peerConnectionCreateDataChannel: (NSString *)label
   resolve([dataChannel json]);
 }
 
-// MARK: -peerConnectionAddTransceiver:valueTag:trackValueTag:resolver:rejecter
+// MARK: -peerConnectionAddTransceiver:trackValueTag:valueTag:resolver:rejecter
 
-RCT_EXPORT_METHOD(peerConnectionAddTransceiver: (NSString *)valueTag
-                  trackValueTag: (NSString *) trackValueTag
+RCT_EXPORT_METHOD(peerConnectionAddTransceiver:(nonnull NSString *)trackValueTag
+                  valueTag:(nonnull NSString *)valueTag
                   init:(nullable RTCRtpTransceiverInit *)init
                   resolver:(nonnull RCTPromiseResolveBlock)resolve
                   rejecter:(nonnull RCTPromiseRejectBlock)reject)

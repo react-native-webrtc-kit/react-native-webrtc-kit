@@ -13,7 +13,7 @@ import RTCConfiguration from './RTCConfiguration';
 import RTCRtpSender from './RTCRtpSender';
 import RTCRtpReceiver from './RTCRtpReceiver';
 import RTCRtpTransceiver from './RTCRtpTransceiver';
-import type { RTCRtpTransceiverInit } from “./RTCRtpTransceiver”;
+import type { RTCRtpTransceiverInit } from './RTCRtpTransceiver';
 import logger from '../Util/RTCLogger';
 import RTCMediaConstraints from './RTCMediaConstraints';
 import RTCDataChannel from './RTCDataChannel';
