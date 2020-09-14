@@ -251,7 +251,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable RTCRtpEncodingParameters *)RTCRtpEncodingParameters:(nullable id)json {
     RTCRtpEncodingParameters *params = [[RTCRtpEncodingParameters alloc] init];
     if (json[@"active"]) {
-        params.active = [RCTConvert BOOL:json[@"active"]];
+        params.isActive = [RCTConvert BOOL:json[@"active"]];
     }
     NSString *rid = Nullable(json[@"rid"]);
     if (rid) {
@@ -263,7 +263,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
     NSNumber *maxBitrate = Nullable(json[@"maxBitrate"]);
     if (maxBitrate) {
-        params.maxBitrate = maxBitrate;
+        params.maxBitrateBps = maxBitrate;
     }
     NSNumber *maxFramerate = Nullable(json[@"maxFramerate"]);
     if (maxFramerate) {
