@@ -8,36 +8,36 @@
 
 #define InvalidValueError(propName, json) \
 do { \
-RCTLogError(@"%@: invalid value '%@'", propName, json); \
-return nil; \
+    RCTLogError(@"%@: invalid value '%@'", propName, json); \
+    return nil; \
 } while (0)
 
 #define AssertNullable(propName, className, json) \
 do { \
-if (IsNonNull(json) && ![json isKindOfClass: NSClassFromString(@"" #className)]) { \
-RCTLogError(@"%@: JSON value '%@' of type %@ cannot be converted to %@", \
-propName, json, [json classForCoder], @"" #className); \
-return nil; \
-} \
+    if (IsNonNull(json) && ![json isKindOfClass: NSClassFromString(@"" #className)]) { \
+        RCTLogError(@"%@: JSON value '%@' of type %@ cannot be converted to %@", \
+            propName, json, [json classForCoder], @"" #className); \
+        return nil; \
+    } \
 } while (0)
 
 #define AssertNonNull(propName, className, json) \
 do { \
-if (IsNull(json)) { \
-RCTLogError(@"%@: JSON value must not be null", propName); \
-return nil; \
-} \
-else if (![json isKindOfClass: NSClassFromString(@"" #className)]) { \
-RCTLogError(@"%@: JSON value '%@' of type %@ cannot be converted to %@", \
-propName, json, [json classForCoder], @"" #className); \
-return nil; \
-} \
+    if (IsNull(json)) { \
+        RCTLogError(@"%@: JSON value must not be null", propName); \
+        return nil; \
+    } \
+    else if (![json isKindOfClass: NSClassFromString(@"" #className)]) { \
+        RCTLogError(@"%@: JSON value '%@' of type %@ cannot be converted to %@", \
+            propName, json, [json classForCoder], @"" #className); \
+        return nil; \
+    } \
 } while (0)
 
 #define NonNullError(propName) \
 do { \
-RTCLogError(@"%@: value must not be null", propName); \
-return nil;\
+    RTCLogError(@"%@: value must not be null", propName); \
+    return nil;\
 } while (0)
 
 NS_ASSUME_NONNULL_BEGIN
@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     AssertNonNull(@"RTCSessionDescription", NSDictionary, json);
     AssertNonNull(@"RTCSessionDescription.sdp", NSString, json[@"sdp"]);
-    
+
     NSString *sdp = json[@"sdp"];
     RTCSdpType sdpType = [RTCSessionDescription typeForString:json[@"type"]];
     
@@ -75,7 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
     AssertNonNull(@"RTCIceServer.urls", NSArray, json[@"urls"]);
     AssertNullable(@"RTCIceServer.username", NSString, json[@"username"]);
     AssertNullable(@"RTCIceServer.credential", NSString, json[@"credential"]);
-    
+
     NSArray<NSString *> *urls = [RCTConvert NSArray: json[@"urls"]];
     for (NSString *url in urls) {
         AssertNonNull(@"each RTCIceServer.urls", NSString, url);
@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     AssertNonNull(@"RTCConfiguration", NSDictionary, json);
     AssertNullable(@"RTCConfiguration.iceServers", NSArray, json[@"iceServers"]);
-    
+
     RTCConfiguration *config = [[RTCConfiguration alloc] init];
     
     id iceServersJson = Nullable(json[@"iceServers"]);
@@ -143,7 +143,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     AssertNonNull(@"RTCMediaStreamConstraints", NSDictionary, json);
     AssertNullable(@"RTCMediaStreamConstraints.video", NSDictionary, json[@"video"]);
-    
+
     WebRTCMediaStreamConstraints *consts = [[WebRTCMediaStreamConstraints alloc] init];
     
     NSDictionary *videoConsts = Nullable(json[@"video"]);
@@ -247,6 +247,7 @@ NS_ASSUME_NONNULL_BEGIN
     RTCDataBuffer *buffer = [[RTCDataBuffer alloc] initWithData:data isBinary:isBinary];
     return buffer;
 }
+
 + (nullable RTCRtpEncodingParameters *)RTCRtpEncodingParameters:(nullable id)json {
     RTCRtpEncodingParameters *params = [[RTCRtpEncodingParameters alloc] init];
     // TODO(kdxu): RTCRtpEncodingParameters の json 変換の実装
@@ -263,9 +264,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable RTCRtpTransceiverInit *)RTCRtpTransceiverInit:(nullable id)json {
     AssertNullable(@"RTCRtpTransceiver.streamIds", NSArray, json[@"streamIds"]);
     RTCRtpTransceiverInit *init = [[RTCRtpTransceiverInit alloc] init];
-    
+
     id streamIdsJson = Nullable(json[@"streamIds"]);
-    // XXX(kdxu): null を許容する処理これでいいのか？
+    // XXX(kdxu): null を許容する処理はこれでいいのか？
     if (streamIdsJson) {
         NSArray<NSString *> *streamIds = [RCTConvert NSArray: json[@"streamIds"]];
         for (NSString *streamId in streamIds) {
@@ -289,6 +290,7 @@ NS_ASSUME_NONNULL_BEGIN
             init.direction = RTCRtpTransceiverDirectionInactive;
         }
         else {
+            // direction が不正な値の場合 nil を返す
             InvalidValueError(@"RTCRTPTransceiverInit.direction", direction);
             return nil;
         }
@@ -305,6 +307,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return init;
 }
+
 
 @end
 
