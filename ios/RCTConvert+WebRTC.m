@@ -250,24 +250,32 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable RTCRtpEncodingParameters *)RTCRtpEncodingParameters:(nullable id)json {
     RTCRtpEncodingParameters *params = [[RTCRtpEncodingParameters alloc] init];
-    // TODO(kdxu): RTCRtpEncodingParameters の json 変換の実装
-    /*
-     active?: boolean;
-     rid?: string;
-     scaleResolutionDownBy?: number;
-     maxBitrate?: number;
-     maxFramerate?: number;
-     */
+    if (json[@"active"]) {
+        params.active = [RCTConvert BOOL:json[@"active"]];
+    }
+    NSString *rid = Nullable(json[@"rid"]);
+    if (rid) {
+        params.rid = rid;
+    }
+    NSNumber *scaleResolutionDownBy = Nullable(json[@"scaleResolutionDownBy"]);
+    if (scaleResolutionDownBy) {
+        params.scaleResolutionDownBy = scaleResolutionDownBy;
+    }
+    NSNumber *maxBitrate = Nullable(json[@"maxBitrate"]);
+    if (maxBitrate) {
+        params.maxBitrate = maxBitrate;
+    }
+    NSNumber *maxFramerate = Nullable(json[@"maxFramerate"]);
+    if (maxFramerate) {
+        params.maxFramerate = maxFramerate;
+    }
     return params;
 }
 
 + (nullable RTCRtpTransceiverInit *)RTCRtpTransceiverInit:(nullable id)json {
     AssertNullable(@"RTCRtpTransceiver.streamIds", NSArray, json[@"streamIds"]);
     RTCRtpTransceiverInit *init = [[RTCRtpTransceiverInit alloc] init];
-
-    id streamIdsJson = Nullable(json[@"streamIds"]);
-    // XXX(kdxu): null を許容する処理はこれでいいのか？
-    if (streamIdsJson) {
+    if (json[@"streamIds"]) {
         NSArray<NSString *> *streamIds = [RCTConvert NSArray: json[@"streamIds"]];
         for (NSString *streamId in streamIds) {
             // streamId 自体は non-null であるべき
@@ -295,10 +303,9 @@ NS_ASSUME_NONNULL_BEGIN
             return nil;
         }
     }
-    id sendEncodingsJson = Nullable(json[@"sendEncodings"]);
-    if (sendEncodingsJson) {
+    if (json[@"sendEncodings"]) {
         NSMutableArray<RTCRtpEncodingParameters *> *sendEncodings = [NSMutableArray new];
-        NSArray<id> *sendEncodingsArray = [RCTConvert NSArray:sendEncodingsJson];
+        NSArray<id> *sendEncodingsArray = [RCTConvert NSArray:json[@"sendEncodings"]];
         for (id sendEncodingsObject in sendEncodingsArray) {
             RTCRtpEncodingParameters *params = [RCTConvert RTCRtpEncodingParameters: sendEncodingsObject];
             [sendEncodings addObject: params];
