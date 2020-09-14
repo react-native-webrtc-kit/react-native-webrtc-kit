@@ -729,6 +729,7 @@ RCT_EXPORT_METHOD(peerConnectionAddTransceiver:(nonnull NSString *)trackValueTag
     reject(@"NotFoundError", @"cannot add transceiver", nil);
     return;
   }
+  transceiver.valueTag = [[WebRTCModule shared] createNewValueTag];
   [self addTransceiver: transceiver forKey: transceiver.valueTag];
   // JSON シリアライズして JS 側に返却
   resolve([transceiver json]);

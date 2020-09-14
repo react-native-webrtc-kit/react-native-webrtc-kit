@@ -249,6 +249,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 + (nullable RTCRtpEncodingParameters *)RTCRtpEncodingParameters:(nullable id)json {
+    AssertNullable(@"RTCRtpEncodingParameters.active", NSNumber, json[@"active"]);
+    AssertNullable(@"RTCRtpEncodingParameters.rid", NSString, json[@"rid"]);
+    AssertNullable(@"RTCRtpEncodingParameters.scaleResolutionDownBy", NSNumber, json[@"scaleResolutionDownBy"]);
+    AssertNullable(@"RTCRtpEncodingParameters.maxBitrate", NSNumber, json[@"maxBitrate"]);
+    AssertNullable(@"RTCRtpEncodingParameters.maxFramerate", NSNumber, json[@"maxFramerate"]);
+
     RTCRtpEncodingParameters *params = [[RTCRtpEncodingParameters alloc] init];
     if (json[@"active"]) {
         params.isActive = [RCTConvert BOOL:json[@"active"]];
@@ -274,6 +280,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable RTCRtpTransceiverInit *)RTCRtpTransceiverInit:(nullable id)json {
     AssertNullable(@"RTCRtpTransceiver.streamIds", NSArray, json[@"streamIds"]);
+    AssertNullable(@"RTCRtpTransceiver.direction", NSString, json[@"direction"]);
+    AssertNullable(@"RTCRtpTransceiver.sendEncodings", NSArray, json[@"sendEncodings"]);
+
     RTCRtpTransceiverInit *init = [[RTCRtpTransceiverInit alloc] init];
     if (json[@"streamIds"]) {
         NSArray<NSString *> *streamIds = [RCTConvert NSArray: json[@"streamIds"]];
