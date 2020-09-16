@@ -193,13 +193,21 @@ static const char *streamIdsKey = "streamIds";
 
 - (id)json
 {
+    NSLog(@"json mid=> %@", self.mid);
+    NSLog(@"json sender=> %@", self.sender);
+    NSLog(@"json receiver=> %@", self.receiver);
+    NSLog(@"json stopped=> %d", self.isStopped);
+    NSLog(@"json valueTag=> %@", self.valueTag);
+
     NSMutableDictionary *json =
     [[NSMutableDictionary alloc]
      initWithDictionary:
-     @{@"mid": self.mid,
-       @"sender": [self.sender json],
+     @{@"sender": [self.sender json],
        @"receiver": [self.receiver json],
        @"stopped": [NSNumber numberWithBool: self.isStopped]}];
+    if (self.mid) {
+        json[@"mid"] = self.mid;
+    }
     if (self.valueTag) {
         json[@"valueTag"] = self.valueTag;
     }
@@ -729,9 +737,10 @@ RCT_EXPORT_METHOD(peerConnectionAddTransceiver:(nonnull NSString *)trackValueTag
     reject(@"NotFoundError", @"cannot add transceiver", nil);
     return;
   }
-  transceiver.valueTag = [[WebRTCModule shared] createNewValueTag];
+  transceiver.valueTag = [self createNewValueTag];
   [self addTransceiver: transceiver forKey: transceiver.valueTag];
   // JSON シリアライズして JS 側に返却
+  NSLog(@"transceiver=> %@", transceiver);
   resolve([transceiver json]);
 }
 

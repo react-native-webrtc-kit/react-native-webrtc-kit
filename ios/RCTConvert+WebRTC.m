@@ -254,7 +254,6 @@ NS_ASSUME_NONNULL_BEGIN
     AssertNullable(@"RTCRtpEncodingParameters.scaleResolutionDownBy", NSNumber, json[@"scaleResolutionDownBy"]);
     AssertNullable(@"RTCRtpEncodingParameters.maxBitrate", NSNumber, json[@"maxBitrate"]);
     AssertNullable(@"RTCRtpEncodingParameters.maxFramerate", NSNumber, json[@"maxFramerate"]);
-
     RTCRtpEncodingParameters *params = [[RTCRtpEncodingParameters alloc] init];
     if (json[@"active"]) {
         params.isActive = [RCTConvert BOOL:json[@"active"]];
@@ -281,9 +280,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable RTCRtpTransceiverInit *)RTCRtpTransceiverInit:(nullable id)json {
     AssertNullable(@"RTCRtpTransceiver.streamIds", NSArray, json[@"streamIds"]);
     AssertNullable(@"RTCRtpTransceiver.direction", NSString, json[@"direction"]);
-    AssertNullable(@"RTCRtpTransceiver.sendEncodings", NSArray, json[@"sendEncodings"]);
-
-    RTCRtpTransceiverInit *init = [[RTCRtpTransceiverInit alloc] init];
+    AssertNullable(@"RTCRtpTransceiver.sendEncodings", NSArray, json[@"sendEncodings"]);    RTCRtpTransceiverInit *init = [[RTCRtpTransceiverInit alloc] init];
     if (json[@"streamIds"]) {
         NSArray<NSString *> *streamIds = [RCTConvert NSArray: json[@"streamIds"]];
         for (NSString *streamId in streamIds) {
@@ -312,18 +309,23 @@ NS_ASSUME_NONNULL_BEGIN
             return nil;
         }
     }
-    if (json[@"sendEncodings"]) {
+    id sendEncodingsJson = Nullable(json[@"sendEncodings"]);
+    if (sendEncodingsJson) {
         NSMutableArray<RTCRtpEncodingParameters *> *sendEncodings = [NSMutableArray new];
-        NSArray<id> *sendEncodingsArray = [RCTConvert NSArray:json[@"sendEncodings"]];
-        for (id sendEncodingsObject in sendEncodingsArray) {
-            RTCRtpEncodingParameters *params = [RCTConvert RTCRtpEncodingParameters: sendEncodingsObject];
-            [sendEncodings addObject: params];
+        for (id sendEncodingsObject in sendEncodingsJson) {
+            NSLog(@"object => %@", sendEncodingsObject);
+            RTCRtpEncodingParameters *convert = [RCTConvert RTCRtpEncodingParameters: sendEncodingsObject];
+            if (convert == nil) {
+                NonNullError(@"each RTCRtpEncodingParameters");
+            } else {
+                [sendEncodings addObject: convert];
+            }
         }
-        init.sendEncodings = sendEncodings;
+        init.sendEncodings = [sendEncodings copy];
     }
+    NSLog(@"transceiver init=>, %@", init.sendEncodings);
     return init;
 }
-
 
 @end
 
