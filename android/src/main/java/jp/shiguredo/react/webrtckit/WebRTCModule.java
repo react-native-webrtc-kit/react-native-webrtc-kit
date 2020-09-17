@@ -758,7 +758,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      * peerConnectionAddTransceiver(String trackValueTag, String valueTag, RtpTransceiver.Init init): Promise<RtpTransceiver>
      */
     @ReactMethod
-    public void peerConnectionAddTransceiver(@NonNull String trackValueTag, @NonNull String valueTag, @NonNul RTCRtpTransceiver.Init init, @NonNull Promise promise) {
+    public void peerConnectionAddTransceiver(@NonNull String trackValueTag, @NonNull String valueTag, @NonNull RTCRtpTransceiver.Init init, @NonNull Promise promise) {
       Log.d(getName(), "peerConnectionAddTransceiver()");
       final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
       if (peerConnection == null) {
