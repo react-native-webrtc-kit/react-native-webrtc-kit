@@ -103,13 +103,10 @@ In other languages, we won't be able to deal with them. Thank you for your under
 
 モバイルだけでなくデスクトップでも利用可能な仕組みを提供していきます。
 
+- [ ] [Simulcast functionality](https://www.w3.org/TR/webrtc/#simulcast-functionality) への対応
 - [ ] [Identifiers for WebRTC's Statistics API](https://www.w3.org/TR/webrtc-stats/) への対応
-- [ ] [Insertable Streams API](https://www.chromestatus.com/feature/6321945865879552) への対応
-- [ ] [React Naitve for macOS](https://github.com/microsoft/react-native-macos) への対応
-    - [VideoToolbox](https://developer.apple.com/documentation/videotoolbox) への対応
 - [ ] [React Native for Windows](https://github.com/microsoft/react-native-windows) への対応
-    - [NVIDIA VIDEO CODEC SDK](https://developer.nvidia.com/nvidia-video-codec-sdk) への対応
-    - [Intel Media SDK](https://github.com/Intel-Media-SDK/MediaSDK) への対応
+- [ ] [React Naitve for macOS](https://github.com/microsoft/react-native-macos) への対応
 
 ## ライセンス
 
