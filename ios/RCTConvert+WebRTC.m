@@ -323,7 +323,7 @@ NS_ASSUME_NONNULL_BEGIN
         }
         init.sendEncodings = [sendEncodings copy];
     }
-    NSLog(@"transceiver init=>, %@", init.sendEncodings);
+    NSLog(@"transceiver init, sendEncodings=>, %@", init.sendEncodings);
     return init;
 }
 
