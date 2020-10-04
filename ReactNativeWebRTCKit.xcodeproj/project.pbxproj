@@ -16,11 +16,30 @@
 		916C008E219022A400C689F3 /* WebRTCValueManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 916C008D219022A400C689F3 /* WebRTCValueManager.m */; };
 		918CE50220F3A7D100F74D70 /* WebRTCUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 918CE50120F3A7D100F74D70 /* WebRTCUtils.m */; };
 		91CB344620EE02D300B6ABC4 /* WebRTCMediaStreamConstraints.m in Sources */ = {isa = PBXBuildFile; fileRef = 91CB344520EE02D300B6ABC4 /* WebRTCMediaStreamConstraints.m */; };
+		AD9D036C252A291A003B615B /* WebRTCModule+getUserMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EA040DD20CBE5B4003113A7 /* WebRTCModule+getUserMedia.m */; };
+		AD9D036D252A291A003B615B /* WebRTCModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C50AB2C020886F6F005BF7F4 /* WebRTCModule.m */; };
+		AD9D036E252A291A003B615B /* WebRTCUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 918CE50120F3A7D100F74D70 /* WebRTCUtils.m */; };
+		AD9D036F252A291A003B615B /* WebRTCVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E781C1820B00A95003050A2 /* WebRTCVideoView.m */; };
+		AD9D0370252A291A003B615B /* RCTConvert+WebRTC.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E3F98B920BAC562006E109D /* RCTConvert+WebRTC.m */; };
+		AD9D0371252A291A003B615B /* WebRTCMediaStreamConstraints.m in Sources */ = {isa = PBXBuildFile; fileRef = 91CB344520EE02D300B6ABC4 /* WebRTCMediaStreamConstraints.m */; };
+		AD9D0372252A291A003B615B /* WebRTCValueManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 916C008D219022A400C689F3 /* WebRTCValueManager.m */; };
+		AD9D0373252A291A003B615B /* WebRTCModule+RTCMediaStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EA040E020CBE5CF003113A7 /* WebRTCModule+RTCMediaStream.m */; };
+		AD9D0374252A291A003B615B /* WebRTCModule+RTCPeerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E781C2520B00C6A003050A2 /* WebRTCModule+RTCPeerConnection.m */; };
+		AD9D0375252A291A003B615B /* WebRTCVideoViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E781C1720B00A95003050A2 /* WebRTCVideoViewManager.m */; };
 		C50AB2C120886F6F005BF7F4 /* WebRTCModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C50AB2C020886F6F005BF7F4 /* WebRTCModule.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		58B511D91A9E6C8500147676 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AD9D0377252A291A003B615B /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
@@ -51,12 +70,20 @@
 		918CE50120F3A7D100F74D70 /* WebRTCUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WebRTCUtils.m; path = ios/WebRTCUtils.m; sourceTree = "<group>"; };
 		91CB344420EE02D300B6ABC4 /* WebRTCMediaStreamConstraints.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WebRTCMediaStreamConstraints.h; path = ios/WebRTCMediaStreamConstraints.h; sourceTree = "<group>"; };
 		91CB344520EE02D300B6ABC4 /* WebRTCMediaStreamConstraints.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WebRTCMediaStreamConstraints.m; path = ios/WebRTCMediaStreamConstraints.m; sourceTree = "<group>"; };
+		AD9D037B252A291A003B615B /* libReactNativeWebRTC-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libReactNativeWebRTC-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C50AB2BF20886F6F005BF7F4 /* WebRTCModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebRTCModule.h; path = ios/WebRTCModule.h; sourceTree = "<group>"; };
 		C50AB2C020886F6F005BF7F4 /* WebRTCModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebRTCModule.m; path = ios/WebRTCModule.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		58B511D81A9E6C8500147676 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AD9D0376252A291A003B615B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -98,6 +125,7 @@
 				0E781C1820B00A95003050A2 /* WebRTCVideoView.m */,
 				0E781C1520B00A94003050A2 /* WebRTCVideoViewManager.h */,
 				0E781C1720B00A95003050A2 /* WebRTCVideoViewManager.m */,
+				AD9D037B252A291A003B615B /* libReactNativeWebRTC-macos.a */,
 			);
 			sourceTree = "<group>";
 		};
@@ -121,6 +149,23 @@
 			productReference = 134814201AA4EA6300B7C361 /* libReactNativeWebRTCKit.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		AD9D036A252A291A003B615B /* ReactNativeWebRTC-macos */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AD9D0378252A291A003B615B /* Build configuration list for PBXNativeTarget "ReactNativeWebRTC-macos" */;
+			buildPhases = (
+				AD9D036B252A291A003B615B /* Sources */,
+				AD9D0376252A291A003B615B /* Frameworks */,
+				AD9D0377252A291A003B615B /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "ReactNativeWebRTC-macos";
+			productName = RCTDataManager;
+			productReference = AD9D037B252A291A003B615B /* libReactNativeWebRTC-macos.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -140,6 +185,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 58B511D21A9E6C8500147676;
@@ -148,6 +194,7 @@
 			projectRoot = "";
 			targets = (
 				58B511DA1A9E6C8500147676 /* ReactNativeWebRTCExtra */,
+				AD9D036A252A291A003B615B /* ReactNativeWebRTC-macos */,
 			);
 		};
 /* End PBXProject section */
@@ -167,6 +214,23 @@
 				0EA040E120CBE5CF003113A7 /* WebRTCModule+RTCMediaStream.m in Sources */,
 				0E781C2620B00C6A003050A2 /* WebRTCModule+RTCPeerConnection.m in Sources */,
 				0E781C1920B00A95003050A2 /* WebRTCVideoViewManager.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AD9D036B252A291A003B615B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AD9D036C252A291A003B615B /* WebRTCModule+getUserMedia.m in Sources */,
+				AD9D036D252A291A003B615B /* WebRTCModule.m in Sources */,
+				AD9D036E252A291A003B615B /* WebRTCUtils.m in Sources */,
+				AD9D036F252A291A003B615B /* WebRTCVideoView.m in Sources */,
+				AD9D0370252A291A003B615B /* RCTConvert+WebRTC.m in Sources */,
+				AD9D0371252A291A003B615B /* WebRTCMediaStreamConstraints.m in Sources */,
+				AD9D0372252A291A003B615B /* WebRTCValueManager.m in Sources */,
+				AD9D0373252A291A003B615B /* WebRTCModule+RTCMediaStream.m in Sources */,
+				AD9D0374252A291A003B615B /* WebRTCModule+RTCPeerConnection.m in Sources */,
+				AD9D0375252A291A003B615B /* WebRTCVideoViewManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,7 +285,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -265,7 +329,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = iphoneos;
+				SDKROOT = macosx;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -302,6 +366,38 @@
 			};
 			name = Release;
 		};
+		AD9D0379252A291A003B615B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)/../../../React/**",
+					"$(SRCROOT)/../../react-native/React/**",
+				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		AD9D037A252A291A003B615B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)/../../../React/**",
+					"$(SRCROOT)/../../react-native/React/**",
+				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -319,6 +415,15 @@
 			buildConfigurations = (
 				58B511F01A9E6C8500147676 /* Debug */,
 				58B511F11A9E6C8500147676 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AD9D0378252A291A003B615B /* Build configuration list for PBXNativeTarget "ReactNativeWebRTC-macos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AD9D0379252A291A003B615B /* Debug */,
+				AD9D037A252A291A003B615B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
