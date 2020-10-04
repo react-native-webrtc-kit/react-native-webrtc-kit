@@ -10,7 +10,8 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/react-native-webrtc-kit/react-native-webrtc-kit"
   s.license      = package['license']
   s.author       = { "Shiguredo Inc." => "info@shiguredo.jp" }
-  s.platform     = :ios, "10.0"
+  s.ios.deployment_target = "10.0"
+  s.macos.deployment_target = "10.13"
   s.source       = { :git => "https://github.com/react-native-webrtc-kit/react-native-webrtc-kit.git", :tag => "develop" }
   s.source_files = "ios/*.{h,m}"
   s.requires_arc = true
