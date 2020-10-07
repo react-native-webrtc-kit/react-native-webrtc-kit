@@ -1,5 +1,7 @@
 @import Foundation;
+#if !TARGET_OS_OSX
 @import UIKit;
+#endif
 
 #import <WebRTC/WebRTC.h>
 
