@@ -349,10 +349,10 @@ final class WebRTCConverter {
     //endregion
 
 
-    // region PeerConnection.RtpTransceiverInit
+    // region RtpTransceiver.RtpTransceiverInit
     @NonNull
-    static RtpTransceiver.Init transceiverInit(@Nullable final ReadableMap json) {
-      final RtpTransceiver.Init init = new RtpTransceiver.Init();
+    static RtpTransceiver.RtpTransceiverInit rtpTransceiverInit(@Nullable final ReadableMap json) {
+      final RtpTransceiver.RtpTransceiverInit init = new RtpTransceiver.RtpTransceiverInit();
       if (json != null) {
         // TODO(kdxu): Transceiver.Init の変換処理を実装する
       }

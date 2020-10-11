@@ -758,7 +758,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
      * peerConnectionAddTransceiver(String trackValueTag, String valueTag, RtpTransceiver.Init init): Promise<RtpTransceiver>
      */
     @ReactMethod
-    public void peerConnectionAddTransceiver(@NonNull String trackValueTag, @NonNull String valueTag, @NonNull RTCRtpTransceiver.Init init, @NonNull Promise promise) {
+    public void peerConnectionAddTransceiver(@NonNull String trackValueTag, @NonNull String valueTag, @NonNull ReadableMap initJson, @NonNull Promise promise) {
       Log.d(getName(), "peerConnectionAddTransceiver()");
       final PeerConnection peerConnection = repository.getPeerConnectionByValueTag(valueTag);
       if (peerConnection == null) {
@@ -770,13 +770,13 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         promise.reject("NotFoundError", "track is not found");
         return;
       }
-      final RtpTransceiver transceiver = peerConnection.addTransceiver(track, rtpTransceiverInit(init));
+      final RtpTransceiver transceiver = peerConnection.addTransceiver(track, rtpTransceiverInit(initJson));
       if (transceiver == null) {
         promise.reject("PeerConnectionError", "cannot add the transceiver");
         return;
       }
       // リポジトリの管理下に追加する
-      repository.transceiver.add(transceiver.id(), createNewValueTag(), transceiver);
+      repository.transceivers.add(transceiver.getMid(), createNewValueTag(), transceiver);
       promise.resolve(rtpTransceiverJsonValue(transceiver, repository));
     }
 
