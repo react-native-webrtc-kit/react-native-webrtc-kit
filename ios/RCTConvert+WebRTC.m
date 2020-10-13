@@ -280,7 +280,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable RTCRtpTransceiverInit *)RTCRtpTransceiverInit:(nullable id)json {
     AssertNullable(@"RTCRtpTransceiver.streamIds", NSArray, json[@"streamIds"]);
     AssertNullable(@"RTCRtpTransceiver.direction", NSString, json[@"direction"]);
-    AssertNullable(@"RTCRtpTransceiver.sendEncodings", NSArray, json[@"sendEncodings"]);    RTCRtpTransceiverInit *init = [[RTCRtpTransceiverInit alloc] init];
+    AssertNullable(@"RTCRtpTransceiver.sendEncodings", NSArray, json[@"sendEncodings"]);
+    RTCRtpTransceiverInit *init = [[RTCRtpTransceiverInit alloc] init];
     if (json[@"streamIds"]) {
         NSArray<NSString *> *streamIds = [RCTConvert NSArray: json[@"streamIds"]];
         for (NSString *streamId in streamIds) {
