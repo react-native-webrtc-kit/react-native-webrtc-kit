@@ -348,7 +348,7 @@ final class WebRTCConverter {
 
     //endregion
 
-
+    // region RtpParameters.Encoding
     @NonNull
     static RtpParameters.Encoding sendEncoding(@NonNull final ReadableMap json) {
         String rid = null;
@@ -368,6 +368,7 @@ final class WebRTCConverter {
         final RtpParameters.Encoding encoding = new RtpParameters.Encoding(rid, active, scaleResolutionDownBy);
         return encoding;
     }
+    //endregion
 
     // region RtpTransceiver.RtpTransceiverInit
     @NonNull
@@ -558,10 +559,10 @@ final class WebRTCConverter {
         String sdpMid = "";
         final int sdpMLineIndex = jint(json, "sdpMLineIndex");
         if (json.hasKey("sdp") && !json.isNull("sdp")) {
-            sdp = string(json, "sdp");
+          sdp = string(json, "sdp");
         }
         if (json.hasKey("sdpMid") && !json.isNull("sdpMid")) {
-            sdpMid = string(json, "sdpMid");
+          sdpMid = string(json, "sdpMid");
         }
         return new IceCandidate(sdpMid, sdpMLineIndex, sdp);
     }
