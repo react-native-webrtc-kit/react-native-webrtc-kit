@@ -193,12 +193,6 @@ static const char *streamIdsKey = "streamIds";
 
 - (id)json
 {
-    NSLog(@"json mid=> %@", self.mid);
-    NSLog(@"json sender=> %@", self.sender);
-    NSLog(@"json receiver=> %@", self.receiver);
-    NSLog(@"json stopped=> %d", self.isStopped);
-    NSLog(@"json valueTag=> %@", self.valueTag);
-
     NSMutableDictionary *json =
     [[NSMutableDictionary alloc]
      initWithDictionary:
