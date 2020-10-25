@@ -1,6 +1,8 @@
 @import Foundation;
 
+#if !TARGET_OS_OSX
 #import <WebRTC/WebRTC.h>
+#endif
 
 #if __has_include("RCTConvert.h")
 #import "RCTConvert.h"

@@ -1,5 +1,9 @@
+#if TARGET_OS_OSX
+#import "api/peer_connection_interface.h"
+#else
 #import <Foundation/Foundation.h>
 #import <WebRTC/WebRTC.h>
+#endif
 
 @interface WebRTCUtils : NSObject
 
