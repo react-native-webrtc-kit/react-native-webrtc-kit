@@ -318,6 +318,18 @@ RCT_EXPORT_METHOD(transceiverStop:(nonnull NSString *)valueTag
 @implementation RTCPeerConnection (ReactNativeWebRTCKit)
 
 static void *peerConnectionValueTagKey = "peerConnectionValueTag";
+static void *peerConnectionMicrophoneInitializedKey = "peerConnectionMicrophoneInitialized";
+
+- (BOOL)microphoneInitialized {
+    return [objc_getAssociatedObject(self, peerConnectionMicrophoneInitializedKey) boolValue];
+}
+
+- (void)setMicrophoneInitialized:(BOOL)microphoneInitialized {
+    objc_setAssociatedObject(self,
+                             peerConnectionMicrophoneInitializedKey,
+                             [NSNumber numberWithBool:microphoneInitialized],
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
 
 - (nullable NSString *)valueTag {
     return objc_getAssociatedObject(self, peerConnectionValueTagKey);
@@ -407,6 +419,7 @@ RCT_EXPORT_METHOD(peerConnectionInit:(nonnull RTCConfiguration *)configuration
                                                     constraints: mediaConsts
                                                        delegate: self];
     peerConnection.valueTag = valueTag;
+    peerConnection.microphoneInitialized = NO;
     [self addPeerConnection: peerConnection forKey: valueTag];
 }
 
@@ -561,7 +574,7 @@ RCT_EXPORT_METHOD(peerConnectionSetRemoteDescription:(nonnull RTCSessionDescript
     
     // マイクの初期化処理
     BOOL microphoneEnabled = [[WebRTCModule shared] microphoneEnabled];
-    BOOL microphoneInitialized = [[WebRTCModule shared] microphoneInitialized];
+    BOOL microphoneInitialized = peerConnection.microphoneInitialized;
     if (microphoneEnabled && !microphoneInitialized) {
         RTCAudioSessionConfiguration.webRTCConfiguration.category = AVAudioSessionCategoryPlayAndRecord;
         RTCAudioSession *session = [RTCAudioSession sharedInstance];
@@ -570,7 +583,7 @@ RCT_EXPORT_METHOD(peerConnectionSetRemoteDescription:(nonnull RTCSessionDescript
                 NSLog(@"failed to initialize audio input: %@", error);
                 return;
             }
-            [WebRTCModule shared].microphoneInitialized = YES;
+            peerConnection.microphoneInitialized = YES;
             NSLog(@"audio input is initialized");
         }];
     }
