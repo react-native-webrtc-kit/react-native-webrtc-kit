@@ -199,6 +199,7 @@ static const char *streamIdsKey = "streamIds";
      @{@"sender": [self.sender json],
        @"receiver": [self.receiver json],
        @"stopped": [NSNumber numberWithBool: self.isStopped]}];
+    // mid 及び valueTag は nil になる場合があるので、dict に直接代入する前に nil check を入れている
     if (self.mid) {
         json[@"mid"] = self.mid;
     }
