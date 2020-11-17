@@ -106,7 +106,9 @@ In other languages, we won't be able to deal with them. Thank you for your under
 - [ ] [Simulcast functionality](https://www.w3.org/TR/webrtc/#simulcast-functionality) への対応
 - [ ] [Identifiers for WebRTC's Statistics API](https://www.w3.org/TR/webrtc-stats/) への対応
 - [ ] [React Native for Windows](https://github.com/microsoft/react-native-windows) への対応
+    - ペンディング
 - [ ] [React Naitve for macOS](https://github.com/microsoft/react-native-macos) への対応
+    - ペンディング
 
 ## ライセンス
 
