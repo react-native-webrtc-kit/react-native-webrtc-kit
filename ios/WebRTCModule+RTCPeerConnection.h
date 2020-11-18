@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RTCPeerConnection (ReactNativeWebRTCKit) <WebRTCExportable>
 
 @property (nonatomic, nullable) NSString *valueTag;
+@property (nonatomic) BOOL microphoneInitialized;
 
 /**
  * 通常の close を含む React Native 向けの終了処理を行う
