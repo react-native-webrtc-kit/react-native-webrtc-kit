@@ -9,6 +9,11 @@
 - FIX
     - バグ修正
 
+## 2020.6.1
+
+- [FIX] iOS のマイクが最初の PeerConnection でしか初期化されないバグを修正する
+    - @enm10k
+
 ## 2020.6.0
 
 - [CHANGE] WebRTC M86 に対応する
