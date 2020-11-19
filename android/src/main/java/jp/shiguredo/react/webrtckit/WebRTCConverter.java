@@ -355,7 +355,7 @@ final class WebRTCConverter {
         Boolean active = true;
         Double scaleResolutionDownBy = null;
         Double maxFramerate = null;
-
+        // TODO(kdxu): maxBitrate / maxFramerate の変換処理を実装する
         if (json.hasKey("rid")) {
             rid = json.getString("rid");
         }
