@@ -13,7 +13,7 @@ jobs:
     name: iOS Test on node 11.x and macos-latest
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Use Node.js 11.x
         uses: actions/setup-node@v1
         with:
