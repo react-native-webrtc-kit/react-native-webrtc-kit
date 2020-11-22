@@ -10,14 +10,14 @@ on:
       - 'LICENSE'
 jobs:
   test:
-    name: Android Test on node 11.x and ubuntu-latest
+    name: Android Test on node 14.x and ubuntu-latest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 11.x
+      - name: Use Node.js 14.x
         uses: actions/setup-node@v1
         with:
-          node-version: 11.x
+          node-version: 14.x
       - name: yarn install
         run: |
           yarn install
