@@ -1,4 +1,4 @@
-source 'https://github.com/shiguredo/sora-ios-sdk-specs.git'
+source 'https://github.com/react-native-webrtc-kit/webrtc-ios.git'
 source 'https://github.com/CocoaPods/Specs.git'
 
 platform :ios, '12.0'
