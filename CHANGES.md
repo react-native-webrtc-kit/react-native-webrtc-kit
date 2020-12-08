@@ -9,6 +9,13 @@
 - FIX
     - バグ修正
 
+## develop
+
+- [CHANGE] WebRTC M88 に対応する
+    - @enm10k
+- [CHANGE] バイナリーを取得するリポジトリを変更する
+    - @enm10k
+
 ## 2020.6.1
 
 - [FIX] iOS のマイクが最初の PeerConnection でしか初期化されないバグを修正する
