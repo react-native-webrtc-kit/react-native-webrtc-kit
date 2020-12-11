@@ -13,8 +13,12 @@
 
 - [CHANGE] WebRTC M88 に対応する
     - @enm10k
-- [CHANGE] バイナリーを取得するリポジトリを変更する
-    - @enm10k
+- [CHANGE] WebRTC バイナリーを取得するリポジトリを変更する
+  - リポジトリを変更しましたが、 WebRTC のバイナリはこれまでと同様に hhttps://github.com/shiguredo-webrtc-build/webrtc-build でビルドしたものを利用しています
+  - 変更後のリポジトリは以下の通りです
+    - iOS: https://github.com/react-native-webrtc-kit/webrtc-ios
+    - Android: https://github.com/react-native-webrtc-kit/webrtc-android
+  - @enm10k
 
 ## 2020.6.1
 
