@@ -1,6 +1,6 @@
 # React Native WebRTC Kit
 
-[![libwebrtc](https://img.shields.io/badge/libwebrtc-m86.4240.1-blue.svg)](https://chromium.googlesource.com/external/webrtc/+/branch-heads/4240)
+[![libwebrtc](https://img.shields.io/badge/libwebrtc-m88.4324.2-blue.svg)](https://chromium.googlesource.com/external/webrtc/+/branch-heads/4240)
 [![GitHub tag](https://img.shields.io/github/tag/react-native-webrtc-kit/react-native-webrtc-kit.svg)](https://github.com/react-native-webrtc-kit/react-native-webrtc-kit)
 [![npm version](https://badge.fury.io/js/react-native-webrtc-kit.svg)](https://badge.fury.io/js/react-native-webrtc-kit)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -14,7 +14,7 @@ React Native WebRTC Kit は、 React Native アプリケーションから WebRT
 
 ## 利用 libwebrtc バージョン
 
-本ライブラリは WebRTC M86 を利用しています。
+本ライブラリは WebRTC M88 を利用しています。
 
 ## Web API (ブラウザ) との互換性について
 
@@ -64,15 +64,14 @@ In other languages, we won't be able to deal with them. Thank you for your under
 このバイナリは弊社製品用の設定でビルドしてあるので、他のバイナリを使いたい場合は次の方法で入れ替えてください。
 
 - iOS: ビルドした `WebRTC.framework` を `ios/Pods/WebRTC/WebRTC.framework` と入れ替えます。
-    - https://github.com/shiguredo/shiguredo-webrtc-ios
+    - https://github.com/react-native-webrtc-kit/webrtc-ios
 - Android: ビルドした `libwebrtc.aar` を `android/libs/` 下に配置し、`android/build.gradle` の dependencies を以下のように編集します。
-    - https://github.com/shiguredo/shiguredo-webrtc-android
-    - トラックの削除イベント検知機能 (onRemoveTrack) を利用するには、 "com.github.shiguredo:shiguredo-webrtc-android:79.5.1" 以降の WebRTC ライブラリを利用する必要があるので、留意してください。
+    - https://github.com/react-native-webrtc-kit/webrtc-android
 
 ```
  dependencies {
      implementation 'com.facebook.react:react-native:+'
-     // api "com.github.shiguredo:shiguredo-webrtc-android:83.4103.12.2"
+     // api "com.github.react-native-webrtc-kit:webrtc-android:88.4324.2.0"
      implementation "androidx.annotation:annotation:1.1.0"
      api fileTree(dir: 'libs')
  }
