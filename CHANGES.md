@@ -9,7 +9,7 @@
 - FIX
     - バグ修正
 
-## develop
+## 2020.7.0
 
 - [CHANGE] WebRTC M88 に対応する
     - @enm10k
