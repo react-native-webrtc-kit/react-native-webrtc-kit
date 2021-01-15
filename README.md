@@ -8,6 +8,12 @@
 React Native WebRTC Kit は、 React Native アプリケーションから WebRTC ネイティブライブラリを使うためのライブラリです。  
 本ライブラリを使うと、マルチプラットフォームに対応する WebRTC ネイティブアプリケーションを React Native で開発できます。  
 
+## About Shiguredo's open source software
+
+We will not respond to PRs or issues that have not been discussed on Discord. Also, Discord is only available in Japanese.
+
+Please read https://github.com/shiguredo/oss before use.
+
 ## 時雨堂のオープンソースソフトウェアについて
 
 利用前に https://github.com/shiguredo/oss をお読みください。
