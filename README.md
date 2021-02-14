@@ -12,7 +12,7 @@ React Native WebRTC Kit は、 React Native アプリケーションから WebRT
 
 We will not respond to PRs or issues that have not been discussed on Discord. Also, Discord is only available in Japanese.
 
-Please read https://github.com/shiguredo/oss before use.
+Please read https://github.com/shiguredo/oss/blob/master/README.en.md before use.
 
 ## 時雨堂のオープンソースソフトウェアについて
 
@@ -28,11 +28,6 @@ Please read https://github.com/shiguredo/oss before use.
 ネイティブ API では実装が難しい API や本ライブラリの都合で同一にできない API があります。
 
 相違点については [ドキュメント](https://react-native-webrtc-kit.shiguredo.jp/apidiff.html) を参照してください。
-
-## About Support
-
-We check PRs or Issues only when written in JAPANESE.
-In other languages, we won't be able to deal with them. Thank you for your understanding.
 
 ## サンプルコード
 
@@ -85,7 +80,8 @@ In other languages, we won't be able to deal with them. Thank you for your under
 
 ## Issues について
 
-質問やバグ報告する場合は次の開発環境のバージョンを **「メジャーバージョン、マイナーバージョン、メンテナンスバージョン」** まで含めて書いてください (9.4.1など) 。  
+Discord で Issue を作成して欲しいと言われた際、
+次の開発環境のバージョンを **「メジャーバージョン、マイナーバージョン、メンテナンスバージョン」** まで含めて書いてください (9.4.1など) 。  
 これらの開発環境はメンテナンスバージョンの違いでも Sora iOS SDK の挙動が変わる可能性があります。
 
 - Discord ID
@@ -119,7 +115,7 @@ In other languages, we won't be able to deal with them. Thank you for your under
 
 ```
 Copyright 2018-2019, Masashi Ono aka akisute (Original Author)
-Copyright 2018-2020, Shiguredo Inc.
+Copyright 2018-2021, Shiguredo Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
