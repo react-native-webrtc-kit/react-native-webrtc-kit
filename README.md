@@ -4,7 +4,7 @@
 
 今後は https://github.com/react-native-webrtc/react-native-webrtc をご利用ください。
 
-### メンテナンス終了の経緯
+### 開発とメンテナンスの終了の経緯
 
 もともとは react-native-webrtc のメンテナンスが活発では無く、
 さらには自分たちが求める設計では無かった事が react-native-webrtc-kit を開発していました。
