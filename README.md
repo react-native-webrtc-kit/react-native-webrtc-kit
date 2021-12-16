@@ -1,5 +1,18 @@
 # React Native WebRTC Kit
 
+**このライブラリの開発とメンテナンスは終了しました**
+
+今後は https://github.com/react-native-webrtc/react-native-webrtc をご利用ください。
+
+### メンテナンス終了の経緯
+
+もともとは react-native-webrtc のメンテナンスが活発では無く、
+さらには自分たちが求める設計では無かった事が react-native-webrtc-kit を開発していました。
+
+今は react-native-webrtc は十分メンテナンスされている状態にあります。 React Native WebRTC Kit の役割はおわったと考えたためです。
+
+---
+
 [![libwebrtc](https://img.shields.io/badge/libwebrtc-m88.4324.2-blue.svg)](https://chromium.googlesource.com/external/webrtc/+/branch-heads/4240)
 [![GitHub tag](https://img.shields.io/github/tag/react-native-webrtc-kit/react-native-webrtc-kit.svg)](https://github.com/react-native-webrtc-kit/react-native-webrtc-kit)
 [![npm version](https://badge.fury.io/js/react-native-webrtc-kit.svg)](https://badge.fury.io/js/react-native-webrtc-kit)
@@ -129,3 +142,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
